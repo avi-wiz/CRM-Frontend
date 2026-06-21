@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, MoreHorizontal, CheckCircle } from "lucide-react";
 import StageBadge from "../components/shared/StageBadge";
 import SideSheet from "../components/shared/SideSheet";
+import CustomerGateModal from "../components/shared/CustomerGateModal";
 import PropertiesPanel from "../components/detail/PropertiesPanel";
 import CenterTabs from "../components/detail/CenterTabs";
 import AssociationsPanel from "../components/detail/AssociationsPanel";
@@ -91,6 +92,17 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
   const [sheet, setSheet] = useState(null); // action key or null
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState(null); // { message }
+  const [orderGateOpen, setOrderGateOpen] = useState(false); // Customer gate for "Create Order"
+
+  // "Create Order" entry point — gate inline if this company isn't a Customer.
+  const handleCreateOrder = () => {
+    setMenuOpen(false);
+    if (company.isCustomer) {
+      showToast("Opening order form…");
+    } else {
+      setOrderGateOpen(true);
+    }
+  };
 
   const updateField = (key, value) => setCompany((c) => ({ ...c, [key]: value }));
 
@@ -148,6 +160,9 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
           ) : (
             <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Company</span>
           )}
+          {company.source && (
+            <span className="text-xs text-gray-500">Source: {company.source}</span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {!company.isCustomer && (
@@ -162,7 +177,13 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-36">
+                <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-40">
+                  <button
+                    onClick={handleCreateOrder}
+                    className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Create Order
+                  </button>
                   {["Archive", "Merge", "Export"].map((item) => (
                     <button
                       key={item}
@@ -202,6 +223,23 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
       <SideSheet open={!!activeSheet} onClose={() => setSheet(null)} title={activeSheet?.title || ""}>
         {activeSheet?.content}
       </SideSheet>
+
+      {/* ─── CUSTOMER GATE (Create Order on a non-Customer company) ─── */}
+      <CustomerGateModal
+        open={orderGateOpen && !sheet}
+        onClose={() => setOrderGateOpen(false)}
+        companyName={company.name}
+        context="order_creation"
+        title="Customer Required for Orders"
+        message={
+          <>
+            <strong className="text-gray-900">{company.name}</strong> is a{" "}
+            <strong className="text-gray-900">Company</strong>, not yet a{" "}
+            <strong className="text-gray-900">Customer</strong>. Only Customers can have orders created.
+          </>
+        }
+        onConvert={() => { setOrderGateOpen(false); setSheet("convert"); }}
+      />
 
       {/* ─── SUCCESS TOAST ─── */}
       {toast && (

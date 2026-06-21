@@ -9,6 +9,7 @@ import PlaceholderPage from "./pages/PlaceholderPage";
 import DealsPage from "./pages/DealsPage";
 import QuotesPage from "./pages/QuotesPage";
 import QuoteDetailPage from "./pages/QuoteDetailPage";
+import CreateOrderPage from "./pages/CreateOrderPage";
 import { crmNav } from "./data/constants";
 
 export default function App() {
@@ -111,6 +112,9 @@ export default function App() {
 
       case "quotes":
         return <QuotesPage onQuoteClick={(id) => setActiveQuoteId(id)} />;
+
+      case "orders":
+        return <CreateOrderPage onBack={() => handleEntityChange("companies")} />;
 
       // Meetings, Tasks, Visits, Activities, Dashboard aren't built yet —
       // route them to PlaceholderPage, passing the nav label so it renders

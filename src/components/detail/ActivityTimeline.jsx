@@ -31,11 +31,47 @@ const ACTIONS = [
   { type: "visit", label: "+ Visit" },
 ];
 
-export default function ActivityTimeline({ activities = [], onAction }) {
+// Pull cross-entity activities off associated contacts/deals into one flat list.
+// Each already carries a `sourceEntity` in the sample data; we backfill defensively.
+function collectCrossEntity(items = [], type) {
+  return items.flatMap((item) =>
+    (item.activities || []).map((a) => ({
+      ...a,
+      // Namespaced id so merged keys never collide with company activity ids.
+      _key: `${type}-${item.id}-${a.id}`,
+      sourceEntity: a.sourceEntity || { type, id: item.id, name: item.name },
+    }))
+  );
+}
+
+export default function ActivityTimeline({ activities = [], onAction, contacts = [], deals = [] }) {
   const [filter, setFilter] = useState("all");
-  const filtered = filter === "all" ? activities : activities.filter((a) => a.type === filter);
-  // Pinned notes float to the top; the rest keep their existing order.
-  const visible = [...filtered].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+  // Toggle + "This Company Only" override live in component state, so they reset
+  // when the user navigates away (the detail page unmounts the timeline).
+  const [showHistory, setShowHistory] = useState(false);
+  const [companyOnly, setCompanyOnly] = useState(false);
+
+  const hasAssociated =
+    collectCrossEntity(contacts, "contact").length + collectCrossEntity(deals, "deal").length > 0;
+
+  // Direct company activities always carry no sourceEntity (they ARE the company's).
+  const direct = activities.map((a) => ({ ...a, _key: a._key ?? `company-${a.id}` }));
+
+  // Build the working set: company-only when history is off OR the "This Company
+  // Only" pill is active; otherwise merge in contact + deal activities.
+  const merged =
+    showHistory && !companyOnly
+      ? [...direct, ...collectCrossEntity(contacts, "contact"), ...collectCrossEntity(deals, "deal")]
+      : direct;
+
+  const filtered = filter === "all" ? merged : merged.filter((a) => a.type === filter);
+
+  // Sort newest-first by timestamp; pinned notes still float above everything.
+  const visible = [...filtered].sort((a, b) => {
+    const pin = (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+    if (pin !== 0) return pin;
+    return String(b.time).localeCompare(String(a.time));
+  });
 
   return (
     <div>
@@ -52,8 +88,8 @@ export default function ActivityTimeline({ activities = [], onAction }) {
         ))}
       </div>
 
-      {/* Filter pills */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
+      {/* Filter pills + Show History toggle */}
+      <div className="flex flex-wrap items-center gap-1.5 mb-4">
         {FILTERS.map((f) => (
           <button
             key={f.key}
@@ -65,6 +101,36 @@ export default function ActivityTimeline({ activities = [], onAction }) {
             {f.label}
           </button>
         ))}
+
+        {/* "This Company Only" pill — only meaningful while history is on. */}
+        {showHistory && hasAssociated && (
+          <button
+            onClick={() => setCompanyOnly((v) => !v)}
+            className={`px-2.5 py-1 text-xs rounded-full ${
+              companyOnly ? "bg-indigo-50 text-indigo-700 font-medium" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            }`}
+          >
+            This Company Only
+          </button>
+        )}
+
+        {/* Show History toggle, pushed to the right */}
+        {hasAssociated && (
+          <label className="ml-auto flex items-center gap-2 cursor-pointer">
+            <span className="text-xs text-gray-500">Show History from Contacts &amp; Deals</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={showHistory}
+              onClick={() => setShowHistory((v) => !v)}
+              className={`relative w-9 h-5 rounded-full transition-colors ${showHistory ? "bg-indigo-600" : "bg-gray-300"}`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${showHistory ? "translate-x-4" : ""}`}
+              />
+            </button>
+          </label>
+        )}
       </div>
 
       {/* Timeline */}
@@ -73,7 +139,7 @@ export default function ActivityTimeline({ activities = [], onAction }) {
           <div className="text-center py-10 text-gray-400 text-sm">No activities</div>
         )}
         {visible.map((a) => (
-          <TimelineRow key={a.id} activity={a} />
+          <TimelineRow key={a._key || a.id} activity={a} />
         ))}
       </div>
     </div>
@@ -83,13 +149,23 @@ export default function ActivityTimeline({ activities = [], onAction }) {
 function TimelineRow({ activity: a }) {
   const meta = TYPE_META[a.type] || TYPE_META.system;
   const Icon = meta.icon;
+  const isCrossEntity = !!a.sourceEntity;
   return (
-    <div className={`flex gap-3 p-3 rounded-lg border border-gray-200 border-l-4 ${meta.border} ${a.type === "system" ? "bg-gray-50" : "bg-white"}`}>
+    <div
+      className={`flex gap-3 p-3 rounded-lg border border-gray-200 border-l-4 ${meta.border} ${
+        a.type === "system" ? "bg-gray-50" : "bg-white"
+      } ${isCrossEntity ? "ml-4" : ""}`}
+      style={isCrossEntity ? { borderLeftStyle: "dashed" } : undefined}
+    >
       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${meta.iconBg}`}>
         <Icon size={13} className={meta.iconColor} />
       </div>
       <div className="flex-1 min-w-0">
         <ActivityBody activity={a} />
+        {/* Source tag for cross-entity (contact/deal) activities */}
+        {isCrossEntity && (
+          <div className="text-xs text-gray-400 italic mt-0.5">via {a.sourceEntity.name}</div>
+        )}
         <div className="text-xs text-gray-400 mt-1">{formatRelativeTime(a.time)}</div>
       </div>
     </div>

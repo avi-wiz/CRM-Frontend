@@ -30,7 +30,12 @@ export default function CenterTabs({ company, onActivityAction, onDealClick }) {
         {active === "Sales" && <SalesTab orders={company.orders} />}
         {active === "Deals" && <DealsTab deals={company.deals} onDealClick={onDealClick} />}
         {active === "Activities" && (
-          <ActivityTimeline activities={company.activities} onAction={onActivityAction} />
+          <ActivityTimeline
+            activities={company.activities}
+            contacts={company.contacts}
+            deals={company.deals}
+            onAction={onActivityAction}
+          />
         )}
         {active === "WizShop Activity" && <WizShopTab company={company} />}
       </div>

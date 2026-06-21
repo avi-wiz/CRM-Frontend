@@ -1,4 +1,4 @@
-import { Building2, Users, Star, DollarSign, Calendar, CheckSquare, Car, Activity, BarChart3, FileText } from "lucide-react";
+import { Building2, Users, Star, DollarSign, Calendar, CheckSquare, Car, Activity, BarChart3, FileText, Globe, Upload, UserPlus, ShoppingCart } from "lucide-react";
 
 // ─── STAGE COLORS (single source of truth) ───
 export const stageColors = {
@@ -39,6 +39,7 @@ export const crmNav = [
   { key: "customers", label: "Customers", icon: Star }, // filtered Companies view (is_customer=true)
   { key: "deals", label: "Deals", icon: DollarSign },
   { key: "quotes", label: "Quotes", icon: FileText },
+  { key: "orders", label: "Orders", icon: ShoppingCart },
   { key: "meetings", label: "Meetings", icon: Calendar },
   { key: "tasks", label: "Tasks", icon: CheckSquare },
   { key: "visits", label: "Visits", icon: Car },
@@ -50,24 +51,27 @@ export const crmNav = [
 // Reps cycle through this roster; ~4 records are customers (isCustomer).
 // Dates are ISO strings relative to mid-2026 (createdAt: last 90d, lastActivity: last 30d).
 export const companies = [
-  { id: 1, name: "Pinnacle Distributors", domain: "pinnacle.co", stage: "Contacted", isCustomer: false, rep: "John Carmichael", contactCount: 3, dealCount: 2, createdAt: "2026-05-30", lastActivity: "2026-06-19", industry: "Wholesale Distribution", employeeCount: 45, annualRevenue: "$2.4M", address: { street: "123 Commerce St", city: "New York", state: "NY", country: "USA" } },
-  { id: 2, name: "ABC Corp", domain: "abccorp.com", stage: "Won", isCustomer: true, rep: "Tyler Jones", contactCount: 5, dealCount: 4, createdAt: "2026-04-02", lastActivity: "2026-06-20", industry: "Consumer Goods", employeeCount: 320, annualRevenue: "$58M", address: { street: "88 Market Ave", city: "Chicago", state: "IL", country: "USA" } },
-  { id: 3, name: "Horizon Retail", domain: "horizonretail.co", stage: "New Lead", isCustomer: false, rep: "Jon Morales", contactCount: 1, dealCount: 0, createdAt: "2026-06-15", lastActivity: "2026-06-21", industry: "Retail", employeeCount: 120, annualRevenue: "$14M", address: { street: "12 High St", city: "Austin", state: "TX", country: "USA" } },
-  { id: 4, name: "Metro Wholesale", domain: "metrowholesale.com", stage: "Qualified", isCustomer: false, rep: "Saul Cabrera", contactCount: 2, dealCount: 1, createdAt: "2026-05-08", lastActivity: "2026-06-18", industry: "Wholesale Distribution", employeeCount: 78, annualRevenue: "$9.1M", address: { street: "455 Industrial Pkwy", city: "Denver", state: "CO", country: "USA" } },
-  { id: 5, name: "Delta Trading", domain: "deltatrading.io", stage: "Negotiation", isCustomer: false, rep: "Ryan Walsh", contactCount: 4, dealCount: 3, createdAt: "2026-04-21", lastActivity: "2026-06-16", industry: "Import / Export", employeeCount: 56, annualRevenue: "$11.7M", address: { street: "7 Dockside Rd", city: "Seattle", state: "WA", country: "USA" } },
-  { id: 6, name: "Summit Foods", domain: "summitfoods.com", stage: "Won", isCustomer: true, rep: "John Carmichael", contactCount: 6, dealCount: 5, createdAt: "2026-03-28", lastActivity: "2026-06-20", industry: "Food & Beverage", employeeCount: 210, annualRevenue: "$42M", address: { street: "900 Orchard Ln", city: "Portland", state: "OR", country: "USA" } },
-  { id: 7, name: "Greenfield Organics", domain: "greenfield.farm", stage: "Proposal Sent", isCustomer: false, rep: "Tyler Jones", contactCount: 2, dealCount: 2, createdAt: "2026-05-12", lastActivity: "2026-06-12", industry: "Agriculture", employeeCount: 34, annualRevenue: "$5.3M", address: { street: "21 Greenway", city: "Sacramento", state: "CA", country: "USA" } },
-  { id: 8, name: "Apex Industrial", domain: "apexind.com", stage: "Contacted", isCustomer: false, rep: "Jon Morales", contactCount: 3, dealCount: 1, createdAt: "2026-05-25", lastActivity: "2026-06-10", industry: "Manufacturing", employeeCount: 540, annualRevenue: "$96M", address: { street: "1400 Forge Blvd", city: "Pittsburgh", state: "PA", country: "USA" } },
-  { id: 9, name: "Coastal Imports", domain: "coastalimports.com", stage: "Qualified", isCustomer: false, rep: "Saul Cabrera", contactCount: 2, dealCount: 0, createdAt: "2026-04-30", lastActivity: "2026-06-05", industry: "Import / Export", employeeCount: 28, annualRevenue: "$3.8M", address: { street: "63 Harbor Dr", city: "Miami", state: "FL", country: "USA" } },
-  { id: 10, name: "Nimbus Tech Supply", domain: "nimbussupply.io", stage: "New Lead", isCustomer: false, rep: "Ryan Walsh", contactCount: 1, dealCount: 0, createdAt: "2026-06-08", lastActivity: "2026-06-17", industry: "Technology", employeeCount: 90, annualRevenue: "$22M", address: { street: "300 Cloud Way", city: "San Jose", state: "CA", country: "USA" } },
-  { id: 11, name: "Ironclad Hardware", domain: "ironcladhw.com", stage: "Lost", isCustomer: false, rep: "John Carmichael", contactCount: 2, dealCount: 1, createdAt: "2026-04-10", lastActivity: "2026-05-29", industry: "Hardware", employeeCount: 65, annualRevenue: "$8.0M", address: { street: "55 Anvil St", city: "Cleveland", state: "OH", country: "USA" } },
-  { id: 12, name: "Verdant Living", domain: "verdantliving.co", stage: "Proposal Sent", isCustomer: false, rep: "Tyler Jones", contactCount: 5, dealCount: 2, createdAt: "2026-05-19", lastActivity: "2026-06-14", industry: "Home Goods", employeeCount: 140, annualRevenue: "$19M", address: { street: "8 Garden Ct", city: "Atlanta", state: "GA", country: "USA" } },
-  { id: 13, name: "Bluewave Logistics", domain: "bluewave.com", stage: "Negotiation", isCustomer: false, rep: "Jon Morales", contactCount: 3, dealCount: 3, createdAt: "2026-04-25", lastActivity: "2026-06-19", industry: "Logistics", employeeCount: 410, annualRevenue: "$73M", address: { street: "120 Transit Loop", city: "Memphis", state: "TN", country: "USA" } },
-  { id: 14, name: "Stonebridge Supply", domain: "stonebridge.co", stage: "Won", isCustomer: true, rep: "Saul Cabrera", contactCount: 7, dealCount: 4, createdAt: "2026-03-30", lastActivity: "2026-06-15", industry: "Construction", employeeCount: 260, annualRevenue: "$51M", address: { street: "44 Quarry Rd", city: "Phoenix", state: "AZ", country: "USA" } },
-  { id: 15, name: "Lumen Electronics", domain: "lumenelec.com", stage: "Contacted", isCustomer: false, rep: "Ryan Walsh", contactCount: 4, dealCount: 1, createdAt: "2026-05-05", lastActivity: "2026-06-09", industry: "Electronics", employeeCount: 175, annualRevenue: "$31M", address: { street: "210 Circuit Ave", city: "San Diego", state: "CA", country: "USA" } },
-  { id: 16, name: "Harvest Mills", domain: "harvestmills.com", stage: "Qualified", isCustomer: false, rep: "John Carmichael", contactCount: 2, dealCount: 1, createdAt: "2026-04-18", lastActivity: "2026-06-02", industry: "Food & Beverage", employeeCount: 88, annualRevenue: "$12.5M", address: { street: "5 Mill Pond Rd", city: "Minneapolis", state: "MN", country: "USA" } },
-  { id: 17, name: "Crestline Brands", domain: "crestline.co", stage: "New Lead", isCustomer: false, rep: "Tyler Jones", contactCount: 1, dealCount: 0, createdAt: "2026-06-11", lastActivity: "2026-06-20", industry: "Consumer Goods", employeeCount: 52, annualRevenue: "$7.4M", address: { street: "77 Summit Way", city: "Salt Lake City", state: "UT", country: "USA" } },
-  { id: 18, name: "Tradewind Partners", domain: "tradewind.com", stage: "Won", isCustomer: true, rep: "Jon Morales", contactCount: 8, dealCount: 5, createdAt: "2026-03-24", lastActivity: "2026-06-18", industry: "Distribution", employeeCount: 300, annualRevenue: "$64M", address: { street: "18 Galleria Blvd", city: "Dallas", state: "TX", country: "USA" } },
+  { id: 1, name: "Pinnacle Distributors", domain: "pinnacle.co", stage: "Contacted", isCustomer: false, rep: "John Carmichael", source: "Manual", contactCount: 3, dealCount: 2, createdAt: "2026-05-30", lastActivity: "2026-06-19", industry: "Wholesale Distribution", employeeCount: 45, annualRevenue: "$2.4M", address: { street: "123 Commerce St", city: "New York", state: "NY", country: "USA" } },
+  { id: 2, name: "ABC Corp", domain: "abccorp.com", stage: "Won", isCustomer: true, rep: "Tyler Jones", source: "Manual", contactCount: 5, dealCount: 4, createdAt: "2026-04-02", lastActivity: "2026-06-20", industry: "Consumer Goods", employeeCount: 320, annualRevenue: "$58M", address: { street: "88 Market Ave", city: "Chicago", state: "IL", country: "USA" } },
+  // WizShop signup-form lead: minimal fields, no rep assigned yet, first pipeline stage.
+  { id: 3, name: "Horizon Retail", domain: "horizonretail.co", stage: "New Lead", isCustomer: false, rep: null, source: "WizShop — New Customer Form", contactCount: 1, dealCount: 0, createdAt: "2026-06-15", lastActivity: "2026-06-21", industry: "Retail", employeeCount: 120, annualRevenue: "$14M", address: { street: "12 High St", city: "Austin", state: "TX", country: "USA" } },
+  { id: 4, name: "Metro Wholesale", domain: "metrowholesale.com", stage: "Qualified", isCustomer: false, rep: "Saul Cabrera", source: "Manual", contactCount: 2, dealCount: 1, createdAt: "2026-05-08", lastActivity: "2026-06-18", industry: "Wholesale Distribution", employeeCount: 78, annualRevenue: "$9.1M", address: { street: "455 Industrial Pkwy", city: "Denver", state: "CO", country: "USA" } },
+  { id: 5, name: "Delta Trading", domain: "deltatrading.io", stage: "Negotiation", isCustomer: false, rep: "Ryan Walsh", source: "Manual", contactCount: 4, dealCount: 3, createdAt: "2026-04-21", lastActivity: "2026-06-16", industry: "Import / Export", employeeCount: 56, annualRevenue: "$11.7M", address: { street: "7 Dockside Rd", city: "Seattle", state: "WA", country: "USA" } },
+  { id: 6, name: "Summit Foods", domain: "summitfoods.com", stage: "Won", isCustomer: true, rep: "John Carmichael", source: "Manual", contactCount: 6, dealCount: 5, createdAt: "2026-03-28", lastActivity: "2026-06-20", industry: "Food & Beverage", employeeCount: 210, annualRevenue: "$42M", address: { street: "900 Orchard Ln", city: "Portland", state: "OR", country: "USA" } },
+  { id: 7, name: "Greenfield Organics", domain: "greenfield.farm", stage: "Proposal Sent", isCustomer: false, rep: "Tyler Jones", source: "Referral", contactCount: 2, dealCount: 2, createdAt: "2026-05-12", lastActivity: "2026-06-12", industry: "Agriculture", employeeCount: 34, annualRevenue: "$5.3M", address: { street: "21 Greenway", city: "Sacramento", state: "CA", country: "USA" } },
+  { id: 8, name: "Apex Industrial", domain: "apexind.com", stage: "Contacted", isCustomer: false, rep: "Jon Morales", source: "Manual", contactCount: 3, dealCount: 1, createdAt: "2026-05-25", lastActivity: "2026-06-10", industry: "Manufacturing", employeeCount: 540, annualRevenue: "$96M", address: { street: "1400 Forge Blvd", city: "Pittsburgh", state: "PA", country: "USA" } },
+  { id: 9, name: "Coastal Imports", domain: "coastalimports.com", stage: "Qualified", isCustomer: false, rep: "Saul Cabrera", source: "Import — CSV", contactCount: 2, dealCount: 0, createdAt: "2026-04-30", lastActivity: "2026-06-05", industry: "Import / Export", employeeCount: 28, annualRevenue: "$3.8M", address: { street: "63 Harbor Dr", city: "Miami", state: "FL", country: "USA" } },
+  // WizShop signup-form lead: minimal fields, no rep assigned yet, first pipeline stage.
+  { id: 10, name: "Nimbus Tech Supply", domain: "nimbussupply.io", stage: "New Lead", isCustomer: false, rep: null, source: "WizShop — New Customer Form", contactCount: 1, dealCount: 0, createdAt: "2026-06-08", lastActivity: "2026-06-17", industry: "Technology", employeeCount: 90, annualRevenue: "$22M", address: { street: "300 Cloud Way", city: "San Jose", state: "CA", country: "USA" } },
+  { id: 11, name: "Ironclad Hardware", domain: "ironcladhw.com", stage: "Lost", isCustomer: false, rep: "John Carmichael", source: "Manual", contactCount: 2, dealCount: 1, createdAt: "2026-04-10", lastActivity: "2026-05-29", industry: "Hardware", employeeCount: 65, annualRevenue: "$8.0M", address: { street: "55 Anvil St", city: "Cleveland", state: "OH", country: "USA" } },
+  { id: 12, name: "Verdant Living", domain: "verdantliving.co", stage: "Proposal Sent", isCustomer: false, rep: "Tyler Jones", source: "Manual", contactCount: 5, dealCount: 2, createdAt: "2026-05-19", lastActivity: "2026-06-14", industry: "Home Goods", employeeCount: 140, annualRevenue: "$19M", address: { street: "8 Garden Ct", city: "Atlanta", state: "GA", country: "USA" } },
+  { id: 13, name: "Bluewave Logistics", domain: "bluewave.com", stage: "Negotiation", isCustomer: false, rep: "Jon Morales", source: "Manual", contactCount: 3, dealCount: 3, createdAt: "2026-04-25", lastActivity: "2026-06-19", industry: "Logistics", employeeCount: 410, annualRevenue: "$73M", address: { street: "120 Transit Loop", city: "Memphis", state: "TN", country: "USA" } },
+  { id: 14, name: "Stonebridge Supply", domain: "stonebridge.co", stage: "Won", isCustomer: true, rep: "Saul Cabrera", source: "Manual", contactCount: 7, dealCount: 4, createdAt: "2026-03-30", lastActivity: "2026-06-15", industry: "Construction", employeeCount: 260, annualRevenue: "$51M", address: { street: "44 Quarry Rd", city: "Phoenix", state: "AZ", country: "USA" } },
+  { id: 15, name: "Lumen Electronics", domain: "lumenelec.com", stage: "Contacted", isCustomer: false, rep: "Ryan Walsh", source: "Manual", contactCount: 4, dealCount: 1, createdAt: "2026-05-05", lastActivity: "2026-06-09", industry: "Electronics", employeeCount: 175, annualRevenue: "$31M", address: { street: "210 Circuit Ave", city: "San Diego", state: "CA", country: "USA" } },
+  { id: 16, name: "Harvest Mills", domain: "harvestmills.com", stage: "Qualified", isCustomer: false, rep: "John Carmichael", source: "Import — CSV", contactCount: 2, dealCount: 1, createdAt: "2026-04-18", lastActivity: "2026-06-02", industry: "Food & Beverage", employeeCount: 88, annualRevenue: "$12.5M", address: { street: "5 Mill Pond Rd", city: "Minneapolis", state: "MN", country: "USA" } },
+  // WizShop signup-form lead: minimal fields, no rep assigned yet, first pipeline stage.
+  { id: 17, name: "Crestline Brands", domain: "crestline.co", stage: "New Lead", isCustomer: false, rep: null, source: "WizShop — New Customer Form", contactCount: 1, dealCount: 0, createdAt: "2026-06-11", lastActivity: "2026-06-20", industry: "Consumer Goods", employeeCount: 52, annualRevenue: "$7.4M", address: { street: "77 Summit Way", city: "Salt Lake City", state: "UT", country: "USA" } },
+  { id: 18, name: "Tradewind Partners", domain: "tradewind.com", stage: "Won", isCustomer: true, rep: "Jon Morales", source: "Manual", contactCount: 8, dealCount: 5, createdAt: "2026-03-24", lastActivity: "2026-06-18", industry: "Distribution", employeeCount: 300, annualRevenue: "$64M", address: { street: "18 Galleria Blvd", city: "Dallas", state: "TX", country: "USA" } },
 ];
 
 // ─── SAMPLE DATA: CONTACTS ───
@@ -124,6 +128,24 @@ export const reps = [
   { id: 3, name: "Priya S." },
   { id: 4, name: "Amit J." },
 ];
+
+// Contact pipeline stages (used by the conversion "default contact stage" setting).
+export const contactStages = ["New", "Open", "In Progress", "Qualified", "Unqualified"];
+
+// ─── ORG-LEVEL SETTINGS ───
+// Mirrors the "Customer Conversion Settings" panel in org-settings-admin.
+// `contactMovement` drives how the individual + bulk conversion flows behave.
+// Mutable in the prototype so the [DEV] toggle on CompaniesPage can swap modes
+// without a settings round-trip.
+export const orgSettings = {
+  customerConversion: {
+    contactMovement: "prompt", // "auto_move_all" | "prompt" | "do_not_move"
+    defaultContactStage: null, // null = keep current, or a stage name
+    autoCreateWizShopUsers: false,
+    defaultWizShopRole: "Buyer",
+    sendInviteOnConversion: true,
+  },
+};
 
 // Account-owner roster used across the companies pipeline (matches companies[].rep).
 export const repNames = ["John Carmichael", "Tyler Jones", "Jon Morales", "Saul Cabrera", "Ryan Walsh"];
@@ -232,14 +254,38 @@ export const companyDetail = {
     { id: 102, name: "ABC Logistics" },
   ],
   contacts: [
-    { id: 1, name: "Sneha Iyer", email: "sneha@abccorp.com", role: "Decision Maker", wizshop: true, wizshopStatus: "Active" },
-    { id: 2, name: "Marcus Bell", email: "marcus@abccorp.com", role: "Billing", wizshop: true, wizshopStatus: "Active" },
+    {
+      id: 1, name: "Sneha Iyer", email: "sneha@abccorp.com", role: "Decision Maker", wizshop: true, wizshopStatus: "Active",
+      // Cross-entity activities surfaced in the company timeline when "Show History" is on.
+      activities: [
+        { id: 1, type: "meeting", title: "Procurement sync", attendees: "Sneha Iyer, Tyler Jones", outcome: "Completed", time: "2026-06-19 10:15", sourceEntity: { type: "contact", id: 1, name: "Sneha Iyer" } },
+        { id: 2, type: "email", subject: "Q4 private-label terms", direction: "received", snippet: "Let's lock the volume tiers before the next cycle.", time: "2026-06-17 09:05", sourceEntity: { type: "contact", id: 1, name: "Sneha Iyer" } },
+      ],
+    },
+    {
+      id: 2, name: "Marcus Bell", email: "marcus@abccorp.com", role: "Billing", wizshop: true, wizshopStatus: "Active",
+      activities: [
+        { id: 1, type: "email", subject: "Updated billing contact", direction: "sent", snippet: "Please route all invoices to AP going forward.", time: "2026-06-14 13:40", sourceEntity: { type: "contact", id: 2, name: "Marcus Bell" } },
+        { id: 2, type: "meeting", title: "Payment terms review", attendees: "Marcus Bell, John Carmichael", outcome: "Completed", time: "2026-06-11 15:00", sourceEntity: { type: "contact", id: 2, name: "Marcus Bell" } },
+      ],
+    },
     { id: 3, name: "Dana Cole", email: "dana@abccorp.com", role: "User", wizshop: false, wizshopStatus: "Inactive" },
     { id: 4, name: "Priya Raman", email: "priya@abccorp.com", role: "User", wizshop: true, wizshopStatus: "Inactive" },
   ],
   deals: [
-    { id: 1, name: "Bulk Reorder Q3", amount: "$120,000", stage: "Negotiation", owner: "Tyler Jones", closeDate: "2026-06-30" },
-    { id: 2, name: "Holiday Catalog 2026", amount: "$78,500", stage: "Proposal Sent", owner: "John Carmichael", closeDate: "2026-08-15" },
+    {
+      id: 1, name: "Bulk Reorder Q3", amount: "$120,000", stage: "Negotiation", owner: "Tyler Jones", closeDate: "2026-06-30",
+      activities: [
+        { id: 1, type: "system", text: "Stage changed from Qualified to Negotiation", time: "2026-06-18 16:10", sourceEntity: { type: "deal", id: 1, name: "Bulk Reorder Q3" } },
+        { id: 2, type: "note", author: "Tyler Jones", body: "Buyer pushing for 90-day terms on this reorder — escalating to finance.", time: "2026-06-16 11:25", sourceEntity: { type: "deal", id: 1, name: "Bulk Reorder Q3" } },
+      ],
+    },
+    {
+      id: 2, name: "Holiday Catalog 2026", amount: "$78,500", stage: "Proposal Sent", owner: "John Carmichael", closeDate: "2026-08-15",
+      activities: [
+        { id: 1, type: "system", text: "Stage changed from Qualified to Proposal Sent", time: "2026-06-13 09:50", sourceEntity: { type: "deal", id: 2, name: "Holiday Catalog 2026" } },
+      ],
+    },
     { id: 3, name: "Private Label Expansion", amount: "$210,000", stage: "Qualified", owner: "Tyler Jones", closeDate: "2026-09-30" },
   ],
   orders: [
@@ -448,6 +494,47 @@ export function getDealDetail(id) {
   };
 }
 
+// ─── SOURCE BADGE ───
+// Renders the acquisition source as an icon badge (WizShop / Import / Referral)
+// or plain muted text for "Manual". `title` shows the full source on hover.
+export function SourceBadge({ source }) {
+  if (!source || source === "Manual") {
+    return <span className="text-xs text-gray-400">Manual</span>;
+  }
+  if (source.startsWith("WizShop")) {
+    return (
+      <span
+        title={source}
+        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200"
+      >
+        <Globe size={11} /> WizShop
+      </span>
+    );
+  }
+  if (source.startsWith("Import")) {
+    return (
+      <span
+        title={source}
+        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700"
+      >
+        <Upload size={11} /> Import
+      </span>
+    );
+  }
+  if (source === "Referral") {
+    return (
+      <span
+        title={source}
+        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-700"
+      >
+        <UserPlus size={11} /> Referral
+      </span>
+    );
+  }
+  // Unknown source → show the raw label.
+  return <span className="text-xs text-gray-500">{source}</span>;
+}
+
 // ─── COLUMN CONFIGS ───
 export const companyColumns = [
   {
@@ -470,6 +557,7 @@ export const companyColumns = [
       ),
   },
   { key: "rep", label: "Rep" },
+  { key: "source", label: "Source", render: (v) => <SourceBadge source={v} /> },
   { key: "contactCount", label: "Contacts" },
   { key: "dealCount", label: "Deals" },
   { key: "createdAt", label: "Created", render: (v) => formatDate(v) },

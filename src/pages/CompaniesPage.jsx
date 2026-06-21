@@ -12,6 +12,7 @@ import { CreateTask } from "../components/side-sheets/log/index.jsx";
 import {
   companies, companyColumns, kanbanStages, formatRelativeTime,
   stageMandatoryFields, companyFieldMeta, contacts as allContacts, repNames,
+  orgSettings,
 } from "../data/constants";
 
 function isMissing(value) {
@@ -24,6 +25,22 @@ function getMissingFields(record, stage) {
 }
 
 const COMPANY_STAGES = ["New Lead", "Contacted", "Qualified", "Proposal Sent", "Negotiation", "Won", "Lost"];
+
+// Above this many companies, "prompt" mode falls back to auto-move (avoid N prompts).
+const BULK_PROMPT_LIMIT = 5;
+
+// Build the post-conversion summary toast from a { contactsMoved, wizShopCreated } summary.
+function conversionSummary(conv, companyLabel) {
+  const moved = conv?.contactsMoved ?? 0;
+  const wiz = conv?.wizShopCreated ?? 0;
+  if (conv?.contactMovement === "do_not_move") {
+    return `${companyLabel} converted to Customer. Contacts remain unchanged.`;
+  }
+  let msg = `${companyLabel} converted to Customer. ${moved} contact${moved === 1 ? "" : "s"} moved`;
+  msg += conv?.contactMovement === "auto_move_all" ? " automatically" : "";
+  if (wiz > 0) msg += `. ${wiz} WizShop user${wiz === 1 ? "" : "s"} created`;
+  return msg + ".";
+}
 
 export default function CompaniesPage({ customerFilter = false, onRowClick }) {
   const [viewMode, setViewMode] = useState("table");
@@ -43,6 +60,10 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
   const [bulkTask, setBulkTask] = useState(false);
   const [bulkGrant, setBulkGrant] = useState(false);
   const [confirmState, setConfirmState] = useState(null); // { type, count, extra? }
+  // Bulk conversion progress: { current, total } while iterating, else null.
+  const [bulkConvertProgress, setBulkConvertProgress] = useState(null);
+  // Re-render trigger so the [DEV] toggle reflects the mutated orgSettings.
+  const [movementMode, setMovementMode] = useState(orgSettings.customerConversion.contactMovement);
   const [stagePickerOpen, setStagePickerOpen] = useState(false);
   const [ownerPickerOpen, setOwnerPickerOpen] = useState(false);
   const [exportPickerOpen, setExportPickerOpen] = useState(false);
@@ -106,8 +127,65 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
     const { company, stage } = gateConvert;
     setGateConvert(null);
     setCompanyData((prev) => prev.map((c) => (c.id === company.id ? { ...c, ...values, isCustomer: true } : c)));
-    showToast(`${company.name} converted to Customer`);
-    setTimeout(() => moveCompany(company.id, stage), 1200);
+    showToast(conversionSummary(values.conversion, company.name));
+    setTimeout(() => moveCompany(company.id, stage), 1400);
+  };
+
+  // Bulk convert: iterate selected companies, applying contact movement per org setting.
+  // The BulkToolbar passes a count (not ids), so we approximate the selection as the
+  // first `count` non-customer companies from the current filtered view.
+  const runBulkConvert = (count) => {
+    const cc = orgSettings.customerConversion;
+    const targets = data.filter((c) => !c.isCustomer).slice(0, count);
+    const total = targets.length;
+    if (total === 0) {
+      showToast("No companies to convert.");
+      return;
+    }
+
+    // >5 prompt → fall back to auto-move (no per-company prompts in bulk).
+    const effectiveMovement =
+      cc.contactMovement === "prompt" && total > BULK_PROMPT_LIMIT ? "auto_move_all" : cc.contactMovement;
+
+    let contactsMoved = 0;
+    let wizShopCreated = 0;
+
+    setBulkConvertProgress({ current: 0, total });
+
+    targets.forEach((company, i) => {
+      // Stagger so the "Converting… [n/total]" indicator is visible in the prototype.
+      setTimeout(() => {
+        const companyContacts = allContacts.filter((c) => c.companyId === company.id);
+        if (effectiveMovement === "auto_move_all") {
+          contactsMoved += companyContacts.length;
+          if (cc.autoCreateWizShopUsers) {
+            wizShopCreated += companyContacts.filter((c) => !c.isWizShopUser).length;
+          }
+        }
+        // "do_not_move" → contactsMoved stays 0; "prompt" (≤5) → also auto in bulk simplification.
+
+        setCompanyData((prev) => prev.map((c) => (c.id === company.id ? { ...c, isCustomer: true } : c)));
+        setBulkConvertProgress({ current: i + 1, total });
+
+        if (i === total - 1) {
+          setTimeout(() => {
+            setBulkConvertProgress(null);
+            const movedClause =
+              effectiveMovement === "do_not_move"
+                ? "Contacts unchanged"
+                : `${contactsMoved} contact${contactsMoved === 1 ? "" : "s"} moved`;
+            const wizClause = wizShopCreated > 0 ? ` ${wizShopCreated} WizShop user${wizShopCreated === 1 ? "" : "s"} created.` : "";
+            showToast(`Converted ${total} ${total === 1 ? "company" : "companies"}. ${movedClause}.${wizClause}`);
+          }, 350);
+        }
+      }, i * 260);
+    });
+  };
+
+  // [DEV] swap the org-level contact movement mode (demo helper).
+  const setContactMovement = (mode) => {
+    orgSettings.customerConversion.contactMovement = mode;
+    setMovementMode(mode);
   };
 
   // Bulk action handlers — receive (count, scope) from BulkToolbar
@@ -233,6 +311,28 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
 
   return (
     <>
+      {/* [DEV] Contact-movement mode toggle — demo helper, not production UI. */}
+      <div className="flex items-center gap-2 px-6 py-1.5 bg-gray-50 border-b border-gray-100 text-xs text-gray-400">
+        <span className="font-medium">[DEV] Contact movement mode:</span>
+        {[
+          { key: "auto_move_all", label: "Auto-move all" },
+          { key: "prompt", label: "Prompt" },
+          { key: "do_not_move", label: "Do not move" },
+        ].map((m) => (
+          <button
+            key={m.key}
+            onClick={() => setContactMovement(m.key)}
+            className={`px-2 py-0.5 rounded-full border transition-colors ${
+              movementMode === m.key
+                ? "border-gray-400 bg-gray-200 text-gray-700"
+                : "border-gray-200 text-gray-400 hover:bg-gray-100"
+            }`}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+
       {viewMode === "kanban" ? (
         <div className="flex-1 flex flex-col">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
@@ -292,12 +392,12 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
             : confirmState?.type === "owner"
             ? `Assign ${confirmState.extra} as owner of selected companies?`
             : confirmState?.type === "convert"
-            ? `Convert selected companies to Customers? This updates their type and unlocks customer-specific fields.`
+            ? <BulkConvertMessage count={confirmState.count} />
             : ""
         }
         confirmLabel={
           confirmState?.type === "archive" ? "Archive" :
-          confirmState?.type === "convert" ? "Convert" : "Apply"
+          confirmState?.type === "convert" ? `Convert ${confirmState.count} ${confirmState.count === 1 ? "Company" : "Companies"}` : "Apply"
         }
         onConfirm={() => {
           const type = confirmState?.type;
@@ -306,7 +406,7 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
           if (type === "archive") showToast(`Archived ${count} ${count === 1 ? "company" : "companies"}`);
           else if (type === "stage") showToast(`Changed stage to "${extra}"`);
           else if (type === "owner") showToast(`Assigned ${extra} as owner`);
-          else if (type === "convert") showToast("Converted to Customers");
+          else if (type === "convert") runBulkConvert(count);
         }}
       />
 
@@ -423,13 +523,62 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
         )}
       </SideSheet>
 
-      {toast && (
+      {/* Bulk conversion progress indicator */}
+      {bulkConvertProgress && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-3 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
+          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin flex-shrink-0" />
+          Converting… [{bulkConvertProgress.current}/{bulkConvertProgress.total}]
+        </div>
+      )}
+
+      {toast && !bulkConvertProgress && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
           <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
           {toast}
         </div>
       )}
     </>
+  );
+}
+
+// Bulk "Convert to Customer" confirmation body — shows the current org behavior,
+// the >5 prompt-fallback warning, and a settings link. Reads orgSettings live.
+function BulkConvertMessage({ count }) {
+  const mode = orgSettings.customerConversion.contactMovement;
+  const isBulkPromptFallback = mode === "prompt" && count > BULK_PROMPT_LIMIT;
+
+  return (
+    <span className="block">
+      <span className="block text-gray-600">
+        Convert {count} {count === 1 ? "company" : "companies"} to Customers? This updates their type and unlocks customer-specific fields.
+      </span>
+
+      <span className="block mt-3 text-xs">
+        {mode === "auto_move_all" && (
+          <span className="text-gray-500">All associated contacts will be moved automatically (org setting).</span>
+        )}
+        {mode === "do_not_move" && (
+          <span className="text-gray-500">Contacts will not be moved (org setting).</span>
+        )}
+        {mode === "prompt" && !isBulkPromptFallback && (
+          <span className="text-gray-500">You will be prompted to select contacts for each company.</span>
+        )}
+        {isBulkPromptFallback && (
+          <span className="block px-2.5 py-2 rounded-lg bg-amber-50 border border-amber-100 text-amber-700">
+            For bulk conversions of more than {BULK_PROMPT_LIMIT} companies, contacts will be moved automatically to
+            avoid {count} prompts. Change this in Org Settings.
+          </span>
+        )}
+      </span>
+
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); console.log("Navigate to Org Settings → Customer Conversion"); }}
+        className="inline-block mt-3 text-xs text-indigo-600 hover:text-indigo-700"
+      >
+        Change behavior in Org Settings →
+      </button>
+    </span>
   );
 }
 
