@@ -15,6 +15,12 @@ export function normalizeContacts(list = []) {
 
 // Grant WizShop Access side sheet. `contacts` is the company's contacts
 // (already normalized). `onClose`/`onDone` are owned by the host SideSheet.
+/**
+ * FORM SOURCE: Org Settings → Forms → WizShop User
+ * Only renders if wizshop_enabled feature flag is true.
+ * Default role from WizShop User form settings.
+ * "Auto-send invite email" default from WizShop User form settings.
+ */
 export default function GrantAccessContent({ contacts = [], onClose, onDone }) {
   // Selection: seed with already-active users (locked on). Non-users start off.
   const [selected, setSelected] = useState(() =>

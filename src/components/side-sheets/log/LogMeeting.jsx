@@ -18,6 +18,12 @@ function entityToCompany(entity) {
 // Log Meeting — appends a { type: "meeting" } activity.
 // `entity` (from a Company detail page) locks the company association; otherwise
 // the company is searchable. A deal can be linked, scoped to the chosen company.
+/**
+ * FORM SOURCE: Org Settings → Forms → Meeting
+ * System fields: Title, Date/Time
+ * "Prompt follow-up task after completion" behavior from Meeting form settings.
+ * Auto-associates with current entity when opened from a detail page.
+ */
 export default function LogMeeting({ entity, contacts = [], onClose, onSave }) {
   const seedCompany = entityToCompany(entity);
   const lockCompany = !!seedCompany;

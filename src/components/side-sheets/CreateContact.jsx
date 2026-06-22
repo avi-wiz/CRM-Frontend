@@ -19,6 +19,14 @@ function toPickerCompany(c) {
 // path was used so the host can toast/persist both.
 // `initialCompany` — when launched from a Company detail page, pre-selects + locks
 // the company association.
+/**
+ * FORM SOURCE: Org Settings → Forms → Contact
+ * Fields rendered here are configured in the Contact form builder.
+ * System fields: First Name, Last Name, Email
+ * The "Create WizShop User" section appears when:
+ *   - WizShop subscription is active (feature flag: wizshop_enabled)
+ *   - "Show on Contact creation form" is ON in WizShop User form settings
+ */
 export default function CreateContact({ onClose, onDone, initialCompany = null }) {
   const seedCompany = toPickerCompany(initialCompany);
   const lockCompany = !!seedCompany;

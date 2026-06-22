@@ -248,6 +248,21 @@ function toPickerCompany(c) {
 // ─── MAIN COMPONENT ───
 // `initialCompany` — when launched from a Company detail page, pre-selects + locks
 // the company and auto-populates its contacts.
+/**
+ * FORM SOURCE: Org Settings → Forms → Deal
+ * Fields rendered here are configured in the Deal form builder.
+ * System fields: Deal Name, Pipeline, Stage, Deal Owner
+ * Pipeline selector populates from: Org Settings → Pipeline
+ * Stage auto-sets from pipeline config.
+ * Contacts auto-inherited from Company when "Auto-associate Company contacts" is ON.
+ *
+ * TODO(form-builder-parity): This form omits builder fields Source, Competitor,
+ *   and Next Steps. Also the Enterprise Pipeline stages here
+ *   (Discovery → Technical Review → Pilot → Procurement → Contract → Closed-Won/Lost)
+ *   differ from the builder's Deal "Stage" options
+ *   (Discovery → Evaluation → Proposal → Negotiation → Closed Won/Lost).
+ *   Reconcile against Org Settings → Forms → Deal sample data.
+ */
 export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
   const seedCompany = toPickerCompany(initialCompany);
   const lockCompany = !!seedCompany;

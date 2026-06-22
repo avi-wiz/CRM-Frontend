@@ -2,6 +2,11 @@ import { useState } from "react";
 import { AssociatedWith, Field, TextArea, Toggle, Footer, CURRENT_USER } from "./_shared";
 
 // Log Note — appends a { type: "note" } activity to the current entity.
+/**
+ * FORM SOURCE: Org Settings → Forms → Note
+ * System fields: Body
+ * Simplest form — always just a text area + pin toggle.
+ */
 export default function LogNote({ entity, onClose, onSave }) {
   const [body, setBody] = useState("");
   const [pinned, setPinned] = useState(false);

@@ -23,6 +23,15 @@ function blankItem() {
 // `company` — pre-fills + locks the company when opened from a Company detail page.
 // `onCreate(quote)` — called with the assembled quote object.
 // `onClose` — cancel handler.
+/**
+ * FORM SOURCE: Org Settings → Forms → Quote
+ * System fields: Quote Number (auto-generated), Company/Customer
+ * Line items are NOT form-builder configured — they use the Product catalog.
+ *
+ * TODO(form-builder-parity): Discount and Tax render as currency inputs here, but
+ *   the builder defines them as Percentage fields ("Discount", "Tax Rate").
+ *   Reconcile against Org Settings → Forms → Quote sample data.
+ */
 export default function CreateQuote({ company = null, onCreate, onClose }) {
   const [companyId, setCompanyId] = useState(company?.id ?? "");
   const [contactId, setContactId] = useState("");

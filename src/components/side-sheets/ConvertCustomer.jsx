@@ -20,6 +20,19 @@ function contactName(c) {
 }
 
 /**
+ * FORM SOURCE: Org Settings → Forms → Company (filtered to star-flagged fields)
+ * Only fields marked "Required for Customer conversion" appear here.
+ * Contact movement behavior controlled by: Org Settings → Pipeline → contact_stage_follow_company
+ * Pre-filled fields come from existing Company record.
+ *
+ * TODO(form-builder-parity): Fields rendered here (Customer Type, Payment Terms,
+ *   Credit Limit, Account Owner) do not match the builder's star-flagged Company
+ *   fields (Bill-to Address, Ship-to Address, Payment Terms, Customer Code,
+ *   Default Price List). Customer Type and Credit Limit are not in the Company
+ *   form sample data at all. Reconcile against Org Settings → Forms → Company
+ *   (fields with "Required for Customer conversion").
+ */
+/**
  * ConvertCustomer — "Company → Customer" conversion (Flow 1-D).
  *
  * Respects orgSettings.customerConversion.contactMovement:

@@ -20,6 +20,11 @@ function entityToCompany(entity) {
 // Log Visit — appends a { type: "visit" } activity. `entity` (from a Company
 // detail page) locks the company; otherwise it's searchable. Contacts met are
 // scoped to the chosen company. A follow-up checkbox reveals date + notes.
+/**
+ * FORM SOURCE: Org Settings → Forms → Visit
+ * System fields: Visit Date, Rep
+ * Follow-up fields (date, notes) appear when "Follow-up Needed" is checked.
+ */
 export default function LogVisit({ entity, onClose, onSave }) {
   const seedCompany = entityToCompany(entity);
   const lockCompany = !!seedCompany;

@@ -6,6 +6,11 @@ import {
 
 // Log Email — appends a { type: "email" } activity. Direction drives the
 // From/To layout: Sent → From is current user; Received → To is current user.
+/**
+ * FORM SOURCE: Org Settings → Forms → Email
+ * System fields: Subject, Direction
+ * Direction toggles From/To field behavior.
+ */
 export default function LogEmail({ entity, contacts = [], onClose, onSave }) {
   const [subject, setSubject] = useState("");
   const [direction, setDirection] = useState("sent"); // "sent" | "received"

@@ -25,6 +25,12 @@ function buildAssociationPool(excludeKey) {
 }
 
 // Create Task — emits one { type: "task" } activity per assignee.
+/**
+ * FORM SOURCE: Org Settings → Forms → Task
+ * System fields: Title, Due Date, Assignee
+ * "Bulk task creation (one per assignee)" behavior from Task form settings.
+ * Multi-assign creates N tasks, one per selected rep.
+ */
 export default function CreateTask({ entity, onClose, onSave }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

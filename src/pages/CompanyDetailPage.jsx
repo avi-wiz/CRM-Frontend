@@ -22,6 +22,20 @@ import { getCompanyDetail, kanbanStages, industries, leadSources, repNames } fro
 const LOG_ACTIONS = ["note", "meeting", "task", "email", "visit"];
 
 // Property-group config for the Company entity (left panel).
+/**
+ * FORM SOURCE: Org Settings → Forms → Company
+ * All fields from Company form builder, in configured order.
+ * When Company is in Customer stage: star-flagged fields show enforced validation.
+ * Read-only-when-value-exists fields: show lock icon if value is set.
+ * Attribute Sync fields: show sync icon with "Synced from/to [Entity.Field]" tooltip.
+ *
+ * TODO(form-builder-parity): This panel uses "Billing Address"/"Shipping Address"
+ *   and a "Stage"/"Is Customer" field, whereas the builder names them
+ *   "Bill-to Address"/"Ship-to Address" and omits Stage/Is Customer from the
+ *   Company form. Builder-only fields not shown here: Tax ID, Payment Terms,
+ *   Customer Code, Default Price List, Region (Attribute Sync). Reconcile against
+ *   Org Settings → Forms → Company sample data.
+ */
 const PROPERTY_GROUPS = [
   {
     title: "Company Info",
