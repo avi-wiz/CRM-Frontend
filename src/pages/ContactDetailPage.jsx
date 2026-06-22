@@ -10,6 +10,7 @@ import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
 import { EditSheet } from "../components/side-sheets/EditSheet";
 import { CreateWizShopUserContent } from "../components/side-sheets/index";
 import { getContactDetail, repNames, leadSources } from "../data/constants";
+import { logActivityFromEntity } from "../data/logActivity";
 
 const CONTACT_STAGES = ["New", "Open", "In Progress", "Qualified", "Unqualified"];
 
@@ -44,7 +45,7 @@ const PROPERTY_GROUPS = [
   },
 ];
 
-export default function ContactDetailPage({ contactId, onBack, onCompanyClick, onDealClick }) {
+export default function ContactDetailPage({ contactId, onBack, onCompanyClick, onDealClick, onVisitClick, onTaskClick, onMeetingClick }) {
   const [contact, setContact] = useState(() => getContactDetail(contactId));
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -66,10 +67,7 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
   const entity = { id: contact.id, type: "contact", name: fullName };
 
   const handleLogSave = (activity) => {
-    setContact((c) => {
-      const nextId = Math.max(0, ...(c.activities || []).map((a) => a.id || 0)) + 1;
-      return { ...c, activities: [{ id: nextId, time: nowStamp(), ...activity }, ...(c.activities || [])] };
-    });
+    logActivityFromEntity(entity, activity);
     setLogSheet(null);
     showToast(`${LOG_SHEETS[logSheet]?.title || "Activity"} saved`);
   };
@@ -146,6 +144,9 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
           contact={contact}
           onActivityAction={(type) => setLogSheet(type)}
           onDealClick={(d) => onDealClick?.(d.id)}
+          onVisitClick={(id) => onVisitClick?.(id)}
+          onTaskClick={(id) => onTaskClick?.(id)}
+          onMeetingClick={(id) => onMeetingClick?.(id)}
         />
         <ContactAssociations
           contact={contact}

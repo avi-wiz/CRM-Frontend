@@ -8,6 +8,8 @@ import ActivityTimeline from "../components/detail/ActivityTimeline";
 import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
 import { EditSheet } from "../components/side-sheets/EditSheet";
 import { getDealDetail, repNames, formatDate, stageColors } from "../data/constants";
+import { useEntityActivities } from "../data/activitiesStore";
+import { logActivityFromEntity } from "../data/logActivity";
 
 // ─── PIPELINE CONFIG ───
 const PIPELINE_STAGES = {
@@ -103,8 +105,9 @@ function MiniTable({ head, rows }) {
   );
 }
 
-function DealCenterTabs({ deal, onActivityAction }) {
+function DealCenterTabs({ deal, onActivityAction, onVisitClick, onTaskClick, onMeetingClick }) {
   const [active, setActive] = useState("Activities");
+  const activities = useEntityActivities("deal", deal.id);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -163,7 +166,7 @@ function DealCenterTabs({ deal, onActivityAction }) {
         )}
 
         {active === "Activities" && (
-          <ActivityTimeline activities={deal.activities} onAction={onActivityAction} />
+          <ActivityTimeline activities={activities} onAction={onActivityAction} onVisitClick={onVisitClick} onTaskClick={onTaskClick} onMeetingClick={onMeetingClick} />
         )}
       </div>
     </div>
@@ -345,7 +348,7 @@ function ChangeStageMenu({ stages, current, onSelect }) {
 }
 
 // ─── MAIN PAGE ───
-export default function DealDetailPage({ dealId, onBack, onCompanyClick, onContactClick, onDuplicate }) {
+export default function DealDetailPage({ dealId, onBack, onCompanyClick, onContactClick, onDuplicate, onVisitClick, onTaskClick, onMeetingClick }) {
   const [deal, setDeal] = useState(() => getDealDetail(dealId));
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -370,12 +373,9 @@ export default function DealDetailPage({ dealId, onBack, onCompanyClick, onConta
   // Entity descriptor passed to log sheets for the "Associated with" header.
   const entity = { id: deal.id, type: "deal", name: deal.name };
 
-  // Append a logged activity to the deal's timeline.
+  // Persist a logged activity, explicitly associated with this deal.
   const handleLogSave = (activity) => {
-    setDeal((d) => {
-      const nextId = Math.max(0, ...(d.activities || []).map((a) => a.id || 0)) + 1;
-      return { ...d, activities: [{ id: nextId, time: nowStamp(), ...activity }, ...(d.activities || [])] };
-    });
+    logActivityFromEntity(entity, activity);
     setLogSheet(null);
     showToast(`${LOG_SHEETS[logSheet]?.title || "Activity"} saved`);
   };
@@ -476,6 +476,9 @@ export default function DealDetailPage({ dealId, onBack, onCompanyClick, onConta
         <DealCenterTabs
           deal={deal}
           onActivityAction={(type) => setLogSheet(type)}
+          onVisitClick={onVisitClick}
+          onTaskClick={onTaskClick}
+          onMeetingClick={onMeetingClick}
         />
         <DealAssociations
           deal={deal}

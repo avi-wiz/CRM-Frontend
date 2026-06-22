@@ -15,6 +15,7 @@ import CreateContact from "../components/side-sheets/CreateContact";
 import { EditSheet } from "../components/side-sheets/EditSheet";
 import CreateQuote from "../components/side-sheets/CreateQuote";
 import { useCompanyQuotes, addQuote } from "../data/quotesStore";
+import { logActivityFromEntity } from "../data/logActivity";
 import { getCompanyDetail, kanbanStages, industries, leadSources, repNames } from "../data/constants";
 
 // Activity logging action keys handled by the shared log sheets.
@@ -100,7 +101,7 @@ function Placeholder({ flow }) {
   return <div className="text-sm text-gray-500">Form coming{flow ? ` in ${flow}` : " soon"}.</div>;
 }
 
-export default function CompanyDetailPage({ companyId, onBack, onContactClick, onDealClick, onQuoteClick }) {
+export default function CompanyDetailPage({ companyId, onBack, onContactClick, onDealClick, onQuoteClick, onVisitClick, onTaskClick, onMeetingClick }) {
   // Local, non-persistent edit state seeded from the merged detail record.
   const [company, setCompany] = useState(() => getCompanyDetail(companyId));
   const [sheet, setSheet] = useState(null); // action key or null
@@ -172,13 +173,12 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
     showToast(`${name} added to ${company.name}`);
   };
 
-  // Append a logged activity to the company's timeline.
+  // Persist a logged activity to the right store, explicitly associated with
+  // this company so it shows only on its (and any co-associated) timeline.
   const handleLogSave = (activity) => {
     const title = LOG_SHEETS[sheet]?.title || "Activity";
-    setCompany((c) => {
-      const nextId = Math.max(0, ...(c.activities || []).map((a) => a.id || 0)) + 1;
-      return { ...c, activities: [{ id: nextId, time: nowStamp(), ...activity }, ...(c.activities || [])] };
-    });
+    const entity = { id: company.id, type: company.isCustomer ? "customer" : "company", name: company.name };
+    logActivityFromEntity(entity, activity);
     setSheet(null);
     showToast(`${title} saved`);
   };
@@ -276,6 +276,9 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
           quotes={quotes}
           onQuoteClick={(id) => onQuoteClick?.(id)}
           onCreateQuote={() => setQuoteOpen(true)}
+          onVisitClick={(id) => onVisitClick?.(id)}
+          onTaskClick={(id) => onTaskClick?.(id)}
+          onMeetingClick={(id) => onMeetingClick?.(id)}
         />
         <AssociationsPanel
           company={company}

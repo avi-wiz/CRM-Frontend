@@ -115,16 +115,13 @@ export default function CreateTask({ entity, onClose, onSave }) {
         {/* Associations: locked current entity + addable extras */}
         <div>
           <Label>Associate With</Label>
-          <div className="flex flex-wrap gap-1.5 mb-2">
-            {entity && <Chip label={entity.name} locked />}
-            {extraAssociations.map((a) => (
-              <Chip
-                key={a.id}
-                label={a.label}
-                onRemove={() => setExtraAssociations((p) => p.filter((x) => x.id !== a.id))}
-              />
-            ))}
-          </div>
+          {/* Locked current-entity chip only — ChipMultiSelect renders the
+              selected extras itself, so don't duplicate them here. */}
+          {entity && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              <Chip label={entity.name} locked />
+            </div>
+          )}
           {showAddAssoc ? (
             <ChipMultiSelect
               options={assocPool}

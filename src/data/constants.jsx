@@ -676,6 +676,1041 @@ export const products = [
   { id: "p12", sku: "WC-4003", name: "Scented Soy Candle", category: "Home Goods", unitPrice: 18.0 },
 ];
 
+// ─── SAMPLE DATA: MEETINGS ───
+// Meetings are a first-class activity type. Mix of past (Completed / Cancelled /
+// No-Show) and upcoming (Scheduled). References real companies / contacts / deals.
+export const meetings = [
+  // ── Past — Completed ──
+  {
+    id: 1,
+    title: "Q3 Planning Review",
+    date: "2026-06-04", startTime: "10:00 AM", duration: 60, location: "Zoom",
+    attendees: [{ contactId: 1, contactName: "Sneha Iyer", email: "sneha@abccorp.com" }, { contactId: 2, contactName: "Marcus Bell", email: "marcus@abccorp.com" }],
+    internalAttendees: [{ repName: "Tyler Jones" }, { repName: "Jon Morales" }],
+    outcome: "Completed",
+    notes: "Walked through Q3 reorder volumes and the proposed bulk pricing tiers. ABC Corp confirmed they want to lock in the Q3 reorder before end of month. Strong intent to expand into the new apparel line.",
+    companyId: 2, companyName: "ABC Corp",
+    dealId: 2, dealName: "Bulk Reorder Q3",
+    createdBy: "Tyler Jones", createdAt: "2026-05-28",
+  },
+  {
+    id: 2,
+    title: "Product Demo — Summer Collection",
+    date: "2026-06-09", startTime: "2:30 PM", duration: 45, location: "Google Meet",
+    attendees: [{ contactId: 5, contactName: "Rahul Mehta", email: "rahul@pinnacle.co" }],
+    internalAttendees: [{ repName: "John Carmichael" }],
+    outcome: "Completed",
+    notes: "Demoed the Spring/Summer catalog inside WizShop. Rahul was impressed by the bulk-order flow. Follow-up: send the proposal for the Spring Collection deal.",
+    companyId: 1, companyName: "Pinnacle Distributors",
+    dealId: 1, dealName: "Spring Collection 2027",
+    createdBy: "John Carmichael", createdAt: "2026-06-02",
+  },
+  {
+    id: 3,
+    title: "Contract Terms Discussion",
+    date: "2026-06-11", startTime: "11:00 AM", duration: 90, location: "Office — Room 4B",
+    attendees: [{ contactId: 16, contactName: "Rachel Nguyen", email: "rnguyen@stonebridge.co" }],
+    internalAttendees: [{ repName: "Saul Cabrera" }],
+    outcome: "Completed",
+    notes: "Reviewed the distribution agreement redlines. Legal wants a 30-day termination clause. Agreed in principle on volume commitments.",
+    companyId: 14, companyName: "Stonebridge Supply",
+    dealId: 6, dealName: "Distribution Agreement 2027",
+    createdBy: "Saul Cabrera", createdAt: "2026-06-05",
+  },
+  {
+    id: 4,
+    title: "Onboarding Kickoff",
+    date: "2026-06-13", startTime: "9:00 AM", duration: 30, location: "Zoom",
+    attendees: [{ contactId: 11, contactName: "Maria Dos Santos", email: "maria@summitfoods.com" }, { contactId: 12, contactName: "Derek Chang", email: "derek@summitfoods.com" }],
+    internalAttendees: [{ repName: "John Carmichael" }],
+    outcome: "Completed",
+    notes: "Kicked off the Private Label Launch onboarding. Set up shared catalog access and aligned on first shipment timeline.",
+    companyId: 6, companyName: "Summit Foods",
+    dealId: 5, dealName: "Private Label Launch",
+    createdBy: "John Carmichael", createdAt: "2026-06-07",
+  },
+  {
+    id: 5,
+    title: "Quarterly Business Review",
+    date: "2026-06-16", startTime: "3:00 PM", duration: 60, location: "Client Office",
+    attendees: [{ contactId: 8, contactName: "James Okafor", email: "james@deltatrading.io" }],
+    internalAttendees: [{ repName: "Ryan Walsh" }, { repName: "Tyler Jones" }],
+    outcome: "Completed",
+    notes: "Reviewed YTD performance with Delta Trading. They're happy with fulfillment SLAs. Opportunity to upsell the enterprise catalog tier next quarter.",
+    companyId: 5, companyName: "Delta Trading",
+    dealId: null, dealName: null,
+    createdBy: "Ryan Walsh", createdAt: "2026-06-10",
+  },
+
+  // ── Past — Cancelled / No-Show ──
+  {
+    id: 6,
+    title: "Pricing Negotiation Follow-up",
+    date: "2026-06-12", startTime: "1:00 PM", duration: 45, location: "Zoom",
+    attendees: [{ contactId: 13, contactName: "Sandra Reyes", email: "sandra@bluewave.com" }],
+    internalAttendees: [{ repName: "Jon Morales" }],
+    outcome: "Cancelled",
+    notes: "Sandra rescheduled last minute — procurement budget review pushed internal timelines. Re-book for next week.",
+    companyId: 13, companyName: "Bluewave Logistics",
+    dealId: 3, dealName: "Enterprise Catalog Access",
+    createdBy: "Jon Morales", createdAt: "2026-06-06",
+  },
+  {
+    id: 7,
+    title: "Intro Call — Lumen Electronics",
+    date: "2026-06-08", startTime: "10:30 AM", duration: 30, location: "Google Meet",
+    attendees: [{ contactId: 17, contactName: "Brian Walsh", email: "brian@lumenelec.com" }],
+    internalAttendees: [{ repName: "Ryan Walsh" }],
+    outcome: "No-Show",
+    notes: "Prospect did not join the call and has not responded to follow-up email. Will try one more outreach before marking cold.",
+    companyId: 15, companyName: "Lumen Electronics",
+    dealId: 10, dealName: "Electronics Supply Deal",
+    createdBy: "Ryan Walsh", createdAt: "2026-06-03",
+  },
+  {
+    id: 8,
+    title: "Renewal Discussion",
+    date: "2026-06-15", startTime: "4:00 PM", duration: 30, location: "Office — Room 2A",
+    attendees: [{ contactId: 18, contactName: "Olivia Stern", email: "olivia@verdantliving.co" }],
+    internalAttendees: [{ repName: "Tyler Jones" }],
+    outcome: "Cancelled",
+    notes: "Cancelled — key stakeholder out sick. Olivia will propose new dates.",
+    companyId: 12, companyName: "Verdant Living",
+    dealId: 9, dealName: "Home Goods Expansion",
+    createdBy: "Tyler Jones", createdAt: "2026-06-09",
+  },
+
+  // ── Upcoming — Scheduled ──
+  {
+    id: 9,
+    title: "Proposal Walkthrough",
+    date: "2026-06-24", startTime: "11:00 AM", duration: 45, location: "Zoom",
+    attendees: [{ contactId: 1, contactName: "Sneha Iyer", email: "sneha@abccorp.com" }, { contactId: 4, contactName: "Priya Raman", email: "priya@abccorp.com" }],
+    internalAttendees: [{ repName: "Tyler Jones" }],
+    outcome: "Scheduled",
+    notes: "Present the finalized Bulk Reorder Q3 proposal. Priya from finance joining to review payment terms.",
+    companyId: 2, companyName: "ABC Corp",
+    dealId: 2, dealName: "Bulk Reorder Q3",
+    createdBy: "Tyler Jones", createdAt: "2026-06-18",
+  },
+  {
+    id: 10,
+    title: "Discovery — Greenfield Organics",
+    date: "2026-06-25", startTime: "9:30 AM", duration: 30, location: "Google Meet",
+    attendees: [],
+    internalAttendees: [{ repName: "Tyler Jones" }],
+    outcome: "Scheduled",
+    notes: "Initial discovery for the Organic Range Contract. Identify decision makers and timeline.",
+    companyId: 7, companyName: "Greenfield Organics",
+    dealId: 11, dealName: "Organic Range Contract",
+    createdBy: "Tyler Jones", createdAt: "2026-06-19",
+  },
+  {
+    id: 11,
+    title: "Negotiation — Spring Collection",
+    date: "2026-06-26", startTime: "2:00 PM", duration: 60, location: "Client Office",
+    attendees: [{ contactId: 5, contactName: "Rahul Mehta", email: "rahul@pinnacle.co" }, { contactId: 7, contactName: "Tom Ferrara", email: "tferrara@pinnacle.co" }],
+    internalAttendees: [{ repName: "John Carmichael" }, { repName: "Saul Cabrera" }],
+    outcome: "Scheduled",
+    notes: "Final pricing negotiation with Pinnacle. COO Tom Ferrara joining — close target is mid-July.",
+    companyId: 1, companyName: "Pinnacle Distributors",
+    dealId: 1, dealName: "Spring Collection 2027",
+    createdBy: "John Carmichael", createdAt: "2026-06-20",
+  },
+  {
+    id: 12,
+    title: "Catalog Demo — Metro Wholesale",
+    date: "2026-06-29", startTime: "10:00 AM", duration: 45, location: "Zoom",
+    attendees: [],
+    internalAttendees: [{ repName: "Saul Cabrera" }],
+    outcome: "Scheduled",
+    notes: "Walk through the Fall Apparel Bundle catalog and answer fulfillment questions.",
+    companyId: 4, companyName: "Metro Wholesale",
+    dealId: 4, dealName: "Fall Apparel Bundle",
+    createdBy: "Saul Cabrera", createdAt: "2026-06-21",
+  },
+  {
+    id: 13,
+    title: "Executive Sync — Tradewind",
+    date: "2026-07-02", startTime: "1:30 PM", duration: 30, location: "Office — Room 4B",
+    attendees: [],
+    internalAttendees: [{ repName: "Jon Morales" }],
+    outcome: "Scheduled",
+    notes: "Quarterly executive check-in to explore the next phase of the partnership.",
+    companyId: 18, companyName: "Tradewind Partners",
+    dealId: null, dealName: null,
+    createdBy: "Jon Morales", createdAt: "2026-06-20",
+  },
+  {
+    id: 14,
+    title: "Implementation Planning",
+    date: "2026-07-03", startTime: "11:00 AM", duration: 90, location: "Google Meet",
+    attendees: [{ contactId: 11, contactName: "Maria Dos Santos", email: "maria@summitfoods.com" }],
+    internalAttendees: [{ repName: "John Carmichael" }, { repName: "Tyler Jones" }],
+    outcome: "Scheduled",
+    notes: "Plan rollout of the Private Label Launch across Summit Foods' distribution centers.",
+    companyId: 6, companyName: "Summit Foods",
+    dealId: 5, dealName: "Private Label Launch",
+    createdBy: "John Carmichael", createdAt: "2026-06-21",
+  },
+];
+
+// Outcome badge color map for meetings.
+export const meetingOutcomeStyles = {
+  Scheduled: "bg-blue-50 text-blue-700",
+  Completed: "bg-emerald-50 text-emerald-700",
+  Cancelled: "bg-gray-100 text-gray-600",
+  "No-Show": "bg-red-50 text-red-700",
+};
+
+export const meetingOutcomes = ["Scheduled", "Completed", "Cancelled", "No-Show"];
+
+// Format a duration in minutes → "30 min", "1 hr", "1.5 hrs".
+export function formatDuration(min) {
+  if (!min) return "—";
+  if (min < 60) return `${min} min`;
+  const hrs = min / 60;
+  if (Number.isInteger(hrs)) return `${hrs} hr${hrs === 1 ? "" : "s"}`;
+  return `${hrs} hrs`;
+}
+
+export function isPastDate(iso) {
+  if (!iso) return false;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return false;
+  return d.getTime() < Date.now();
+}
+
+export function getMeetingCompany(meeting) {
+  return companies.find((c) => c.id === meeting.companyId) || null;
+}
+
+// ─── SAMPLE DATA: TASKS ───
+// Tasks are core CRM activities. One rep owns each task (REP → TASK is 1:M),
+// but a task can associate with many contacts/companies/deals and at most one
+// originating meeting (TASK → MEETING is M:1). Mix of statuses + due dates
+// relative to "today" (2026-06-22).
+export const tasks = [
+  // ── Open (2 overdue) ──
+  {
+    id: 1,
+    title: "Send revised proposal to ABC Corp",
+    description: "Incorporate the new bulk pricing tiers agreed in the Q3 Planning Review and send the updated proposal PDF.",
+    dueDate: "2026-06-18", priority: "High", status: "Open",
+    assignee: { repName: "Tyler Jones" },
+    createdBy: "Tyler Jones", createdAt: "2026-06-12", completedAt: null,
+    associations: {
+      companyId: 2, companyName: "ABC Corp",
+      contactIds: [{ contactId: 1, contactName: "Sneha Iyer" }],
+      dealId: 2, dealName: "Bulk Reorder Q3",
+      meetingId: 1, meetingTitle: "Q3 Planning Review",
+    },
+  },
+  {
+    id: 2,
+    title: "Follow up on pricing discussion",
+    description: "Bluewave rescheduled the pricing negotiation — re-book and confirm the enterprise catalog tier terms.",
+    dueDate: "2026-06-19", priority: "Urgent", status: "Open",
+    assignee: { repName: "Jon Morales" },
+    createdBy: "Jon Morales", createdAt: "2026-06-12", completedAt: null,
+    associations: {
+      companyId: 13, companyName: "Bluewave Logistics",
+      contactIds: [{ contactId: 13, contactName: "Sandra Reyes" }],
+      dealId: 3, dealName: "Enterprise Catalog Access",
+      meetingId: 6, meetingTitle: "Pricing Negotiation Follow-up",
+    },
+  },
+  {
+    id: 3,
+    title: "Prepare demo materials for Summer Collection",
+    description: "Assemble the catalog deck and sample line sheets ahead of the Pinnacle negotiation.",
+    dueDate: "2026-06-24", priority: "Medium", status: "Open",
+    assignee: { repName: "John Carmichael" },
+    createdBy: "John Carmichael", createdAt: "2026-06-15", completedAt: null,
+    associations: {
+      companyId: 1, companyName: "Pinnacle Distributors",
+      contactIds: [{ contactId: 5, contactName: "Rahul Mehta" }],
+      dealId: 1, dealName: "Spring Collection 2027",
+      meetingId: null, meetingTitle: null,
+    },
+  },
+  {
+    id: 4,
+    title: "Schedule QBR with Delta Trading",
+    description: "Coordinate calendars for the next quarterly business review and circulate an agenda.",
+    dueDate: "2026-06-26", priority: "Low", status: "Open",
+    assignee: { repName: "Ryan Walsh" },
+    createdBy: "Ryan Walsh", createdAt: "2026-06-17", completedAt: null,
+    associations: {
+      companyId: 5, companyName: "Delta Trading",
+      contactIds: [{ contactId: 8, contactName: "James Okafor" }],
+      dealId: null, dealName: null,
+      meetingId: 5, meetingTitle: "Quarterly Business Review",
+    },
+  },
+  {
+    id: 5,
+    title: "Draft distribution agreement redlines",
+    description: "Apply the 30-day termination clause requested by Stonebridge legal and route for internal review.",
+    dueDate: "2026-06-30", priority: "High", status: "Open",
+    assignee: { repName: "Saul Cabrera" },
+    createdBy: "Saul Cabrera", createdAt: "2026-06-16", completedAt: null,
+    associations: {
+      companyId: 14, companyName: "Stonebridge Supply",
+      contactIds: [{ contactId: 16, contactName: "Rachel Nguyen" }],
+      dealId: 6, dealName: "Distribution Agreement 2027",
+      meetingId: 3, meetingTitle: "Contract Terms Discussion",
+    },
+  },
+  {
+    id: 6,
+    title: "Qualify Greenfield Organics lead",
+    description: "Run discovery questions and identify decision makers before the catalog walkthrough.",
+    dueDate: "2026-07-03", priority: "Medium", status: "Open",
+    assignee: { repName: "Tyler Jones" },
+    createdBy: "Tyler Jones", createdAt: "2026-06-19", completedAt: null,
+    associations: {
+      companyId: 7, companyName: "Greenfield Organics",
+      contactIds: [],
+      dealId: 11, dealName: "Organic Range Contract",
+      meetingId: 10, meetingTitle: "Discovery — Greenfield Organics",
+    },
+  },
+
+  // ── In Progress ──
+  {
+    id: 7,
+    title: "Build private label rollout plan",
+    description: "Map the Private Label Launch across Summit Foods distribution centers and confirm first shipment timeline.",
+    dueDate: "2026-06-25", priority: "High", status: "In Progress",
+    assignee: { repName: "John Carmichael" },
+    createdBy: "John Carmichael", createdAt: "2026-06-13", completedAt: null,
+    associations: {
+      companyId: 6, companyName: "Summit Foods",
+      contactIds: [{ contactId: 11, contactName: "Maria Dos Santos" }, { contactId: 12, contactName: "Derek Chang" }],
+      dealId: 5, dealName: "Private Label Launch",
+      meetingId: 4, meetingTitle: "Onboarding Kickoff",
+    },
+  },
+  {
+    id: 8,
+    title: "Collect W-9 and payment terms from ABC Corp",
+    description: "Finance needs the signed W-9 and confirmed Net-30 terms before order conversion.",
+    dueDate: "2026-06-23", priority: "Medium", status: "In Progress",
+    assignee: { repName: "Tyler Jones" },
+    createdBy: "Tyler Jones", createdAt: "2026-06-14", completedAt: null,
+    associations: {
+      companyId: 2, companyName: "ABC Corp",
+      contactIds: [{ contactId: 4, contactName: "Priya Raman" }],
+      dealId: 2, dealName: "Bulk Reorder Q3",
+      meetingId: null, meetingTitle: null,
+    },
+  },
+  {
+    id: 9,
+    title: "Configure WizShop catalog for Metro Wholesale",
+    description: "Set up the Fall Apparel Bundle catalog and pricing visibility ahead of the demo.",
+    dueDate: "2026-06-28", priority: "Low", status: "In Progress",
+    assignee: { repName: "Saul Cabrera" },
+    createdBy: "Saul Cabrera", createdAt: "2026-06-18", completedAt: null,
+    associations: {
+      companyId: 4, companyName: "Metro Wholesale",
+      contactIds: [],
+      dealId: 4, dealName: "Fall Apparel Bundle",
+      meetingId: 12, meetingTitle: "Catalog Demo — Metro Wholesale",
+    },
+  },
+  {
+    id: 10,
+    title: "Re-engage Lumen Electronics after no-show",
+    description: "Send a fresh outreach sequence after the missed intro call; mark cold if no response.",
+    dueDate: "2026-06-24", priority: "Low", status: "In Progress",
+    assignee: { repName: "Ryan Walsh" },
+    createdBy: "Ryan Walsh", createdAt: "2026-06-10", completedAt: null,
+    associations: {
+      companyId: 15, companyName: "Lumen Electronics",
+      contactIds: [{ contactId: 17, contactName: "Brian Walsh" }],
+      dealId: 10, dealName: "Electronics Supply Deal",
+      meetingId: 7, meetingTitle: "Intro Call — Lumen Electronics",
+    },
+  },
+
+  // ── Completed ──
+  {
+    id: 11,
+    title: "Send Spring Collection proposal to Pinnacle",
+    description: "Follow-up from the product demo — proposal delivered with bulk-order pricing.",
+    dueDate: "2026-06-11", priority: "High", status: "Completed",
+    assignee: { repName: "John Carmichael" },
+    createdBy: "John Carmichael", createdAt: "2026-06-02", completedAt: "2026-06-10",
+    associations: {
+      companyId: 1, companyName: "Pinnacle Distributors",
+      contactIds: [{ contactId: 5, contactName: "Rahul Mehta" }],
+      dealId: 1, dealName: "Spring Collection 2027",
+      meetingId: 2, meetingTitle: "Product Demo — Summer Collection",
+    },
+  },
+  {
+    id: 12,
+    title: "Set up shared catalog access for Summit Foods",
+    description: "Provisioned WizShop access for the onboarding kickoff.",
+    dueDate: "2026-06-12", priority: "Medium", status: "Completed",
+    assignee: { repName: "John Carmichael" },
+    createdBy: "John Carmichael", createdAt: "2026-06-07", completedAt: "2026-06-11",
+    associations: {
+      companyId: 6, companyName: "Summit Foods",
+      contactIds: [{ contactId: 11, contactName: "Maria Dos Santos" }],
+      dealId: 5, dealName: "Private Label Launch",
+      meetingId: 4, meetingTitle: "Onboarding Kickoff",
+    },
+  },
+  {
+    id: 13,
+    title: "Confirm fulfillment SLAs with Delta Trading",
+    description: "Reviewed YTD SLA performance during the QBR — all green.",
+    dueDate: "2026-06-16", priority: "Low", status: "Completed",
+    assignee: { repName: "Ryan Walsh" },
+    createdBy: "Ryan Walsh", createdAt: "2026-06-10", completedAt: "2026-06-16",
+    associations: {
+      companyId: 5, companyName: "Delta Trading",
+      contactIds: [{ contactId: 8, contactName: "James Okafor" }],
+      dealId: null, dealName: null,
+      meetingId: 5, meetingTitle: "Quarterly Business Review",
+    },
+  },
+  {
+    id: 14,
+    title: "Prepare contract terms summary for Stonebridge",
+    description: "Summarized volume commitments and termination clause for legal review.",
+    dueDate: "2026-06-10", priority: "High", status: "Completed",
+    assignee: { repName: "Saul Cabrera" },
+    createdBy: "Saul Cabrera", createdAt: "2026-06-05", completedAt: "2026-06-09",
+    associations: {
+      companyId: 14, companyName: "Stonebridge Supply",
+      contactIds: [{ contactId: 16, contactName: "Rachel Nguyen" }],
+      dealId: 6, dealName: "Distribution Agreement 2027",
+      meetingId: 3, meetingTitle: "Contract Terms Discussion",
+    },
+  },
+  {
+    id: 15,
+    title: "Log Tradewind executive sync notes",
+    description: "Captured key takeaways from the quarterly executive check-in.",
+    dueDate: "2026-06-09", priority: "Low", status: "Completed",
+    assignee: { repName: "Jon Morales" },
+    createdBy: "Jon Morales", createdAt: "2026-06-04", completedAt: "2026-06-08",
+    associations: {
+      companyId: 18, companyName: "Tradewind Partners",
+      contactIds: [],
+      dealId: null, dealName: null,
+      meetingId: null, meetingTitle: null,
+    },
+  },
+
+  // ── Cancelled ──
+  {
+    id: 16,
+    title: "Send renewal quote to Verdant Living",
+    description: "Cancelled — renewal discussion postponed after the meeting was called off.",
+    dueDate: "2026-06-17", priority: "Medium", status: "Cancelled",
+    assignee: { repName: "Tyler Jones" },
+    createdBy: "Tyler Jones", createdAt: "2026-06-09", completedAt: null,
+    associations: {
+      companyId: 12, companyName: "Verdant Living",
+      contactIds: [{ contactId: 18, contactName: "Olivia Stern" }],
+      dealId: 9, dealName: "Home Goods Expansion",
+      meetingId: 8, meetingTitle: "Renewal Discussion",
+    },
+  },
+  {
+    id: 17,
+    title: "Follow up with Ironclad Hardware",
+    description: "Cancelled — deal closed lost, no further outreach planned.",
+    dueDate: "2026-06-05", priority: "Low", status: "Cancelled",
+    assignee: { repName: "Ryan Walsh" },
+    createdBy: "Ryan Walsh", createdAt: "2026-05-30", completedAt: null,
+    associations: {
+      companyId: 11, companyName: "Ironclad Hardware",
+      contactIds: [],
+      dealId: 8, dealName: "Tech Refresh Pilot",
+      meetingId: null, meetingTitle: null,
+    },
+  },
+];
+
+// Status + priority style maps for tasks.
+export const taskStatusStyles = {
+  Open: "bg-blue-50 text-blue-700",
+  "In Progress": "bg-amber-50 text-amber-700",
+  Completed: "bg-emerald-50 text-emerald-700",
+  Cancelled: "bg-gray-100 text-gray-600",
+};
+
+export const taskStatuses = ["Open", "In Progress", "Completed", "Cancelled"];
+
+// Priority → { color, icon } where icon is a lucide-react component name handled
+// in the UI. Kept as plain config so it can drive both listing + detail.
+export const taskPriorities = [
+  { value: "Low", color: "#9ca3af", icon: "ArrowDown" },
+  { value: "Medium", color: "#3b82f6", icon: "Minus" },
+  { value: "High", color: "#f59e0b", icon: "ArrowUp" },
+  { value: "Urgent", color: "#ef4444", icon: "ChevronsUp" },
+];
+
+export const taskPriorityStyles = {
+  Low: "bg-gray-100 text-gray-600",
+  Medium: "bg-blue-50 text-blue-700",
+  High: "bg-amber-50 text-amber-700",
+  Urgent: "bg-red-50 text-red-700",
+};
+
+// True when the due date is strictly before today (date-only comparison).
+export function isTaskOverdue(task) {
+  if (!task || task.status === "Completed" || task.status === "Cancelled") return false;
+  return isPastDate(task.dueDate) && !isToday(task.dueDate);
+}
+
+export function isToday(iso) {
+  if (!iso) return false;
+  return iso.slice(0, 10) === new Date().toISOString().slice(0, 10);
+}
+
+export function getTaskCompany(task) {
+  return companies.find((c) => c.id === task?.associations?.companyId) || null;
+}
+
+// ─── SAMPLE DATA: VISITS ───
+// Rep visits logged against companies/contacts. Mix of purposes, outcomes, and
+// follow-up states across the last ~60 days relative to "today" (2026-06-22).
+export const visits = [
+  {
+    id: 1,
+    visitDate: "2026-06-19", rep: { repName: "Tyler Jones" },
+    companyId: 2, companyName: "ABC Corp",
+    contactIds: [{ contactId: 1, contactName: "Sneha Iyer" }, { contactId: 2, contactName: "Marcus Bell" }],
+    purpose: "Relationship", outcome: "Positive",
+    notes: "Stopped by ABC Corp HQ to check in on the Q3 reorder. Sneha is enthusiastic about expanding into the new apparel line and wants pricing locked before month end. Marcus confirmed budget approval is in motion.",
+    followUpNeeded: true, followUpDate: "2026-06-26", followUpNotes: "Send finalized bulk pricing sheet and confirm Net-30 terms.",
+    duration: 60, location: "Client Office", createdAt: "2026-06-19",
+  },
+  {
+    id: 2,
+    visitDate: "2026-06-16", rep: { repName: "John Carmichael" },
+    companyId: 1, companyName: "Pinnacle Distributors",
+    contactIds: [{ contactId: 5, contactName: "Rahul Mehta" }],
+    purpose: "Product Demo", outcome: "Positive",
+    notes: "On-site demo of the Spring/Summer catalog at Pinnacle's showroom. Rahul walked the team through the bulk-order flow and was impressed by the WizShop experience.",
+    followUpNeeded: true, followUpDate: "2026-06-23", followUpNotes: "Deliver the Spring Collection proposal with negotiated pricing.",
+    duration: 90, location: "Showroom", createdAt: "2026-06-16",
+  },
+  {
+    id: 3,
+    visitDate: "2026-06-13", rep: { repName: "John Carmichael" },
+    companyId: 6, companyName: "Summit Foods",
+    contactIds: [{ contactId: 11, contactName: "Maria Dos Santos" }, { contactId: 12, contactName: "Derek Chang" }],
+    purpose: "Onboarding", outcome: "Positive",
+    notes: "Kicked off the Private Label Launch onboarding at Summit Foods. Set up shared catalog access and aligned on the first shipment timeline. Both stakeholders engaged.",
+    followUpNeeded: false, followUpDate: null, followUpNotes: null,
+    duration: 120, location: "Client Office", createdAt: "2026-06-13",
+  },
+  {
+    id: 4,
+    visitDate: "2026-06-11", rep: { repName: "Saul Cabrera" },
+    companyId: 14, companyName: "Stonebridge Supply",
+    contactIds: [{ contactId: 16, contactName: "Rachel Nguyen" }],
+    purpose: "Sales Call", outcome: "Follow-up Required",
+    notes: "Reviewed the distribution agreement at Stonebridge's office. Legal wants a 30-day termination clause added. Agreed in principle on volume commitments but contract not yet signed.",
+    followUpNeeded: true, followUpDate: "2026-06-20", followUpNotes: "Route redlined agreement back to their legal team.",
+    duration: 90, location: "Client Office", createdAt: "2026-06-11",
+  },
+  {
+    id: 5,
+    visitDate: "2026-06-09", rep: { repName: "Ryan Walsh" },
+    companyId: 5, companyName: "Delta Trading",
+    contactIds: [{ contactId: 8, contactName: "James Okafor" }],
+    purpose: "Relationship", outcome: "Positive",
+    notes: "Quarterly relationship visit with Delta Trading. James is happy with fulfillment SLAs. Flagged interest in the enterprise catalog tier for next quarter.",
+    followUpNeeded: false, followUpDate: null, followUpNotes: null,
+    duration: 60, location: "Client Office", createdAt: "2026-06-09",
+  },
+  {
+    id: 6,
+    visitDate: "2026-06-05", rep: { repName: "Saul Cabrera" },
+    companyId: 4, companyName: "Metro Wholesale",
+    contactIds: [],
+    purpose: "Sales Call", outcome: "Neutral",
+    notes: "Cold visit to Metro Wholesale to gauge interest in the Fall Apparel Bundle. Reception was lukewarm — budget cycle hasn't opened yet. Worth re-engaging in July.",
+    followUpNeeded: true, followUpDate: "2026-07-08", followUpNotes: "Re-engage once their Q3 budget opens.",
+    duration: 45, location: "Client Office", createdAt: "2026-06-05",
+  },
+  {
+    id: 7,
+    visitDate: "2026-05-30", rep: { repName: "Tyler Jones" },
+    companyId: 12, companyName: "Verdant Living",
+    contactIds: [{ contactId: 18, contactName: "Olivia Stern" }],
+    purpose: "Collection Follow-up", outcome: "Follow-up Required",
+    notes: "Followed up on the Home Goods Expansion at Verdant Living's showroom. Olivia needs internal sign-off before committing. Renewal discussion postponed.",
+    followUpNeeded: true, followUpDate: "2026-06-18", followUpNotes: "Check on internal approval status.",
+    duration: 45, location: "Showroom", createdAt: "2026-05-30",
+  },
+  {
+    id: 8,
+    visitDate: "2026-05-27", rep: { repName: "Jon Morales" },
+    companyId: 13, companyName: "Bluewave Logistics",
+    contactIds: [{ contactId: 13, contactName: "Sandra Reyes" }, { contactId: 14, contactName: "Aaron Kim" }],
+    purpose: "Product Demo", outcome: "Positive",
+    notes: "Demoed the enterprise catalog access at Bluewave's facility. Sandra and Aaron both engaged; operations team sees clear value in self-serve ordering.",
+    followUpNeeded: true, followUpDate: "2026-06-24", followUpNotes: "Send pricing for the enterprise catalog tier.",
+    duration: 90, location: "Factory", createdAt: "2026-05-27",
+  },
+  {
+    id: 9,
+    visitDate: "2026-05-22", rep: { repName: "Ryan Walsh" },
+    companyId: 15, companyName: "Lumen Electronics",
+    contactIds: [{ contactId: 17, contactName: "Brian Walsh" }],
+    purpose: "Sales Call", outcome: "Negative",
+    notes: "Visited Lumen Electronics to pitch the supply deal. Brian was non-committal and indicated they're evaluating a competitor. Low probability of progress.",
+    followUpNeeded: false, followUpDate: null, followUpNotes: null,
+    duration: 30, location: "Client Office", createdAt: "2026-05-22",
+  },
+  {
+    id: 10,
+    visitDate: "2026-05-18", rep: { repName: "Jon Morales" },
+    companyId: 18, companyName: "Tradewind Partners",
+    contactIds: [],
+    purpose: "Relationship", outcome: "Positive",
+    notes: "Annual partnership visit at Tradewind. Strong relationship — they want to explore the next phase of the agreement. No immediate action needed.",
+    followUpNeeded: false, followUpDate: null, followUpNotes: null,
+    duration: 60, location: "Client Office", createdAt: "2026-05-18",
+  },
+  {
+    id: 11,
+    visitDate: "2026-05-12", rep: { repName: "Saul Cabrera" },
+    companyId: 9, companyName: "Coastal Imports",
+    contactIds: [],
+    purpose: "Support", outcome: "Neutral",
+    notes: "Support visit at Coastal Imports to resolve a catalog sync issue. Walked their ops lead through the fix. No outstanding blockers.",
+    followUpNeeded: false, followUpDate: null, followUpNotes: null,
+    duration: 45, location: "Client Office", createdAt: "2026-05-12",
+  },
+  {
+    id: 12,
+    visitDate: "2026-04-29", rep: { repName: "Tyler Jones" },
+    companyId: 7, companyName: "Greenfield Organics",
+    contactIds: [],
+    purpose: "Sales Call", outcome: "Follow-up Required",
+    notes: "Intro visit at Greenfield's farm to discuss the Organic Range Contract. Promising fit but they need to identify a procurement decision maker.",
+    followUpNeeded: true, followUpDate: "2026-06-25", followUpNotes: "Confirm decision maker and schedule discovery.",
+    duration: 60, location: "Trade Show Booth", createdAt: "2026-04-29",
+  },
+];
+
+export const visitPurposes = ["Sales Call", "Support", "Onboarding", "Relationship", "Product Demo", "Collection Follow-up", "Other"];
+
+export const visitPurposeStyles = {
+  "Sales Call": "bg-indigo-50 text-indigo-700",
+  Support: "bg-amber-50 text-amber-700",
+  Onboarding: "bg-blue-50 text-blue-700",
+  Relationship: "bg-purple-50 text-purple-700",
+  "Product Demo": "bg-emerald-50 text-emerald-700",
+  "Collection Follow-up": "bg-orange-50 text-orange-700",
+  Other: "bg-gray-100 text-gray-600",
+};
+
+export const visitOutcomes = ["Positive", "Neutral", "Negative", "Follow-up Required"];
+
+export const visitOutcomeStyles = {
+  Positive: "bg-emerald-50 text-emerald-700",
+  Neutral: "bg-gray-100 text-gray-600",
+  Negative: "bg-red-50 text-red-700",
+  "Follow-up Required": "bg-amber-50 text-amber-700",
+};
+
+export function getVisitCompany(visit) {
+  return companies.find((c) => c.id === visit?.companyId) || null;
+}
+
+// ─── SAMPLE DATA: ACTIVITIES AGGREGATE ───
+// Unified, de-duplicated feed of the LATEST state of every activity across all
+// entities, for the top-level Activities page (PRD 7.4). Each entry carries its
+// full change `history` (opened via the "Show History" modal) and the list of
+// `associatedEntities` it is cross-visible on. Timestamps relative to today
+// (2026-06-22).
+export const activitiesAggregate = [
+  {
+    id: 1, type: "meeting",
+    summary: "Meeting with ABC Corp — Q3 Planning Review completed",
+    latestUpdate: { timestamp: "2026-06-22T11:35:00Z", action: "Outcome Set", by: "Tyler Jones" },
+    entity: { type: "company", id: 2, name: "ABC Corp" },
+    associatedEntities: [
+      { type: "company", id: 2, name: "ABC Corp" },
+      { type: "contact", id: 1, name: "Sneha Iyer" },
+      { type: "deal", id: 2, name: "Bulk Reorder Q3" },
+    ],
+    history: [
+      { timestamp: "2026-06-20T14:00:00Z", action: "Created", by: "Tyler Jones", detail: "Meeting scheduled for June 22 with Sneha Iyer and Marcus Bell" },
+      { timestamp: "2026-06-22T11:30:00Z", action: "Notes Added", by: "Tyler Jones", detail: "Added meeting summary covering Q3 reorder volumes and pricing tiers" },
+      { timestamp: "2026-06-22T11:35:00Z", action: "Outcome Set", by: "Tyler Jones", detail: "Marked as Completed" },
+      { timestamp: "2026-06-22T11:40:00Z", action: "Task Created", by: "Tyler Jones", detail: "Follow-up task: Send revised proposal to ABC Corp" },
+    ],
+  },
+  {
+    id: 2, type: "task",
+    summary: "Task: Send revised proposal to ABC Corp — in progress",
+    latestUpdate: { timestamp: "2026-06-21T16:10:00Z", action: "Updated", by: "Tyler Jones" },
+    entity: { type: "company", id: 2, name: "ABC Corp" },
+    associatedEntities: [
+      { type: "company", id: 2, name: "ABC Corp" },
+      { type: "contact", id: 1, name: "Sneha Iyer" },
+      { type: "deal", id: 2, name: "Bulk Reorder Q3" },
+    ],
+    history: [
+      { timestamp: "2026-06-20T11:42:00Z", action: "Created", by: "Tyler Jones", detail: "Follow-up from Q3 Planning Review, due June 18" },
+      { timestamp: "2026-06-21T16:10:00Z", action: "Updated", by: "Tyler Jones", detail: "Priority raised to High" },
+    ],
+  },
+  {
+    id: 3, type: "stage_change",
+    summary: "Stage changed: Negotiation → Won — ABC Corp",
+    latestUpdate: { timestamp: "2026-06-20T14:02:00Z", action: "Stage Changed", by: "System" },
+    entity: { type: "company", id: 2, name: "ABC Corp" },
+    associatedEntities: [{ type: "company", id: 2, name: "ABC Corp" }],
+    history: [
+      { timestamp: "2026-06-18T16:10:00Z", action: "Stage Changed", by: "Tyler Jones", detail: "Qualified → Negotiation" },
+      { timestamp: "2026-06-20T14:02:00Z", action: "Stage Changed", by: "System", detail: "Negotiation → Won (all deal criteria met)" },
+    ],
+  },
+  {
+    id: 4, type: "visit",
+    summary: "Visit to ABC Corp — Relationship check-in, follow-up required",
+    latestUpdate: { timestamp: "2026-06-19T15:00:00Z", action: "Created", by: "Tyler Jones" },
+    entity: { type: "company", id: 2, name: "ABC Corp" },
+    associatedEntities: [
+      { type: "company", id: 2, name: "ABC Corp" },
+      { type: "contact", id: 1, name: "Sneha Iyer" },
+      { type: "contact", id: 2, name: "Marcus Bell" },
+    ],
+    history: [
+      { timestamp: "2026-06-19T15:00:00Z", action: "Created", by: "Tyler Jones", detail: "On-site relationship visit, 60 min" },
+      { timestamp: "2026-06-19T15:30:00Z", action: "Note Added", by: "Tyler Jones", detail: "Sneha keen to expand into new apparel line" },
+      { timestamp: "2026-06-19T15:32:00Z", action: "Follow-up Set", by: "Tyler Jones", detail: "Follow-up scheduled for June 26" },
+    ],
+  },
+  {
+    id: 5, type: "email",
+    summary: "Email received: Signed agreement attached — Sneha Iyer",
+    latestUpdate: { timestamp: "2026-06-19T16:20:00Z", action: "Created", by: "System" },
+    entity: { type: "contact", id: 1, name: "Sneha Iyer" },
+    associatedEntities: [
+      { type: "contact", id: 1, name: "Sneha Iyer" },
+      { type: "company", id: 2, name: "ABC Corp" },
+      { type: "deal", id: 2, name: "Bulk Reorder Q3" },
+    ],
+    history: [
+      { timestamp: "2026-06-19T16:20:00Z", action: "Created", by: "System", detail: "Inbound email logged from sneha@abccorp.com" },
+    ],
+  },
+  {
+    id: 6, type: "meeting",
+    summary: "Meeting with Pinnacle Distributors — Product Demo completed",
+    latestUpdate: { timestamp: "2026-06-16T15:15:00Z", action: "Outcome Set", by: "John Carmichael" },
+    entity: { type: "company", id: 1, name: "Pinnacle Distributors" },
+    associatedEntities: [
+      { type: "company", id: 1, name: "Pinnacle Distributors" },
+      { type: "contact", id: 5, name: "Rahul Mehta" },
+      { type: "deal", id: 1, name: "Spring Collection 2027" },
+    ],
+    history: [
+      { timestamp: "2026-06-09T13:00:00Z", action: "Created", by: "John Carmichael", detail: "Demo scheduled at Pinnacle showroom" },
+      { timestamp: "2026-06-16T15:00:00Z", action: "Notes Added", by: "John Carmichael", detail: "Rahul impressed by the bulk-order flow" },
+      { timestamp: "2026-06-16T15:15:00Z", action: "Outcome Set", by: "John Carmichael", detail: "Marked as Completed" },
+    ],
+  },
+  {
+    id: 7, type: "quote",
+    summary: "Quote QT-2026-0003 sent to Pinnacle Distributors",
+    latestUpdate: { timestamp: "2026-06-17T10:00:00Z", action: "Updated", by: "John Carmichael" },
+    entity: { type: "company", id: 1, name: "Pinnacle Distributors" },
+    associatedEntities: [
+      { type: "company", id: 1, name: "Pinnacle Distributors" },
+      { type: "deal", id: 1, name: "Spring Collection 2027" },
+    ],
+    history: [
+      { timestamp: "2026-06-15T09:30:00Z", action: "Created", by: "John Carmichael", detail: "Draft created for Spring Collection" },
+      { timestamp: "2026-06-17T10:00:00Z", action: "Updated", by: "John Carmichael", detail: "Status changed Draft → Sent" },
+    ],
+  },
+  {
+    id: 8, type: "task",
+    summary: "Task: Follow up on pricing discussion — overdue",
+    latestUpdate: { timestamp: "2026-06-12T09:00:00Z", action: "Created", by: "Jon Morales" },
+    entity: { type: "company", id: 13, name: "Bluewave Logistics" },
+    associatedEntities: [
+      { type: "company", id: 13, name: "Bluewave Logistics" },
+      { type: "contact", id: 13, name: "Sandra Reyes" },
+      { type: "deal", id: 3, name: "Enterprise Catalog Access" },
+    ],
+    history: [
+      { timestamp: "2026-06-12T09:00:00Z", action: "Created", by: "Jon Morales", detail: "Re-book pricing negotiation, due June 19" },
+    ],
+  },
+  {
+    id: 9, type: "visit",
+    summary: "Visit to Bluewave Logistics — Product Demo, positive",
+    latestUpdate: { timestamp: "2026-05-27T14:30:00Z", action: "Note Added", by: "Jon Morales" },
+    entity: { type: "company", id: 13, name: "Bluewave Logistics" },
+    associatedEntities: [
+      { type: "company", id: 13, name: "Bluewave Logistics" },
+      { type: "contact", id: 13, name: "Sandra Reyes" },
+      { type: "contact", id: 14, name: "Aaron Kim" },
+    ],
+    history: [
+      { timestamp: "2026-05-27T13:00:00Z", action: "Created", by: "Jon Morales", detail: "On-site demo at facility" },
+      { timestamp: "2026-05-27T14:30:00Z", action: "Note Added", by: "Jon Morales", detail: "Ops team sees value in self-serve ordering" },
+    ],
+  },
+  {
+    id: 10, type: "conversion",
+    summary: "Lead converted to Customer — Summit Foods",
+    latestUpdate: { timestamp: "2026-06-13T10:00:00Z", action: "Completed", by: "John Carmichael" },
+    entity: { type: "company", id: 6, name: "Summit Foods" },
+    associatedEntities: [
+      { type: "company", id: 6, name: "Summit Foods" },
+      { type: "deal", id: 5, name: "Private Label Launch" },
+    ],
+    history: [
+      { timestamp: "2026-06-13T09:55:00Z", action: "Stage Changed", by: "John Carmichael", detail: "Proposal → Won" },
+      { timestamp: "2026-06-13T10:00:00Z", action: "Completed", by: "John Carmichael", detail: "Company flagged as Customer (is_customer = true)" },
+    ],
+  },
+  {
+    id: 11, type: "meeting",
+    summary: "Onboarding Kickoff with Summit Foods — completed",
+    latestUpdate: { timestamp: "2026-06-13T09:30:00Z", action: "Outcome Set", by: "John Carmichael" },
+    entity: { type: "company", id: 6, name: "Summit Foods" },
+    associatedEntities: [
+      { type: "company", id: 6, name: "Summit Foods" },
+      { type: "contact", id: 11, name: "Maria Dos Santos" },
+      { type: "deal", id: 5, name: "Private Label Launch" },
+    ],
+    history: [
+      { timestamp: "2026-06-07T09:00:00Z", action: "Created", by: "John Carmichael", detail: "Kickoff scheduled" },
+      { timestamp: "2026-06-13T09:30:00Z", action: "Outcome Set", by: "John Carmichael", detail: "Marked as Completed; catalog access provisioned" },
+    ],
+  },
+  {
+    id: 12, type: "note",
+    summary: "Note on Delta Trading — happy with fulfillment SLAs",
+    latestUpdate: { timestamp: "2026-06-09T16:05:00Z", action: "Note Added", by: "Ryan Walsh" },
+    entity: { type: "company", id: 5, name: "Delta Trading" },
+    associatedEntities: [
+      { type: "company", id: 5, name: "Delta Trading" },
+      { type: "contact", id: 8, name: "James Okafor" },
+    ],
+    history: [
+      { timestamp: "2026-06-09T16:05:00Z", action: "Note Added", by: "Ryan Walsh", detail: "Opportunity to upsell enterprise catalog tier next quarter" },
+    ],
+  },
+  {
+    id: 13, type: "order",
+    summary: "Order ORD-4821 placed by ABC Corp — $18,400",
+    latestUpdate: { timestamp: "2026-06-12T09:31:00Z", action: "Created", by: "System" },
+    entity: { type: "company", id: 2, name: "ABC Corp" },
+    associatedEntities: [
+      { type: "company", id: 2, name: "ABC Corp" },
+      { type: "contact", id: 1, name: "Sneha Iyer" },
+    ],
+    history: [
+      { timestamp: "2026-06-12T09:31:00Z", action: "Created", by: "System", detail: "Order placed via WizShop — 24 items, $18,400" },
+    ],
+  },
+  {
+    id: 14, type: "wizshop_event",
+    summary: "WizShop access granted to Sneha Iyer (Admin)",
+    latestUpdate: { timestamp: "2026-06-05T09:00:00Z", action: "Created", by: "Tyler Jones" },
+    entity: { type: "contact", id: 1, name: "Sneha Iyer" },
+    associatedEntities: [
+      { type: "contact", id: 1, name: "Sneha Iyer" },
+      { type: "company", id: 2, name: "ABC Corp" },
+    ],
+    history: [
+      { timestamp: "2026-06-05T09:00:00Z", action: "Created", by: "Tyler Jones", detail: "Admin role granted; invite email sent" },
+    ],
+  },
+  {
+    id: 15, type: "task",
+    summary: "Task: Draft distribution agreement redlines — open",
+    latestUpdate: { timestamp: "2026-06-16T12:00:00Z", action: "Created", by: "Saul Cabrera" },
+    entity: { type: "deal", id: 6, name: "Distribution Agreement 2027" },
+    associatedEntities: [
+      { type: "deal", id: 6, name: "Distribution Agreement 2027" },
+      { type: "company", id: 14, name: "Stonebridge Supply" },
+      { type: "contact", id: 16, name: "Rachel Nguyen" },
+    ],
+    history: [
+      { timestamp: "2026-06-16T12:00:00Z", action: "Created", by: "Saul Cabrera", detail: "Apply 30-day termination clause requested by legal" },
+    ],
+  },
+  {
+    id: 16, type: "meeting",
+    summary: "Contract Terms Discussion with Stonebridge Supply — completed",
+    latestUpdate: { timestamp: "2026-06-11T12:30:00Z", action: "Outcome Set", by: "Saul Cabrera" },
+    entity: { type: "company", id: 14, name: "Stonebridge Supply" },
+    associatedEntities: [
+      { type: "company", id: 14, name: "Stonebridge Supply" },
+      { type: "contact", id: 16, name: "Rachel Nguyen" },
+      { type: "deal", id: 6, name: "Distribution Agreement 2027" },
+    ],
+    history: [
+      { timestamp: "2026-06-05T11:00:00Z", action: "Created", by: "Saul Cabrera", detail: "Scheduled at client office" },
+      { timestamp: "2026-06-11T12:30:00Z", action: "Outcome Set", by: "Saul Cabrera", detail: "Marked Completed; legal wants 30-day termination clause" },
+    ],
+  },
+  {
+    id: 17, type: "email",
+    summary: "Email sent: Revised tiered pricing sheet — to Sneha Iyer",
+    latestUpdate: { timestamp: "2026-06-16T10:05:00Z", action: "Created", by: "Tyler Jones" },
+    entity: { type: "deal", id: 2, name: "Bulk Reorder Q3" },
+    associatedEntities: [
+      { type: "deal", id: 2, name: "Bulk Reorder Q3" },
+      { type: "company", id: 2, name: "ABC Corp" },
+      { type: "contact", id: 1, name: "Sneha Iyer" },
+    ],
+    history: [
+      { timestamp: "2026-06-16T10:05:00Z", action: "Created", by: "Tyler Jones", detail: "Outbound email with pricing for volumes over 500 units" },
+    ],
+  },
+  {
+    id: 18, type: "visit",
+    summary: "Visit to Lumen Electronics — Sales Call, negative",
+    latestUpdate: { timestamp: "2026-05-22T11:00:00Z", action: "Note Added", by: "Ryan Walsh" },
+    entity: { type: "company", id: 15, name: "Lumen Electronics" },
+    associatedEntities: [
+      { type: "company", id: 15, name: "Lumen Electronics" },
+      { type: "contact", id: 17, name: "Brian Walsh" },
+    ],
+    history: [
+      { timestamp: "2026-05-22T10:30:00Z", action: "Created", by: "Ryan Walsh", detail: "Pitched supply deal" },
+      { timestamp: "2026-05-22T11:00:00Z", action: "Note Added", by: "Ryan Walsh", detail: "Evaluating a competitor; low probability" },
+    ],
+  },
+  {
+    id: 19, type: "stage_change",
+    summary: "Stage changed: Discovery → Proposal — Greenfield Organics",
+    latestUpdate: { timestamp: "2026-06-19T10:00:00Z", action: "Stage Changed", by: "Tyler Jones" },
+    entity: { type: "deal", id: 11, name: "Organic Range Contract" },
+    associatedEntities: [
+      { type: "deal", id: 11, name: "Organic Range Contract" },
+      { type: "company", id: 7, name: "Greenfield Organics" },
+    ],
+    history: [
+      { timestamp: "2026-06-19T10:00:00Z", action: "Stage Changed", by: "Tyler Jones", detail: "Discovery → Proposal" },
+    ],
+  },
+  {
+    id: 20, type: "merge",
+    summary: "Duplicate contact merged — Coastal Imports",
+    latestUpdate: { timestamp: "2026-05-12T14:00:00Z", action: "Completed", by: "Saul Cabrera" },
+    entity: { type: "company", id: 9, name: "Coastal Imports" },
+    associatedEntities: [{ type: "company", id: 9, name: "Coastal Imports" }],
+    history: [
+      { timestamp: "2026-05-12T14:00:00Z", action: "Completed", by: "Saul Cabrera", detail: "Merged duplicate contact records into primary" },
+    ],
+  },
+  {
+    id: 21, type: "task",
+    summary: "Task: Build private label rollout plan — in progress",
+    latestUpdate: { timestamp: "2026-06-13T11:00:00Z", action: "Updated", by: "John Carmichael" },
+    entity: { type: "deal", id: 5, name: "Private Label Launch" },
+    associatedEntities: [
+      { type: "deal", id: 5, name: "Private Label Launch" },
+      { type: "company", id: 6, name: "Summit Foods" },
+      { type: "contact", id: 11, name: "Maria Dos Santos" },
+    ],
+    history: [
+      { timestamp: "2026-06-13T11:00:00Z", action: "Created", by: "John Carmichael", detail: "Map rollout across distribution centers" },
+    ],
+  },
+  {
+    id: 22, type: "note",
+    summary: "Note on Tradewind Partners — explore next partnership phase",
+    latestUpdate: { timestamp: "2026-05-18T13:00:00Z", action: "Note Added", by: "Jon Morales" },
+    entity: { type: "company", id: 18, name: "Tradewind Partners" },
+    associatedEntities: [{ type: "company", id: 18, name: "Tradewind Partners" }],
+    history: [
+      { timestamp: "2026-05-18T13:00:00Z", action: "Note Added", by: "Jon Morales", detail: "Annual partnership visit — strong relationship" },
+    ],
+  },
+  {
+    id: 23, type: "quote",
+    summary: "Quote QT-2026-0008 accepted — ABC Corp",
+    latestUpdate: { timestamp: "2026-06-18T15:20:00Z", action: "Updated", by: "Tyler Jones" },
+    entity: { type: "company", id: 2, name: "ABC Corp" },
+    associatedEntities: [
+      { type: "company", id: 2, name: "ABC Corp" },
+      { type: "deal", id: 2, name: "Bulk Reorder Q3" },
+    ],
+    history: [
+      { timestamp: "2026-06-14T11:00:00Z", action: "Created", by: "Tyler Jones", detail: "Quote drafted" },
+      { timestamp: "2026-06-16T09:00:00Z", action: "Updated", by: "Tyler Jones", detail: "Status Draft → Sent" },
+      { timestamp: "2026-06-18T15:20:00Z", action: "Updated", by: "Tyler Jones", detail: "Status Sent → Accepted" },
+    ],
+  },
+  {
+    id: 24, type: "wizshop_event",
+    summary: "WizShop order surge — Summit Foods placed 3 orders this week",
+    latestUpdate: { timestamp: "2026-06-20T08:00:00Z", action: "Created", by: "System" },
+    entity: { type: "company", id: 6, name: "Summit Foods" },
+    associatedEntities: [{ type: "company", id: 6, name: "Summit Foods" }],
+    history: [
+      { timestamp: "2026-06-20T08:00:00Z", action: "Created", by: "System", detail: "3 orders totaling $46,200 placed via WizShop" },
+    ],
+  },
+  {
+    id: 25, type: "email",
+    summary: "Email received: Bulk reorder proposal request — Rahul Mehta",
+    latestUpdate: { timestamp: "2026-06-10T09:30:00Z", action: "Created", by: "System" },
+    entity: { type: "contact", id: 5, name: "Rahul Mehta" },
+    associatedEntities: [
+      { type: "contact", id: 5, name: "Rahul Mehta" },
+      { type: "company", id: 1, name: "Pinnacle Distributors" },
+      { type: "deal", id: 1, name: "Spring Collection 2027" },
+    ],
+    history: [
+      { timestamp: "2026-06-10T09:30:00Z", action: "Created", by: "System", detail: "Inbound email requesting updated Q3 pricing" },
+    ],
+  },
+];
+
+// Filter-pill config + per-type styling for the Activities aggregate page.
+export const activityTypeMeta = {
+  note: { label: "Note", iconBg: "bg-blue-100", iconColor: "text-blue-600" },
+  email: { label: "Email", iconBg: "bg-amber-100", iconColor: "text-amber-600" },
+  meeting: { label: "Meeting", iconBg: "bg-purple-100", iconColor: "text-purple-600" },
+  task: { label: "Task", iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+  visit: { label: "Visit", iconBg: "bg-orange-100", iconColor: "text-orange-600" },
+  stage_change: { label: "Stage Change", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
+  conversion: { label: "Conversion", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
+  merge: { label: "Merge", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
+  quote: { label: "Quote", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+  order: { label: "Order", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
+  wizshop_event: { label: "WizShop Event", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
+};
+
+// Action badge colors for the Show History modal.
+export const historyActionStyles = {
+  Created: "bg-blue-50 text-blue-700",
+  Updated: "bg-amber-50 text-amber-700",
+  Completed: "bg-emerald-50 text-emerald-700",
+  Cancelled: "bg-gray-100 text-gray-600",
+  "Stage Changed": "bg-purple-50 text-purple-700",
+  "Note Added": "bg-blue-50 text-blue-700",
+  "Notes Added": "bg-blue-50 text-blue-700",
+  "Outcome Set": "bg-emerald-50 text-emerald-700",
+  "Follow-up Set": "bg-orange-50 text-orange-700",
+  "Task Created": "bg-emerald-50 text-emerald-700",
+};
+
 // ─── SAMPLE DATA: QUOTES ───
 // Demo data for the Quotes tab + Quote → Order conversion flow (Customer Gate).
 // Quotes 1, 5, 8 are tied to ABC Corp (companyId 2) — the detailed company from Flow 1-C.

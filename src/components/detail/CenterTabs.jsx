@@ -3,13 +3,18 @@ import { Plus } from "lucide-react";
 import StageBadge from "../shared/StageBadge";
 import ActivityTimeline from "./ActivityTimeline";
 import { formatDate, formatCurrency, quoteStatusStyles, isQuoteExpired } from "../../data/constants";
+import { useEntityActivities } from "../../data/activitiesStore";
 
 // Center panel — tab bar + tab content for the Company detail page.
-// `company` carries the nested orders/deals/activities/wizshop data.
+// `company` carries the nested orders/deals/wizshop data; activities come from
+// the unified store, filtered to this company by explicit association.
 const TABS = ["Sales", "Deals", "WizShop Activity", "Activities", "Quotes"];
 
-export default function CenterTabs({ company, onActivityAction, onDealClick, quotes = [], onQuoteClick, onCreateQuote }) {
+export default function CenterTabs({ company, onActivityAction, onDealClick, quotes = [], onQuoteClick, onCreateQuote, onVisitClick, onTaskClick, onMeetingClick }) {
   const [active, setActive] = useState("Activities");
+
+  const entityType = company.isCustomer ? "customer" : "company";
+  const activities = useEntityActivities(entityType, company.id);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -37,10 +42,11 @@ export default function CenterTabs({ company, onActivityAction, onDealClick, quo
         {active === "Deals" && <DealsTab deals={company.deals} onDealClick={onDealClick} />}
         {active === "Activities" && (
           <ActivityTimeline
-            activities={company.activities}
-            contacts={company.contacts}
-            deals={company.deals}
+            activities={activities}
             onAction={onActivityAction}
+            onVisitClick={onVisitClick}
+            onTaskClick={onTaskClick}
+            onMeetingClick={onMeetingClick}
           />
         )}
         {active === "WizShop Activity" && <WizShopTab company={company} />}

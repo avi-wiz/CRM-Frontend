@@ -1,10 +1,12 @@
 import { useState } from "react";
 import StageBadge from "../shared/StageBadge";
 import ActivityTimeline from "./ActivityTimeline";
-import { formatDate } from "../../data/constants";
+import { formatDate, formatDuration, visitOutcomeStyles, visitPurposeStyles } from "../../data/constants";
+import { useVisits } from "../../data/visitsStore";
+import { useEntityActivities } from "../../data/activitiesStore";
 
-// Center panel for the Contact detail page — 6 tabs.
-const TABS = ["Sales", "Deals", "Meetings", "Tasks", "WizShop Activity", "Activities"];
+// Center panel for the Contact detail page — 7 tabs.
+const TABS = ["Sales", "Deals", "Meetings", "Tasks", "Visits", "WizShop Activity", "Activities"];
 
 const ORDER_STATUS_COLOR = {
   Pending: "bg-gray-100 text-gray-600",
@@ -24,9 +26,18 @@ const TASK_STATUS_COLOR = {
   Open: "bg-amber-50 text-amber-600",
 };
 
-export default function ContactCenterTabs({ contact, onActivityAction, onDealClick }) {
+export default function ContactCenterTabs({ contact, onActivityAction, onDealClick, onVisitClick, onTaskClick, onMeetingClick }) {
   const [active, setActive] = useState("Activities");
   const companyName = contact.company?.name;
+
+  // Visits where this contact was met — sourced from the live visits store so
+  // newly-logged visits show up here too.
+  const allVisits = useVisits();
+  const contactVisits = allVisits.filter((v) =>
+    (v.contactIds || []).some((c) => c.contactId === contact.id)
+  );
+  // Unified activity timeline, filtered to this contact by explicit association.
+  const activities = useEntityActivities("contact", contact.id);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -99,6 +110,19 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
           />
         )}
 
+        {active === "Visits" && (
+          <MiniTable
+            head={["Date", "Rep", "Purpose", "Outcome", "Duration"]}
+            rows={contactVisits.map((v) => [
+              <span onClick={() => onVisitClick?.(v.id)} className="font-medium text-gray-900 hover:underline cursor-pointer">{formatDate(v.visitDate)}</span>,
+              v.rep?.repName || "—",
+              <span className={`text-xs px-2 py-0.5 rounded-full ${visitPurposeStyles[v.purpose] || "bg-gray-100 text-gray-600"}`}>{v.purpose}</span>,
+              <span className={`text-xs px-2 py-0.5 rounded-full ${visitOutcomeStyles[v.outcome] || "bg-gray-100 text-gray-600"}`}>{v.outcome}</span>,
+              formatDuration(v.duration),
+            ])}
+          />
+        )}
+
         {active === "WizShop Activity" && (
           <div className="space-y-2.5 max-w-xl">
             {(contact.wizShopActions || []).length === 0 && (
@@ -118,7 +142,7 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
         )}
 
         {active === "Activities" && (
-          <ActivityTimeline activities={contact.activities} onAction={onActivityAction} />
+          <ActivityTimeline activities={activities} onAction={onActivityAction} onVisitClick={onVisitClick} onTaskClick={onTaskClick} onMeetingClick={onMeetingClick} />
         )}
       </div>
     </div>

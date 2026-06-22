@@ -9,6 +9,13 @@ import PlaceholderPage from "./pages/PlaceholderPage";
 import DealsPage from "./pages/DealsPage";
 import QuotesPage from "./pages/QuotesPage";
 import QuoteDetailPage from "./pages/QuoteDetailPage";
+import MeetingsPage from "./pages/MeetingsPage";
+import MeetingDetailPage from "./pages/MeetingDetailPage";
+import TasksPage from "./pages/TasksPage";
+import TaskDetailPage from "./pages/TaskDetailPage";
+import VisitsPage from "./pages/VisitsPage";
+import VisitDetailPage from "./pages/VisitDetailPage";
+import ActivitiesPage from "./pages/ActivitiesPage";
 import CreateOrderPage from "./pages/CreateOrderPage";
 import { crmNav } from "./data/constants";
 
@@ -18,45 +25,71 @@ export default function App() {
   const [activeContactId, setActiveContactId] = useState(null);
   const [activeDealId, setActiveDealId] = useState(null);
   const [activeQuoteId, setActiveQuoteId] = useState(null);
+  const [activeMeetingId, setActiveMeetingId] = useState(null);
+  const [activeTaskId, setActiveTaskId] = useState(null);
+  const [activeVisitId, setActiveVisitId] = useState(null);
   const [pendingDuplicate, setPendingDuplicate] = useState(null); // deal to add when DealsPage next renders
 
-  const handleEntityChange = (key) => {
-    setActiveEntity(key);
+  const clearDetails = () => {
     setActiveCompanyId(null);
     setActiveContactId(null);
     setActiveDealId(null);
     setActiveQuoteId(null);
+    setActiveMeetingId(null);
+    setActiveTaskId(null);
+    setActiveVisitId(null);
+  };
+
+  const handleEntityChange = (key) => {
+    setActiveEntity(key);
+    clearDetails();
   };
 
   const openCompany = (companyId) => {
     setActiveEntity("companies");
-    setActiveContactId(null);
-    setActiveDealId(null);
-    setActiveQuoteId(null);
+    clearDetails();
     setActiveCompanyId(companyId);
   };
 
   const openContact = (contactId) => {
     setActiveEntity("contacts");
-    setActiveCompanyId(null);
-    setActiveDealId(null);
-    setActiveQuoteId(null);
+    clearDetails();
     setActiveContactId(contactId);
   };
 
   const openDeal = (dealId) => {
     setActiveEntity("deals");
-    setActiveCompanyId(null);
-    setActiveContactId(null);
-    setActiveQuoteId(null);
+    clearDetails();
     setActiveDealId(dealId);
   };
 
   const openQuote = (quoteId) => {
-    setActiveCompanyId(null);
-    setActiveContactId(null);
-    setActiveDealId(null);
+    clearDetails();
     setActiveQuoteId(quoteId);
+  };
+
+  const openMeeting = (meetingId) => {
+    clearDetails();
+    setActiveMeetingId(meetingId);
+  };
+
+  const openTask = (taskId) => {
+    clearDetails();
+    setActiveTaskId(taskId);
+  };
+
+  const openVisit = (visitId) => {
+    clearDetails();
+    setActiveVisitId(visitId);
+  };
+
+  // Dispatch an { type, id } entity descriptor (from the Activities feed) to the
+  // right detail page.
+  const openEntity = (entity) => {
+    if (!entity) return;
+    if (entity.type === "company" || entity.type === "customer") openCompany(entity.id);
+    else if (entity.type === "contact") openContact(entity.id);
+    else if (entity.type === "deal") openDeal(entity.id);
   };
 
   const renderContent = () => {
@@ -68,6 +101,9 @@ export default function App() {
           onContactClick={openContact}
           onDealClick={openDeal}
           onQuoteClick={openQuote}
+          onVisitClick={openVisit}
+          onTaskClick={openTask}
+          onMeetingClick={openMeeting}
         />
       );
     }
@@ -79,6 +115,9 @@ export default function App() {
           onBack={() => setActiveContactId(null)}
           onCompanyClick={openCompany}
           onDealClick={openDeal}
+          onVisitClick={openVisit}
+          onTaskClick={openTask}
+          onMeetingClick={openMeeting}
         />
       );
     }
@@ -90,6 +129,9 @@ export default function App() {
           onBack={() => setActiveDealId(null)}
           onCompanyClick={openCompany}
           onContactClick={openContact}
+          onVisitClick={openVisit}
+          onTaskClick={openTask}
+          onMeetingClick={openMeeting}
           onDuplicate={(deal) => {
             setPendingDuplicate(deal);
             setActiveDealId(null); // navigate back to deals list
@@ -105,6 +147,44 @@ export default function App() {
           onBack={() => setActiveQuoteId(null)}
           onCompanyClick={openCompany}
           onOpenQuote={openQuote}
+        />
+      );
+    }
+
+    if (activeMeetingId != null) {
+      return (
+        <MeetingDetailPage
+          meetingId={activeMeetingId}
+          onBack={() => setActiveMeetingId(null)}
+          onCompanyClick={openCompany}
+          onContactClick={openContact}
+          onDealClick={openDeal}
+        />
+      );
+    }
+
+    if (activeTaskId != null) {
+      return (
+        <TaskDetailPage
+          taskId={activeTaskId}
+          onBack={() => setActiveTaskId(null)}
+          onCompanyClick={openCompany}
+          onContactClick={openContact}
+          onDealClick={openDeal}
+          onMeetingClick={openMeeting}
+          onTaskClick={openTask}
+        />
+      );
+    }
+
+    if (activeVisitId != null) {
+      return (
+        <VisitDetailPage
+          visitId={activeVisitId}
+          onBack={() => setActiveVisitId(null)}
+          onCompanyClick={openCompany}
+          onContactClick={openContact}
+          onVisitClick={openVisit}
         />
       );
     }
@@ -138,6 +218,18 @@ export default function App() {
 
       case "quotes":
         return <QuotesPage onQuoteClick={(id) => setActiveQuoteId(id)} />;
+
+      case "meetings":
+        return <MeetingsPage onMeetingClick={openMeeting} onCompanyClick={openCompany} />;
+
+      case "tasks":
+        return <TasksPage onTaskClick={openTask} onCompanyClick={openCompany} />;
+
+      case "visits":
+        return <VisitsPage onVisitClick={openVisit} onCompanyClick={openCompany} />;
+
+      case "activities":
+        return <ActivitiesPage onEntityClick={openEntity} />;
 
       case "orders":
         return <CreateOrderPage onBack={() => handleEntityChange("companies")} />;
