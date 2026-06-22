@@ -324,9 +324,9 @@ function SelectField({ label, required, value, onChange, options }) {
       <select
         value={value}
         onChange={onChange}
-        className={`w-full border rounded-lg px-3 py-2 text-sm bg-white ${
-          isEmpty && required ? "border-red-200 focus:border-red-400" : "border-gray-200"
-        } focus:outline-none focus:ring-1 focus:ring-indigo-300`}
+        className={`w-full border rounded-xl px-3 py-2 text-sm bg-white transition-all duration-200 ${
+          isEmpty && required ? "border-red-200 focus:border-red-400 focus:ring-2 focus:ring-red-500/10" : "border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+        } focus:outline-none`}
       >
         {options.map((o) => <option key={o} value={o}>{o || `Select ${label}`}</option>)}
       </select>
@@ -348,9 +348,9 @@ function CurrencyField({ label, required, value, onChange }) {
           value={value}
           onChange={onChange}
           placeholder="0"
-          className={`w-full border rounded-lg pl-6 pr-3 py-2 text-sm ${
-            isEmpty && required ? "border-red-200 focus:border-red-400" : "border-gray-200"
-          } focus:outline-none focus:ring-1 focus:ring-indigo-300`}
+          className={`w-full border rounded-xl pl-6 pr-3 py-2 text-sm transition-all duration-200 ${
+            isEmpty && required ? "border-red-200 focus:border-red-400 focus:ring-2 focus:ring-red-500/10" : "border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+          } focus:outline-none`}
         />
       </div>
     </div>
@@ -369,10 +369,78 @@ function TextInput({ label, placeholder, value, onChange, required }) {
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full border rounded-lg px-3 py-2 text-sm ${
-          isEmpty ? "border-red-200 focus:border-red-400" : "border-gray-200"
-        } focus:outline-none focus:ring-1 focus:ring-indigo-300`}
+        className={`w-full border rounded-xl px-3 py-2 text-sm transition-all duration-200 ${
+          isEmpty ? "border-red-200 focus:border-red-400 focus:ring-2 focus:ring-red-500/10" : "border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+        } focus:outline-none`}
       />
+    </div>
+  );
+}
+
+// ─── CREATE WIZSHOP USER (from Contact detail "Create WizShop User") ───
+export function CreateWizShopUserContent({ contact, onDone, onClose }) {
+  const [role, setRole] = useState("Buyer");
+  const [sendInvite, setSendInvite] = useState(true);
+  const [done, setDone] = useState(false);
+
+  const handleCreate = () => {
+    setDone(true);
+    setTimeout(() => {
+      onDone?.({ role, sendInvite });
+    }, 900);
+  };
+
+  const fullName = contact ? `${contact.firstName} ${contact.lastName}` : "this contact";
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="bg-indigo-50/60 rounded-xl p-3 border border-indigo-100">
+        <div className="text-xs font-semibold text-indigo-700 mb-0.5">Creating account for</div>
+        <div className="text-sm font-bold text-gray-900">{fullName}</div>
+        <div className="text-xs text-gray-500">{contact?.email}</div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-gray-500 block mb-1">WizShop Role <span className="text-red-500">*</span></label>
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+        >
+          {["Admin", "Buyer", "Viewer"].map((r) => <option key={r} value={r}>{r}</option>)}
+        </select>
+        <p className="text-xs text-gray-400 mt-1">
+          {role === "Admin" && "Full access — can manage products, orders, and users."}
+          {role === "Buyer" && "Can browse catalog, place orders, and view order history."}
+          {role === "Viewer" && "Read-only access to catalog and order history."}
+        </p>
+      </div>
+
+      <label className="flex items-center gap-2.5 cursor-pointer select-none">
+        <div
+          onClick={() => setSendInvite((v) => !v)}
+          className={`w-9 h-5 rounded-full transition-colors cursor-pointer flex-shrink-0 ${sendInvite ? "bg-indigo-600" : "bg-gray-200"}`}
+        >
+          <span className={`block w-4 h-4 rounded-full bg-white shadow-sm transition-transform mt-0.5 mx-0.5 ${sendInvite ? "translate-x-4" : "translate-x-0"}`} />
+        </div>
+        <span className="text-sm text-gray-700">Send invite email to {contact?.email}</span>
+      </label>
+
+      <div className="pt-2 border-t border-gray-100 space-y-2">
+        {done ? (
+          <div className="w-full py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
+            <CheckCircle size={15} /> WizShop user created!
+          </div>
+        ) : (
+          <button
+            onClick={handleCreate}
+            className="w-full py-2.5 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:opacity-90 transition-all"
+          >
+            Create WizShop User
+          </button>
+        )}
+        <button onClick={onClose} className="w-full py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+      </div>
     </div>
   );
 }
@@ -549,18 +617,18 @@ function FormField({ label, value, placeholder, type = "text", options, required
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       {type === "select" ? (
-        <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+        <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200">
           {options?.map((o) => <option key={o}>{o}</option>)}
         </select>
       ) : type === "textarea" ? (
-        <textarea rows={rows || 3} placeholder={placeholder} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+        <textarea rows={rows || 3} placeholder={placeholder} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200" />
       ) : (
         <input
           type={type}
           defaultValue={value}
           placeholder={placeholder}
           readOnly={readOnly}
-          className={`w-full border border-gray-200 rounded-lg px-3 py-2 text-sm ${readOnly ? "bg-gray-50" : ""}`}
+          className={`w-full border border-gray-200 rounded-xl px-3 py-2 text-sm transition-all duration-200 ${readOnly ? "bg-gray-50" : "focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"}`}
         />
       )}
     </div>

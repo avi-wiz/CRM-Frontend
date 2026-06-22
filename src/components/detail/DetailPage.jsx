@@ -34,48 +34,48 @@ export default function DetailPage({ entity, entityType = "Company", onBack }) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── HEADER ─── */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-1 rounded hover:bg-gray-100">
-            <ArrowLeft size={18} className="text-gray-500" />
+          <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
+            <ArrowLeft size={18} />
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 uppercase tracking-wide">{entityType}</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{entityType}</span>
               {entity.isCustomer && (
-                <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded">✓ Customer</span>
+                <span className="text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-full">✓ Customer</span>
               )}
             </div>
-            <h1 className="text-lg font-semibold text-gray-900">{entity.name}</h1>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">{entity.name}</h1>
           </div>
           <StageBadge stage={entity.stage} />
         </div>
         <div className="flex items-center gap-2">
           {!entity.isCustomer && entityType === "Company" && (
-            <button onClick={() => setSideSheet("convert")} className="px-3 py-1.5 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+            <button onClick={() => setSideSheet("convert")} className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 shadow-sm hover:shadow-[0_4px_12px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
               Convert to Customer
             </button>
           )}
-          <button onClick={() => setSideSheet("merge")} className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">
+          <button onClick={() => setSideSheet("merge")} className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200">
             Merge / Convert
           </button>
-          <button onClick={() => setSideSheet("task")} className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">
+          <button onClick={() => setSideSheet("task")} className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200">
             Create Task
           </button>
-          <button className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">Log Activity</button>
-          <button className="p-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"><MoreHorizontal size={16} /></button>
+          <button className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200">Log Activity</button>
+          <button className="p-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 shadow-sm transition-all duration-200"><MoreHorizontal size={16} /></button>
         </div>
       </div>
 
       {/* ─── 3-PANEL LAYOUT ─── */}
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT: Properties */}
-        <div className="w-72 border-r border-gray-100 overflow-y-auto bg-gray-50/50 p-4">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Properties</h3>
+        <div className="w-72 border-r border-gray-150 overflow-y-auto bg-white p-5">
+          <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Properties</h3>
           {getPropertiesForEntity(entity, entityType).map((f) => (
             <div key={f.label} className="mb-3">
-              <label className="text-xs text-gray-500 block mb-0.5">{f.label}</label>
-              <div className="text-sm text-gray-900 bg-white border border-gray-200 rounded px-2.5 py-1.5">{f.value}</div>
+              <label className="text-xs font-medium text-gray-500 block mb-1">{f.label}</label>
+              <div className="text-sm text-gray-900 bg-white border border-gray-200 rounded-xl px-3 py-2 hover:border-indigo-200 hover:bg-indigo-50/20 transition-all duration-200">{f.value}</div>
             </div>
           ))}
         </div>

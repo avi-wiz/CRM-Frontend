@@ -1,0 +1,25 @@
+# Tasks
+
+- `[x]` Setup Typography & Styling Foundation
+  - `[x]` Update [index.html](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/index.html) with Google Font "Plus Jakarta Sans"
+  - `[x]` Update [tailwind.config.js](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/tailwind.config.js) to configure font family
+  - `[x]` Add global styles/animations/variables in [index.css](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/index.css)
+- `[x]` Polish Frame & Navigation
+  - `[x]` Enhance Sidebar / App Frame in [AppShell.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/layouts/AppShell.jsx)
+- `[x]` Overhaul Modals & Side Sheets with transitions
+  - `[x]` Polish [SideSheet.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/shared/SideSheet.jsx)
+  - `[x]` Polish [Modal.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/shared/Modal.jsx)
+  - `[x]` Polish [ConfirmModal.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/shared/ConfirmModal.jsx)
+  - `[x]` Polish [CustomerGateModal.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/shared/CustomerGateModal.jsx)
+- `[x]` Improve Listings & Boards
+  - `[x]` Polish [ListingPage.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/listings/ListingPage.jsx)
+  - `[x]` Polish [KanbanBoard.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/listings/KanbanBoard.jsx)
+- `[x]` Polish Detail View Panels & Side Sheets
+  - `[x]` Style Detail Page frame in [DetailPage.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/detail/DetailPage.jsx) (also applied to the live CompanyDetailPage header)
+  - `[x]` Enhance left panel in [PropertiesPanel.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/detail/PropertiesPanel.jsx)
+  - `[x]` Enhance tabs and cards in [CenterTabs.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/detail/CenterTabs.jsx)
+  - `[x]` Enhance associations list in [AssociationsPanel.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/detail/AssociationsPanel.jsx)
+  - `[x]` Style timeline components in [ActivityTimeline.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/detail/ActivityTimeline.jsx)
+  - `[x]` Clean up dialog side-sheet components in [index.jsx](file:///Users/avi/Code/WizCommerce_Work/POCs/CRM/crm-prototype/src/components/side-sheets/index.jsx)
+- `[x]` Verification & Build Check
+  - `[x]` Run production build and ensure no compilation errors.

@@ -25,17 +25,15 @@ export default function ConfirmModal({
   undoable = false,
   count,
 }) {
-  if (!open) return null;
-
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
+      <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-gray-150 flex flex-col transition-all duration-300 ease-out transform ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
         {/* Header */}
         <div className={`flex items-start justify-between px-6 py-4 ${
-          destructive ? "bg-red-50 border-b border-red-100" : "border-b border-gray-100"
+          destructive ? "bg-red-50 border-b border-red-100" : "border-b border-gray-100 bg-gray-50/30"
         }`}>
           <div className="flex items-start gap-3">
             {destructive && (

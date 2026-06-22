@@ -9,6 +9,7 @@ import MergeConvertContent from "../components/side-sheets/MergeConvert";
 import ConvertCustomer from "../components/side-sheets/ConvertCustomer";
 import GrantAccessContent, { normalizeContacts } from "../components/side-sheets/GrantAccess";
 import { CreateTask } from "../components/side-sheets/log/index.jsx";
+import CreateCompany from "../components/side-sheets/CreateCompany";
 import {
   companies, companyColumns, kanbanStages, formatRelativeTime,
   stageMandatoryFields, companyFieldMeta, contacts as allContacts, repNames,
@@ -410,9 +411,22 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
         }}
       />
 
-      {/* Create company placeholder */}
-      <SideSheet open={createOpen} onClose={() => setCreateOpen(false)} title="Create Company">
-        <div className="text-sm text-gray-500">Form coming in Flow 5</div>
+      {/* Create company */}
+      <SideSheet open={createOpen} onClose={() => setCreateOpen(false)} title="Create Company" width="max-w-lg">
+        {createOpen && (
+          <CreateCompany
+            onClose={() => setCreateOpen(false)}
+            onCreate={(company) => {
+              const today = new Date().toISOString().slice(0, 10);
+              setCompanyData((rows) => {
+                const nextId = Math.max(0, ...rows.map((r) => r.id || 0)) + 1;
+                return [{ id: nextId, createdAt: today, lastActivity: today, ...company }, ...rows];
+              });
+              setCreateOpen(false);
+              showToast(`${company.name} created`);
+            }}
+          />
+        )}
       </SideSheet>
 
       {/* Merge / Convert */}

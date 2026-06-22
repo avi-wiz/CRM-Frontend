@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, MoreHorizontal, CheckCircle } from "lucide-react";
 import StageBadge from "../components/shared/StageBadge";
 import SideSheet from "../components/shared/SideSheet";
+import ConfirmModal from "../components/shared/ConfirmModal";
 import CustomerGateModal from "../components/shared/CustomerGateModal";
 import PropertiesPanel from "../components/detail/PropertiesPanel";
 import CenterTabs from "../components/detail/CenterTabs";
@@ -9,6 +10,11 @@ import AssociationsPanel from "../components/detail/AssociationsPanel";
 import { ConvertCustomerContent } from "../components/side-sheets/index";
 import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
 import GrantAccessContent, { normalizeContacts } from "../components/side-sheets/GrantAccess";
+import CreateDeal from "../components/side-sheets/CreateDeal";
+import CreateContact from "../components/side-sheets/CreateContact";
+import { EditSheet } from "../components/side-sheets/EditSheet";
+import CreateQuote from "../components/side-sheets/CreateQuote";
+import { useCompanyQuotes, addQuote } from "../data/quotesStore";
 import { getCompanyDetail, kanbanStages, industries, leadSources, repNames } from "../data/constants";
 
 // Activity logging action keys handled by the shared log sheets.
@@ -47,7 +53,7 @@ const PROPERTY_GROUPS = [
 // Maps an action key → side sheet { title, content }. The 5 activity-logging
 // actions render the shared log sheets; the rest use the real or placeholder forms.
 function sheetFor(action, company, handlers) {
-  const { onConversionDone, onGrantDone, onClose, onLogSave } = handlers;
+  const { onConversionDone, onGrantDone, onClose, onLogSave, onDealCreated, onContactCreated } = handlers;
 
   // Activity logging sheets (note/meeting/task/email/visit).
   if (LOG_ACTIONS.includes(action)) {
@@ -72,8 +78,16 @@ function sheetFor(action, company, handlers) {
       title: `Grant WizShop Access — ${company.name}`,
       content: <GrantAccessContent contacts={normalizeContacts(company.contacts)} onClose={onClose} onDone={onGrantDone} />,
     };
-    case "addContact": return { title: "Add Contact", content: <Placeholder flow="Flow 5" /> };
-    case "addDeal": return { title: "Add Deal", content: <Placeholder flow="Flow 6" /> };
+    case "addContact": return {
+      title: "Add Contact",
+      width: "max-w-lg",
+      content: <CreateContact initialCompany={company} onClose={onClose} onDone={onContactCreated} />,
+    };
+    case "addDeal": return {
+      title: "Create Deal",
+      width: "max-w-lg",
+      content: <CreateDeal initialCompany={company} onClose={onClose} onDone={onDealCreated} />,
+    };
     case "editBilling": return { title: "Edit Billing Address", content: <Placeholder /> };
     case "editShipping": return { title: "Edit Shipping Address", content: <Placeholder /> };
     case "editPayment": return { title: "Edit Payment Terms", content: <Placeholder /> };
@@ -86,13 +100,17 @@ function Placeholder({ flow }) {
   return <div className="text-sm text-gray-500">Form coming{flow ? ` in ${flow}` : " soon"}.</div>;
 }
 
-export default function CompanyDetailPage({ companyId, onBack, onContactClick, onDealClick }) {
+export default function CompanyDetailPage({ companyId, onBack, onContactClick, onDealClick, onQuoteClick }) {
   // Local, non-persistent edit state seeded from the merged detail record.
   const [company, setCompany] = useState(() => getCompanyDetail(companyId));
   const [sheet, setSheet] = useState(null); // action key or null
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState(null); // { message }
   const [orderGateOpen, setOrderGateOpen] = useState(false); // Customer gate for "Create Order"
+  const [editOpen, setEditOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [quoteOpen, setQuoteOpen] = useState(false);
+  const quotes = useCompanyQuotes(companyId);
 
   // "Create Order" entry point — gate inline if this company isn't a Customer.
   const handleCreateOrder = () => {
@@ -122,6 +140,38 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
     showToast(`Created WizShop access for ${count} contact${count === 1 ? "" : "s"}`);
   };
 
+  // Add a newly-created deal to the company's associated deals list.
+  const handleDealCreated = (deal) => {
+    const amountRaw = Number(String(deal.amount).replace(/[^0-9.]/g, "")) || 0;
+    const formatted = amountRaw.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    setCompany((c) => {
+      const nextId = Math.max(0, ...(c.deals || []).map((d) => d.id || 0)) + 1;
+      const row = { id: nextId, name: deal.name, amount: formatted, stage: deal.stage, owner: deal.owner, closeDate: deal.closeDate };
+      return { ...c, deals: [row, ...(c.deals || [])] };
+    });
+    setSheet(null);
+    showToast(`Deal "${deal.name}" created`);
+  };
+
+  // Add a newly-created contact to the company's associated contacts list.
+  const handleContactCreated = (contact) => {
+    const name = `${contact.firstName} ${contact.lastName}`.trim();
+    setCompany((c) => {
+      const nextId = Math.max(0, ...(c.contacts || []).map((ct) => ct.id || 0)) + 1;
+      const row = {
+        id: nextId,
+        name,
+        email: contact.email,
+        role: "User",
+        wizshop: !!contact.isWizShopUser,
+        wizshopStatus: contact.isWizShopUser ? "Active" : "Inactive",
+      };
+      return { ...c, contacts: [...(c.contacts || []), row] };
+    });
+    setSheet(null);
+    showToast(`${name} added to ${company.name}`);
+  };
+
   // Append a logged activity to the company's timeline.
   const handleLogSave = (activity) => {
     const title = LOG_SHEETS[sheet]?.title || "Activity";
@@ -139,60 +189,76 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
         onGrantDone: handleGrantDone,
         onClose: () => setSheet(null),
         onLogSave: handleLogSave,
+        onDealCreated: handleDealCreated,
+        onContactCreated: handleContactCreated,
       })
     : null;
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── HEADER ─── */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-1 rounded hover:bg-gray-100" title="Back to listing">
-            <ArrowLeft size={18} className="text-gray-500" />
+          <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors" title="Back to listing">
+            <ArrowLeft size={18} />
           </button>
           <div>
-            <span className="text-xs text-gray-400 uppercase tracking-wide">Company</span>
-            <h1 className="text-lg font-semibold text-gray-900">{company.name}</h1>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Company</span>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">{company.name}</h1>
           </div>
           <StageBadge stage={company.stage} />
           {company.isCustomer ? (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Customer</span>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Customer</span>
           ) : (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Company</span>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Company</span>
           )}
           {company.source && (
-            <span className="text-xs text-gray-500">Source: {company.source}</span>
+            <span className="text-xs text-gray-400">Source: {company.source}</span>
           )}
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setEditOpen(true)}
+            className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200"
+          >
+            Edit
+          </button>
           {!company.isCustomer && (
-            <button onClick={() => setSheet("convert")} className="px-3 py-1.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            <button onClick={() => setSheet("convert")} className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 shadow-sm hover:shadow-[0_4px_12px_rgba(99,102,241,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
               Convert to Customer
             </button>
           )}
           <div className="relative">
-            <button onClick={() => setMenuOpen((o) => !o)} className="p-1.5 border border-gray-200 rounded-lg hover:bg-gray-50">
+            <button onClick={() => setMenuOpen((o) => !o)} className="p-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 shadow-sm transition-all duration-200">
               <MoreHorizontal size={16} />
             </button>
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-40">
+                <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-44">
                   <button
                     onClick={handleCreateOrder}
                     className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
                   >
                     Create Order
                   </button>
-                  {["Archive", "Merge", "Export"].map((item) => (
+                  {["Merge", "Export"].map((item) => (
                     <button
                       key={item}
-                      onClick={() => { console.log(item, company.name); setMenuOpen(false); }}
+                      onClick={() => { showToast(`${item} — coming soon`); setMenuOpen(false); }}
                       className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       {item}
                     </button>
                   ))}
+                  <div className="border-t border-gray-100 mt-1 pt-1">
+                    <button
+                      onClick={() => { setMenuOpen(false); setArchiveOpen(true); }}
+                      className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Archive
+                    </button>
+                  </div>
                 </div>
               </>
             )}
@@ -207,6 +273,9 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
           company={company}
           onActivityAction={(type) => setSheet(type)}
           onDealClick={(d) => onDealClick?.(d.id)}
+          quotes={quotes}
+          onQuoteClick={(id) => onQuoteClick?.(id)}
+          onCreateQuote={() => setQuoteOpen(true)}
         />
         <AssociationsPanel
           company={company}
@@ -220,7 +289,7 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
       </div>
 
       {/* ─── SIDE SHEET (single, content varies by action) ─── */}
-      <SideSheet open={!!activeSheet} onClose={() => setSheet(null)} title={activeSheet?.title || ""}>
+      <SideSheet open={!!activeSheet} onClose={() => setSheet(null)} title={activeSheet?.title || ""} width={activeSheet?.width || "max-w-md"}>
         {activeSheet?.content}
       </SideSheet>
 
@@ -239,6 +308,53 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
           </>
         }
         onConvert={() => { setOrderGateOpen(false); setSheet("convert"); }}
+      />
+
+      {/* ─── EDIT SIDE SHEET ─── */}
+      <SideSheet open={editOpen} onClose={() => setEditOpen(false)} title={`Edit ${company.name}`}>
+        {editOpen && (
+          <EditSheet
+            groups={PROPERTY_GROUPS}
+            values={company}
+            entityLabel="Company"
+            onClose={() => setEditOpen(false)}
+            onSave={(updated) => {
+              setCompany((c) => ({ ...c, ...updated }));
+              setEditOpen(false);
+              showToast("Company updated");
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* ─── CREATE QUOTE SIDE SHEET ─── */}
+      <SideSheet open={quoteOpen} onClose={() => setQuoteOpen(false)} title="Create Quote" width="max-w-lg">
+        {quoteOpen && (
+          <CreateQuote
+            company={company}
+            onClose={() => setQuoteOpen(false)}
+            onCreate={(quote) => {
+              const created = addQuote(quote);
+              setQuoteOpen(false);
+              showToast(`${created.quoteNumber} created`);
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* ─── ARCHIVE CONFIRM ─── */}
+      <ConfirmModal
+        open={archiveOpen}
+        onClose={() => setArchiveOpen(false)}
+        title="Archive Company"
+        message={`Archive ${company.name}? They will be hidden from the active list but can be restored later.`}
+        confirmLabel="Archive"
+        destructive
+        onConfirm={() => {
+          setArchiveOpen(false);
+          showToast(`${company.name} archived`);
+          setTimeout(() => onBack?.(), 1800);
+        }}
       />
 
       {/* ─── SUCCESS TOAST ─── */}

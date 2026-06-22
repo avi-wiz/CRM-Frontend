@@ -18,6 +18,7 @@ export default function App() {
   const [activeContactId, setActiveContactId] = useState(null);
   const [activeDealId, setActiveDealId] = useState(null);
   const [activeQuoteId, setActiveQuoteId] = useState(null);
+  const [pendingDuplicate, setPendingDuplicate] = useState(null); // deal to add when DealsPage next renders
 
   const handleEntityChange = (key) => {
     setActiveEntity(key);
@@ -51,6 +52,13 @@ export default function App() {
     setActiveDealId(dealId);
   };
 
+  const openQuote = (quoteId) => {
+    setActiveCompanyId(null);
+    setActiveContactId(null);
+    setActiveDealId(null);
+    setActiveQuoteId(quoteId);
+  };
+
   const renderContent = () => {
     if (activeCompanyId != null) {
       return (
@@ -59,6 +67,7 @@ export default function App() {
           onBack={() => setActiveCompanyId(null)}
           onContactClick={openContact}
           onDealClick={openDeal}
+          onQuoteClick={openQuote}
         />
       );
     }
@@ -81,12 +90,23 @@ export default function App() {
           onBack={() => setActiveDealId(null)}
           onCompanyClick={openCompany}
           onContactClick={openContact}
+          onDuplicate={(deal) => {
+            setPendingDuplicate(deal);
+            setActiveDealId(null); // navigate back to deals list
+          }}
         />
       );
     }
 
     if (activeQuoteId != null) {
-      return <QuoteDetailPage quoteId={activeQuoteId} onBack={() => setActiveQuoteId(null)} />;
+      return (
+        <QuoteDetailPage
+          quoteId={activeQuoteId}
+          onBack={() => setActiveQuoteId(null)}
+          onCompanyClick={openCompany}
+          onOpenQuote={openQuote}
+        />
+      );
     }
 
     switch (activeEntity) {
@@ -108,7 +128,13 @@ export default function App() {
         );
 
       case "deals":
-        return <DealsPage onDealClick={(row) => setActiveDealId(row.id)} />;
+        return (
+          <DealsPage
+            onDealClick={(row) => setActiveDealId(row.id)}
+            pendingDuplicate={pendingDuplicate}
+            onDuplicateConsumed={() => setPendingDuplicate(null)}
+          />
+        );
 
       case "quotes":
         return <QuotesPage onQuoteClick={(id) => setActiveQuoteId(id)} />;

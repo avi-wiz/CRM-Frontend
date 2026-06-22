@@ -1,77 +1,125 @@
-import { FileText } from "lucide-react";
-import { quotes, getQuoteCompany } from "../data/constants";
+import { useState } from "react";
+import { FileText, Plus, CheckCircle } from "lucide-react";
+import SideSheet from "../components/shared/SideSheet";
+import CreateQuote from "../components/side-sheets/CreateQuote";
+import {
+  getQuoteCompany,
+  formatDate,
+  formatCurrency,
+  quoteStatusStyles,
+  isQuoteExpired,
+} from "../data/constants";
+import { useQuotes, addQuote } from "../data/quotesStore";
 
-const STATUS_STYLES = {
-  Approved: "bg-emerald-50 text-emerald-700",
-  Sent: "bg-blue-50 text-blue-700",
-  Draft: "bg-gray-100 text-gray-600",
-};
+const HEAD = ["Quote #", "Company", "Amount", "Status", "Contact", "Valid Until", "Created"];
 
-// Simple Quotes listing — each row links to QuoteDetailPage (Customer Gate demo).
+// Quotes listing — each row links to QuoteDetailPage.
 export default function QuotesPage({ onQuoteClick }) {
+  const quotes = useQuotes();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3500);
+  };
+
   return (
     <div className="flex-1 flex flex-col">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
-        <h1 className="text-lg font-semibold text-gray-900">Quotes</h1>
+      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-bold text-gray-900 tracking-tight">Quotes</h1>
+          <span className="text-sm text-gray-400">{quotes.length} quotes</span>
+        </div>
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200"
+        >
+          <Plus size={15} /> Create Quote
+        </button>
       </div>
 
-      <div className="flex-1 overflow-auto px-6 py-4">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-100">
-              {["Quote #", "Company", "Amount", "Status", "Created"].map((h) => (
-                <th key={h} className="py-2.5 px-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {quotes.length === 0 && (
-              <tr>
-                <td colSpan={5} className="py-12 text-center">
-                  <div className="text-sm text-gray-500">No quotes found</div>
-                  <div className="text-xs text-gray-400 mt-1">Quotes will appear here once created.</div>
-                </td>
+      <div className="flex-1 overflow-auto p-8 bg-[#f8fafc]">
+        <div className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-150 bg-gray-50/70">
+                {HEAD.map((h) => (
+                  <th key={h} className="py-3 px-4 text-left font-bold text-gray-400 text-[10px] uppercase tracking-wider">
+                    {h}
+                  </th>
+                ))}
               </tr>
-            )}
-            {quotes.map((q) => {
-              const company = getQuoteCompany(q);
-              return (
-                <tr
-                  key={q.id}
-                  className="border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer"
-                  onClick={() => onQuoteClick?.(q.id)}
-                >
-                  <td className="py-2.5 px-3">
-                    <span className="flex items-center gap-2 font-medium text-gray-900">
-                      <FileText size={14} className="text-indigo-500" />
-                      {q.quoteNumber}
-                    </span>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {quotes.length === 0 && (
+                <tr>
+                  <td colSpan={HEAD.length} className="py-12 text-center">
+                    <div className="text-sm text-gray-500">No quotes found</div>
+                    <div className="text-xs text-gray-400 mt-1">Quotes will appear here once created.</div>
                   </td>
-                  <td className="py-2.5 px-3 text-gray-700">
-                    <span className="flex items-center gap-2">
-                      {q.companyName}
-                      {!company?.isCustomer && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700">
-                          Not a Customer
-                        </span>
-                      )}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-3 font-semibold text-gray-900">{q.amount}</td>
-                  <td className="py-2.5 px-3">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[q.status] || "bg-gray-100 text-gray-600"}`}>
-                      {q.status}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-3 text-gray-500">{q.createdAt}</td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              )}
+              {quotes.map((q) => {
+                const company = getQuoteCompany(q);
+                const expired = isQuoteExpired(q.validUntil);
+                return (
+                  <tr
+                    key={q.id}
+                    className="hover:bg-slate-50/50 cursor-pointer transition-colors duration-150"
+                    onClick={() => onQuoteClick?.(q.id)}
+                  >
+                    <td className="py-3 px-4">
+                      <span className="flex items-center gap-2 font-medium text-gray-900">
+                        <FileText size={14} className="text-indigo-500" />
+                        {q.quoteNumber}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-700">
+                      <span className="flex items-center gap-2">
+                        {q.companyName}
+                        {!company?.isCustomer && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700">Not a Customer</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 font-semibold text-gray-900">{formatCurrency(q.grandTotal)}</td>
+                    <td className="py-3 px-4">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${quoteStatusStyles[q.status] || "bg-gray-100 text-gray-600"}`}>
+                        {q.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600">{q.contactName || "—"}</td>
+                    <td className={`py-3 px-4 ${expired ? "text-red-600 font-medium" : "text-gray-500"}`}>{formatDate(q.validUntil)}</td>
+                    <td className="py-3 px-4 text-gray-500">{formatDate(q.createdAt)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {/* ─── CREATE QUOTE SIDE SHEET ─── */}
+      <SideSheet open={createOpen} onClose={() => setCreateOpen(false)} title="Create Quote" width="max-w-lg">
+        {createOpen && (
+          <CreateQuote
+            onClose={() => setCreateOpen(false)}
+            onCreate={(quote) => {
+              const created = addQuote(quote);
+              setCreateOpen(false);
+              showToast(`${created.quoteNumber} created`);
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
+          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

@@ -81,7 +81,7 @@ export default function ActivityTimeline({ activities = [], onAction, contacts =
           <button
             key={a.type}
             onClick={() => onAction?.(a.type)}
-            className="px-2.5 py-1 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50"
+            className="px-3 py-1.5 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg bg-white hover:bg-indigo-50/50 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all duration-200"
           >
             {a.label}
           </button>
@@ -94,8 +94,8 @@ export default function ActivityTimeline({ activities = [], onAction, contacts =
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`px-2.5 py-1 text-xs rounded-full ${
-              filter === f.key ? "bg-indigo-50 text-indigo-700 font-medium" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            className={`px-3 py-1 text-xs rounded-full transition-all duration-200 ${
+              filter === f.key ? "bg-indigo-600 text-white font-semibold shadow-[0_2px_8px_rgba(99,102,241,0.25)]" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             {f.label}
@@ -106,8 +106,8 @@ export default function ActivityTimeline({ activities = [], onAction, contacts =
         {showHistory && hasAssociated && (
           <button
             onClick={() => setCompanyOnly((v) => !v)}
-            className={`px-2.5 py-1 text-xs rounded-full ${
-              companyOnly ? "bg-indigo-50 text-indigo-700 font-medium" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            className={`px-3 py-1 text-xs rounded-full transition-all duration-200 ${
+              companyOnly ? "bg-indigo-600 text-white font-semibold shadow-[0_2px_8px_rgba(99,102,241,0.25)]" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             This Company Only
@@ -152,13 +152,13 @@ function TimelineRow({ activity: a }) {
   const isCrossEntity = !!a.sourceEntity;
   return (
     <div
-      className={`flex gap-3 p-3 rounded-lg border border-gray-200 border-l-4 ${meta.border} ${
-        a.type === "system" ? "bg-gray-50" : "bg-white"
-      } ${isCrossEntity ? "ml-4" : ""}`}
+      className={`flex gap-3 p-3.5 rounded-xl border border-gray-150 border-l-4 ${meta.border} ${
+        a.type === "system" ? "bg-gray-50/70" : "bg-white"
+      } shadow-[0_1px_4px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all duration-200 ${isCrossEntity ? "ml-5" : ""}`}
       style={isCrossEntity ? { borderLeftStyle: "dashed" } : undefined}
     >
-      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${meta.iconBg}`}>
-        <Icon size={13} className={meta.iconColor} />
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${meta.iconBg} shadow-sm`}>
+        <Icon size={14} className={meta.iconColor} />
       </div>
       <div className="flex-1 min-w-0">
         <ActivityBody activity={a} />

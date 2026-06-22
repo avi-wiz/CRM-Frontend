@@ -73,7 +73,7 @@ function SectionHeader({ children }) {
 }
 
 // ─── COMPANY SEARCH ───
-function CompanySearch({ selected, onSelect }) {
+function CompanySearch({ selected, onSelect, locked }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -98,12 +98,14 @@ function CompanySearch({ selected, onSelect }) {
           <div className="text-sm font-medium text-gray-900">{selected.name}</div>
           <div className="text-xs text-gray-500">{selected.domain}</div>
         </div>
-        <button
-          onClick={() => onSelect(null)}
-          className="p-1 rounded hover:bg-indigo-100 text-gray-400 hover:text-gray-600"
-        >
-          <X size={14} />
-        </button>
+        {!locked && (
+          <button
+            onClick={() => onSelect(null)}
+            className="p-1 rounded hover:bg-indigo-100 text-gray-400 hover:text-gray-600"
+          >
+            <X size={14} />
+          </button>
+        )}
       </div>
     );
   }
@@ -235,8 +237,21 @@ function ContactChips({ chips, onRemove, onAdd, companyId }) {
   );
 }
 
+// Resolve a companies[] row from an arbitrary company-like object (the company
+// detail record carries extra nested data we don't want in the picker).
+function toPickerCompany(c) {
+  if (!c) return null;
+  const match = companies.find((co) => co.id === c.id) || companies.find((co) => co.name === c.name);
+  return match || { id: c.id, name: c.name, domain: c.domain || "", isCustomer: !!c.isCustomer };
+}
+
 // ─── MAIN COMPONENT ───
-export default function CreateDeal({ onClose, onDone }) {
+// `initialCompany` — when launched from a Company detail page, pre-selects + locks
+// the company and auto-populates its contacts.
+export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
+  const seedCompany = toPickerCompany(initialCompany);
+  const lockCompany = !!seedCompany;
+
   const [pipeline, setPipeline] = useState(null);
   const [stage, setStage] = useState("");
   const [name, setName] = useState("");
@@ -244,8 +259,10 @@ export default function CreateDeal({ onClose, onDone }) {
   const [closeDate, setCloseDate] = useState("");
   const [owner, setOwner] = useState(repNames[0]);
   const [forecastCategory, setForecastCategory] = useState("Pipeline");
-  const [company, setCompany] = useState(null);
-  const [contactChips, setContactChips] = useState([]);
+  const [company, setCompany] = useState(seedCompany);
+  const [contactChips, setContactChips] = useState(
+    seedCompany ? contacts.filter((ct) => ct.companyId === seedCompany.id) : []
+  );
 
   const handlePipelineChange = (pipelineName) => {
     const p = PIPELINES.find((pl) => pl.name === pipelineName) ?? null;
@@ -360,7 +377,7 @@ export default function CreateDeal({ onClose, onDone }) {
           <div className="space-y-3">
             <div>
               <Label required>Company / Customer</Label>
-              <CompanySearch selected={company} onSelect={handleCompanySelect} />
+              <CompanySearch selected={company} onSelect={handleCompanySelect} locked={lockCompany} />
             </div>
             <div>
               <Label>Contacts</Label>

@@ -27,8 +27,6 @@ export default function CustomerGateModal({
   onConvert,
   context,
 }) {
-  if (!open) return null;
-
   const resolvedTitle = title || CONTEXT_TITLES[context] || "Customer Required";
 
   const defaultMessage = (
@@ -42,10 +40,10 @@ export default function CustomerGateModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/30 backdrop-blur-sm"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      className={`fixed inset-0 z-[70] flex items-center justify-center transition-all duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
+      <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-gray-150 flex flex-col transition-all duration-300 ease-out transform ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
         {/* Close */}
         <div className="flex justify-end px-3 pt-3">
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">

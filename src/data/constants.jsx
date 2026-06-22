@@ -29,6 +29,9 @@ export const stageColors = {
 // Company kanban columns, in pipeline order.
 export const kanbanStages = ["New Lead", "Contacted", "Qualified", "Proposal Sent", "Negotiation", "Won", "Lost"];
 
+// Deal kanban columns, in pipeline order.
+export const dealKanbanStages = ["Discovery", "Qualification", "Proposal", "Negotiation", "Closed Won", "Closed Lost"];
+
 // ─── CRM NAVIGATION ───
 // Note: "Customers" is NOT a separate entity. It routes to the same
 // CompaniesPage but pre-filters to is_customer=true (see App.jsx, which keys
@@ -106,9 +109,21 @@ export const contacts = [
 ];
 
 // ─── SAMPLE DATA: DEALS ───
+// amountRaw is the numeric value used for Kanban column totals.
+// isCustomerCompany flags whether the associated company is already a Customer (green dot on card).
 export const deals = [
-  { id: 1, name: "Spring Collection 2027", amount: "$45,000", stage: "Proposal", company: "Pinnacle Distributors", contact: "Rahul Mehta", owner: "Sneha I.", closeDate: "Jul 15" },
-  { id: 2, name: "Bulk Reorder Q3", amount: "$120,000", stage: "Negotiation", company: "ABC Corp", contact: "Sneha Iyer", owner: "Rahul M.", closeDate: "Jun 30" },
+  { id: 1, name: "Spring Collection 2027", amountRaw: 45000, amount: "$45,000", stage: "Proposal", company: "Pinnacle Distributors", isCustomerCompany: false, contact: "Rahul Mehta", owner: "John Carmichael", closeDate: "Jul 15", source: "Inbound", daysInStage: 8 },
+  { id: 2, name: "Bulk Reorder Q3", amountRaw: 120000, amount: "$120,000", stage: "Negotiation", company: "ABC Corp", isCustomerCompany: true, contact: "Sneha Iyer", owner: "Tyler Jones", closeDate: "Jun 30", source: "Referral", daysInStage: 14 },
+  { id: 3, name: "Enterprise Catalog Access", amountRaw: 88000, amount: "$88,000", stage: "Discovery", company: "Bluewave Logistics", isCustomerCompany: false, contact: "Sandra Reyes", owner: "Jon Morales", closeDate: "Aug 10", source: "Outbound", daysInStage: 3 },
+  { id: 4, name: "Fall Apparel Bundle", amountRaw: 34500, amount: "$34,500", stage: "Qualification", company: "Metro Wholesale", isCustomerCompany: false, contact: "—", owner: "Saul Cabrera", closeDate: "Jul 28", source: "Trade Show", daysInStage: 6 },
+  { id: 5, name: "Private Label Launch", amountRaw: 210000, amount: "$210,000", stage: "Proposal", company: "Summit Foods", isCustomerCompany: true, contact: "Maria Dos Santos", owner: "John Carmichael", closeDate: "Sep 5", source: "Referral", daysInStage: 11 },
+  { id: 6, name: "Distribution Agreement 2027", amountRaw: 175000, amount: "$175,000", stage: "Negotiation", company: "Stonebridge Supply", isCustomerCompany: true, contact: "Rachel Nguyen", owner: "Saul Cabrera", closeDate: "Jun 25", source: "Inbound", daysInStage: 22 },
+  { id: 7, name: "Seasonal Promotions Pack", amountRaw: 52000, amount: "$52,000", stage: "Closed Won", company: "Tradewind Partners", isCustomerCompany: true, contact: "—", owner: "Jon Morales", closeDate: "Jun 10", source: "Outbound", daysInStage: 45 },
+  { id: 8, name: "Tech Refresh Pilot", amountRaw: 27000, amount: "$27,000", stage: "Closed Lost", company: "Ironclad Hardware", isCustomerCompany: false, contact: "—", owner: "Ryan Walsh", closeDate: "May 30", source: "Manual", daysInStage: 30 },
+  { id: 9, name: "Home Goods Expansion", amountRaw: 63000, amount: "$63,000", stage: "Discovery", company: "Verdant Living", isCustomerCompany: false, contact: "Olivia Stern", owner: "Tyler Jones", closeDate: "Aug 20", source: "Inbound", daysInStage: 5 },
+  { id: 10, name: "Electronics Supply Deal", amountRaw: 41000, amount: "$41,000", stage: "Qualification", company: "Lumen Electronics", isCustomerCompany: false, contact: "Brian Walsh", owner: "Ryan Walsh", closeDate: "Jul 18", source: "Manual", daysInStage: 9 },
+  { id: 11, name: "Organic Range Contract", amountRaw: 95000, amount: "$95,000", stage: "Proposal", company: "Greenfield Organics", isCustomerCompany: false, contact: "—", owner: "Tyler Jones", closeDate: "Aug 1", source: "Referral", daysInStage: 4 },
+  { id: 12, name: "Import Clearance Bundle", amountRaw: 58000, amount: "$58,000", stage: "Closed Won", company: "Coastal Imports", isCustomerCompany: false, contact: "—", owner: "Saul Cabrera", closeDate: "Jun 5", source: "Manual", daysInStage: 38 },
 ];
 
 // ─── SAMPLE DATA: ACTIVITIES ───
@@ -173,6 +188,19 @@ export const companyFieldMeta = {
   annualRevenue: { label: "Annual Revenue", type: "currency" },
   leadSource: { label: "Lead Source", type: "select", options: leadSources },
   isCustomer: { label: "Is Customer", type: "boolean" },
+};
+
+// ─── MANDATORY FIELDS ON DEAL STAGE MOVEMENT (Deal Kanban gate) ───
+export const dealStageMandatoryFields = {
+  Proposal: ["amountRaw", "closeDate"],
+  Negotiation: ["amountRaw", "closeDate", "source"],
+  "Closed Won": ["amountRaw", "closeDate"],
+};
+
+export const dealFieldMeta = {
+  amountRaw: { label: "Amount", type: "currency" },
+  closeDate: { label: "Close Date", type: "text" },
+  source: { label: "Source", type: "select", options: leadSources },
 };
 
 // ─── KAI MERGE-MATCH RECOMMENDATIONS (sample) ───
@@ -274,19 +302,18 @@ export const companyDetail = {
   ],
   deals: [
     {
-      id: 1, name: "Bulk Reorder Q3", amount: "$120,000", stage: "Negotiation", owner: "Tyler Jones", closeDate: "2026-06-30",
+      id: 2, name: "Bulk Reorder Q3", amount: "$120,000", stage: "Negotiation", owner: "Tyler Jones", closeDate: "2026-06-30",
       activities: [
-        { id: 1, type: "system", text: "Stage changed from Qualified to Negotiation", time: "2026-06-18 16:10", sourceEntity: { type: "deal", id: 1, name: "Bulk Reorder Q3" } },
-        { id: 2, type: "note", author: "Tyler Jones", body: "Buyer pushing for 90-day terms on this reorder — escalating to finance.", time: "2026-06-16 11:25", sourceEntity: { type: "deal", id: 1, name: "Bulk Reorder Q3" } },
+        { id: 1, type: "system", text: "Stage changed from Qualified to Negotiation", time: "2026-06-18 16:10", sourceEntity: { type: "deal", id: 2, name: "Bulk Reorder Q3" } },
+        { id: 2, type: "note", author: "Tyler Jones", body: "Buyer pushing for 90-day terms on this reorder — escalating to finance.", time: "2026-06-16 11:25", sourceEntity: { type: "deal", id: 2, name: "Bulk Reorder Q3" } },
       ],
     },
     {
-      id: 2, name: "Holiday Catalog 2026", amount: "$78,500", stage: "Proposal Sent", owner: "John Carmichael", closeDate: "2026-08-15",
+      id: 5, name: "Private Label Launch", amount: "$210,000", stage: "Proposal", owner: "John Carmichael", closeDate: "2026-09-05",
       activities: [
-        { id: 1, type: "system", text: "Stage changed from Qualified to Proposal Sent", time: "2026-06-13 09:50", sourceEntity: { type: "deal", id: 2, name: "Holiday Catalog 2026" } },
+        { id: 1, type: "system", text: "Stage changed from Qualification to Proposal", time: "2026-06-13 09:50", sourceEntity: { type: "deal", id: 5, name: "Private Label Launch" } },
       ],
     },
-    { id: 3, name: "Private Label Expansion", amount: "$210,000", stage: "Qualified", owner: "Tyler Jones", closeDate: "2026-09-30" },
   ],
   orders: [
     { id: "ORD-4821", date: "2026-06-12", amount: "$18,400", status: "Delivered", items: 24 },
@@ -332,6 +359,12 @@ export function getCompanyDetail(id) {
   const base = companies.find((c) => c.id === id);
   if (id === companyDetail.id) return { ...base, ...companyDetail };
   if (!base) return companyDetail;
+  // Look up real deals for this company from the global deals array so that
+  // deal ids match and clicking a deal card navigates to the correct deal.
+  const companyDeals = deals.filter((d) => d.company === base.name).map((d) => ({
+    id: d.id, name: d.name, amount: d.amount, stage: d.stage,
+    owner: d.owner, closeDate: d.closeDate,
+  }));
   return {
     ...companyDetail, // nested orders/activities/contacts/etc. as sample content
     ...base, // real row fields (name, stage, rep, etc.) win
@@ -339,6 +372,7 @@ export function getCompanyDetail(id) {
     billingAddress: { ...base.address, zip: companyDetail.billingAddress.zip },
     shippingAddress: { ...base.address, zip: companyDetail.shippingAddress.zip },
     leadSource: companyDetail.leadSource,
+    deals: companyDeals.length > 0 ? companyDeals : companyDetail.deals,
   };
 }
 
@@ -438,10 +472,10 @@ export function formatRelativeTime(iso) {
 }
 
 // ─── FULLY-FLESHED DEAL DETAIL ───
-// One rich deal record (id:1) with all nested data for DealDetailPage.
+// One rich deal record (id:2, "Bulk Reorder Q3") with all nested data for DealDetailPage.
 // getDealDetail(id) merges this onto the deals[] row, falling back for other ids.
 export const dealDetail = {
-  id: 1,
+  id: 2,
   name: "Bulk Reorder Q3",
   pipeline: "Default Sales Pipeline",
   stage: "Negotiation",
@@ -481,12 +515,25 @@ export const dealDetail = {
 
 export function getDealDetail(id) {
   const base = deals.find((d) => d.id === id);
-  if (id === dealDetail.id) return { ...base, ...dealDetail };
+
+  // Resolve the company object from the companies array using the deal's company name.
+  function resolveCompany(companyName) {
+    if (!companyName || typeof companyName !== "string") return null;
+    const c = companies.find((co) => co.name === companyName);
+    if (!c) return null;
+    return { id: c.id, name: c.name, domain: c.domain, isCustomer: c.isCustomer, industry: c.industry, stage: c.stage };
+  }
+
+  if (id === dealDetail.id) {
+    return { ...base, ...dealDetail };
+  }
   if (!base) return dealDetail;
-  // For other ids, overlay real row fields on top of the rich sample.
+  // For other ids: overlay real row fields, but build a proper company object
+  // (base.company is a plain string like "ABC Corp", not a nested object).
   return {
     ...dealDetail,
     ...base,
+    company: resolveCompany(base.company),
     pipeline: dealDetail.pipeline,
     forecastCategory: dealDetail.forecastCategory,
     createdBy: dealDetail.createdBy,
@@ -612,27 +659,175 @@ export const dealColumns = [
   { key: "closeDate", label: "Close Date" },
 ];
 
-// ─── SAMPLE DATA: QUOTES ───
-// Demo data for the Quote → Order conversion flow (Customer Gate).
-// Only QT-2024-0851 (Pinnacle Distributors, companyId 1) is tied to a
-// non-customer company — that's the one that triggers the CustomerGateModal.
-// The rest map to customer companies (ABC Corp, Summit Foods, Stonebridge).
-export const quotes = [
-  { id: 1, quoteNumber: "QT-2024-0847", companyId: 2, companyName: "ABC Corp", amount: "$24,500", status: "Approved", createdAt: "2026-06-12" },
-  { id: 2, quoteNumber: "QT-2024-0849", companyId: 6, companyName: "Summit Foods", amount: "$58,200", status: "Sent", createdAt: "2026-06-15" },
-  { id: 3, quoteNumber: "QT-2024-0851", companyId: 1, companyName: "Pinnacle Distributors", amount: "$12,800", status: "Approved", createdAt: "2026-06-18" },
-  { id: 4, quoteNumber: "QT-2024-0853", companyId: 14, companyName: "Stonebridge Supply", amount: "$41,000", status: "Draft", createdAt: "2026-06-20" },
+// ─── SAMPLE DATA: PRODUCTS ───
+// Minimal catalog used by the Create Quote line-item search.
+export const products = [
+  { id: "p1", sku: "WC-1001", name: "Classic Oxford Shirt", category: "Apparel", unitPrice: 45.0 },
+  { id: "p2", sku: "WC-1002", name: "Merino Wool Sweater", category: "Apparel", unitPrice: 89.0 },
+  { id: "p3", sku: "WC-1003", name: "Tailored Chino Pants", category: "Apparel", unitPrice: 62.0 },
+  { id: "p4", sku: "WC-2001", name: "Leather Belt", category: "Accessories", unitPrice: 34.0 },
+  { id: "p5", sku: "WC-2002", name: "Canvas Tote Bag", category: "Accessories", unitPrice: 28.0 },
+  { id: "p6", sku: "WC-2003", name: "Wool Scarf", category: "Accessories", unitPrice: 22.5 },
+  { id: "p7", sku: "WC-3001", name: "Suede Chelsea Boots", category: "Footwear", unitPrice: 148.0 },
+  { id: "p8", sku: "WC-3002", name: "Canvas Sneakers", category: "Footwear", unitPrice: 72.0 },
+  { id: "p9", sku: "WC-3003", name: "Leather Loafers", category: "Footwear", unitPrice: 115.0 },
+  { id: "p10", sku: "WC-4001", name: "Ceramic Dinnerware Set", category: "Home Goods", unitPrice: 96.0 },
+  { id: "p11", sku: "WC-4002", name: "Linen Throw Blanket", category: "Home Goods", unitPrice: 54.0 },
+  { id: "p12", sku: "WC-4003", name: "Scented Soy Candle", category: "Home Goods", unitPrice: 18.0 },
 ];
 
-export const quoteColumns = [
-  { key: "quoteNumber", label: "Quote #", render: (v) => <span className="font-medium text-gray-900">{v}</span> },
-  { key: "companyName", label: "Company" },
-  { key: "amount", label: "Amount", render: (v) => <span className="font-semibold">{v}</span> },
-  { key: "status", label: "Status" },
-  { key: "createdAt", label: "Created" },
+// ─── SAMPLE DATA: QUOTES ───
+// Demo data for the Quotes tab + Quote → Order conversion flow (Customer Gate).
+// Quotes 1, 5, 8 are tied to ABC Corp (companyId 2) — the detailed company from Flow 1-C.
+// Quote 3 (Pinnacle Distributors, companyId 1) is on a NON-customer company —
+// that's the one that triggers the CustomerGateModal in Flow 10.
+export const quotes = [
+  {
+    id: 1, quoteNumber: "QT-2026-0001", companyId: 2, companyName: "ABC Corp", isCustomerCompany: true,
+    contactId: 1, contactName: "Sneha Iyer", dealId: 2, dealName: "Bulk Reorder Q3",
+    items: [
+      { sku: "WC-1001", productName: "Classic Oxford Shirt", quantity: 120, unitPrice: 45.0, total: 5400.0 },
+      { sku: "WC-1002", productName: "Merino Wool Sweater", quantity: 80, unitPrice: 89.0, total: 7120.0 },
+      { sku: "WC-2001", productName: "Leather Belt", quantity: 150, unitPrice: 34.0, total: 5100.0 },
+    ],
+    subtotal: 17620.0, tax: 1409.6, discount: 1000.0, grandTotal: 18029.6,
+    status: "Accepted", validUntil: "2026-07-15", createdAt: "2026-06-12", createdBy: "Tyler Jones",
+    notes: "Volume pricing applied for Q3 reorder.",
+  },
+  {
+    id: 2, quoteNumber: "QT-2026-0002", companyId: 6, companyName: "Summit Foods", isCustomerCompany: true,
+    contactId: 11, contactName: "Maria Dos Santos", dealId: 5, dealName: "Private Label Launch",
+    items: [
+      { sku: "WC-4001", productName: "Ceramic Dinnerware Set", quantity: 200, unitPrice: 96.0, total: 19200.0 },
+      { sku: "WC-4002", productName: "Linen Throw Blanket", quantity: 300, unitPrice: 54.0, total: 16200.0 },
+    ],
+    subtotal: 35400.0, tax: 2832.0, discount: 2000.0, grandTotal: 36232.0,
+    status: "Sent", validUntil: "2026-08-05", createdAt: "2026-06-15", createdBy: "John Carmichael",
+    notes: "",
+  },
+  {
+    id: 3, quoteNumber: "QT-2026-0003", companyId: 1, companyName: "Pinnacle Distributors", isCustomerCompany: false,
+    contactId: 5, contactName: "Rahul Mehta", dealId: 1, dealName: "Spring Collection 2027",
+    items: [
+      { sku: "WC-1003", productName: "Tailored Chino Pants", quantity: 100, unitPrice: 62.0, total: 6200.0 },
+      { sku: "WC-3002", productName: "Canvas Sneakers", quantity: 90, unitPrice: 72.0, total: 6480.0 },
+    ],
+    subtotal: 12680.0, tax: 1014.4, discount: 0, grandTotal: 13694.4,
+    status: "Viewed", validUntil: "2026-07-28", createdAt: "2026-06-18", createdBy: "John Carmichael",
+    notes: "Awaiting buyer feedback on sneaker sizing.",
+  },
+  {
+    id: 4, quoteNumber: "QT-2026-0004", companyId: 14, companyName: "Stonebridge Supply", isCustomerCompany: true,
+    contactId: 16, contactName: "Rachel Nguyen", dealId: 6, dealName: "Distribution Agreement 2027",
+    items: [
+      { sku: "WC-3001", productName: "Suede Chelsea Boots", quantity: 60, unitPrice: 148.0, total: 8880.0 },
+      { sku: "WC-3003", productName: "Leather Loafers", quantity: 50, unitPrice: 115.0, total: 5750.0 },
+      { sku: "WC-2003", productName: "Wool Scarf", quantity: 120, unitPrice: 22.5, total: 2700.0 },
+    ],
+    subtotal: 17330.0, tax: 1386.4, discount: 500.0, grandTotal: 18216.4,
+    status: "Draft", validUntil: "2026-08-20", createdAt: "2026-06-20", createdBy: "Saul Cabrera",
+    notes: "",
+  },
+  {
+    id: 5, quoteNumber: "QT-2026-0005", companyId: 2, companyName: "ABC Corp", isCustomerCompany: true,
+    contactId: 2, contactName: "Marcus Bell", dealId: null, dealName: null,
+    items: [
+      { sku: "WC-2002", productName: "Canvas Tote Bag", quantity: 500, unitPrice: 28.0, total: 14000.0 },
+      { sku: "WC-4003", productName: "Scented Soy Candle", quantity: 400, unitPrice: 18.0, total: 7200.0 },
+    ],
+    subtotal: 21200.0, tax: 1696.0, discount: 1200.0, grandTotal: 21696.0,
+    status: "Draft", validUntil: "2026-08-30", createdAt: "2026-06-19", createdBy: "Tyler Jones",
+    notes: "Standalone promo quote — not tied to a deal.",
+  },
+  {
+    id: 6, quoteNumber: "QT-2026-0006", companyId: 5, companyName: "Delta Trading", isCustomerCompany: false,
+    contactId: 8, contactName: "James Okafor", dealId: null, dealName: null,
+    items: [
+      { sku: "WC-1001", productName: "Classic Oxford Shirt", quantity: 60, unitPrice: 45.0, total: 2700.0 },
+      { sku: "WC-2001", productName: "Leather Belt", quantity: 60, unitPrice: 34.0, total: 2040.0 },
+    ],
+    subtotal: 4740.0, tax: 379.2, discount: 0, grandTotal: 5119.2,
+    status: "Rejected", validUntil: "2026-05-30", createdAt: "2026-05-10", createdBy: "Ryan Walsh",
+    notes: "Buyer went with a competing supplier.",
+  },
+  {
+    id: 7, quoteNumber: "QT-2026-0007", companyId: 13, companyName: "Bluewave Logistics", isCustomerCompany: false,
+    contactId: 13, contactName: "Sandra Reyes", dealId: 3, dealName: "Enterprise Catalog Access",
+    items: [
+      { sku: "WC-4001", productName: "Ceramic Dinnerware Set", quantity: 150, unitPrice: 96.0, total: 14400.0 },
+      { sku: "WC-4002", productName: "Linen Throw Blanket", quantity: 100, unitPrice: 54.0, total: 5400.0 },
+      { sku: "WC-4003", productName: "Scented Soy Candle", quantity: 200, unitPrice: 18.0, total: 3600.0 },
+    ],
+    subtotal: 23400.0, tax: 1872.0, discount: 1500.0, grandTotal: 23772.0,
+    status: "Sent", validUntil: "2026-08-10", createdAt: "2026-06-16", createdBy: "Jon Morales",
+    notes: "",
+  },
+  {
+    id: 8, quoteNumber: "QT-2026-0008", companyId: 2, companyName: "ABC Corp", isCustomerCompany: true,
+    contactId: 4, contactName: "Priya Raman", dealId: null, dealName: null,
+    items: [
+      { sku: "WC-1002", productName: "Merino Wool Sweater", quantity: 40, unitPrice: 89.0, total: 3560.0 },
+      { sku: "WC-2003", productName: "Wool Scarf", quantity: 80, unitPrice: 22.5, total: 1800.0 },
+    ],
+    subtotal: 5360.0, tax: 428.8, discount: 0, grandTotal: 5788.8,
+    status: "Expired", validUntil: "2026-05-15", createdAt: "2026-04-14", createdBy: "Tyler Jones",
+    notes: "Quote lapsed; reissue if buyer re-engages.",
+  },
+  {
+    id: 9, quoteNumber: "QT-2026-0009", companyId: 18, companyName: "Tradewind Partners", isCustomerCompany: true,
+    contactId: null, contactName: null, dealId: 7, dealName: "Seasonal Promotions Pack",
+    items: [
+      { sku: "WC-3002", productName: "Canvas Sneakers", quantity: 200, unitPrice: 72.0, total: 14400.0 },
+      { sku: "WC-3003", productName: "Leather Loafers", quantity: 80, unitPrice: 115.0, total: 9200.0 },
+    ],
+    subtotal: 23600.0, tax: 1888.0, discount: 1800.0, grandTotal: 23688.0,
+    status: "Accepted", validUntil: "2026-07-01", createdAt: "2026-06-08", createdBy: "Jon Morales",
+    notes: "",
+  },
 ];
+
+// Status → badge classes used across the Quotes UI.
+export const quoteStatusStyles = {
+  Draft: "bg-gray-100 text-gray-600",
+  Sent: "bg-blue-50 text-blue-700",
+  Viewed: "bg-amber-50 text-amber-700",
+  Accepted: "bg-emerald-50 text-emerald-700",
+  Rejected: "bg-red-50 text-red-700",
+  Expired: "bg-gray-100 text-gray-500",
+};
+
+export const quoteStatuses = ["Draft", "Sent", "Viewed", "Accepted", "Rejected", "Expired"];
+
+// Currency formatter for quote amounts (numeric → "$18,029.60").
+export function formatCurrency(n) {
+  if (n == null || Number.isNaN(Number(n))) return "—";
+  return Number(n).toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
+// True if the quote's validUntil date is in the past (relative to now).
+export function isQuoteExpired(iso) {
+  if (!iso) return false;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return false;
+  return d.getTime() < Date.now();
+}
 
 // Resolve a quote's associated company (for the Customer Gate check).
 export function getQuoteCompany(quote) {
   return companies.find((c) => c.id === quote.companyId) || null;
+}
+
+// All quotes for a given company id.
+export function getCompanyQuotes(companyId) {
+  return quotes.filter((q) => q.companyId === companyId);
+}
+
+// Contacts belonging to a company (for the Create Quote contact dropdown).
+export function getCompanyContacts(companyId) {
+  return contacts.filter((c) => c.companyId === companyId);
+}
+
+// Deals belonging to a company by name (deals[] store company as a string).
+export function getCompanyDeals(companyName) {
+  return deals.filter((d) => d.company === companyName);
 }

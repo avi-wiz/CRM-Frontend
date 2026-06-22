@@ -1,12 +1,20 @@
 import { useState } from "react";
-import { User, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { stageColors } from "../../data/constants";
+
+// Helper to extract initials for representations
+function repInitials(name) {
+  if (!name) return "?";
+  return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+}
 
 // Generic Kanban board. `onDrop(item, newStage)` is called when a card is
 // dragged onto a different column — the host decides whether the move is
 // allowed (e.g. mandatory-field gate). Cards don't move on their own; the host
 // owns the data, so the column a card appears in always reflects item[stageField].
-export default function KanbanBoard({ stages, data, stageField = "stage", onCardClick, onDrop, renderCard }) {
+// `columnMeta` is an optional object keyed by stage name with { bg, borderColor, total }
+// that allows hosts to customize column header appearance and show aggregate totals.
+export default function KanbanBoard({ stages, data, stageField = "stage", onCardClick, onDrop, renderCard, columnMeta }) {
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverStage, setDragOverStage] = useState(null);
 
@@ -18,33 +26,38 @@ export default function KanbanBoard({ stages, data, stageField = "stage", onCard
   };
 
   return (
-    <div className="flex-1 overflow-x-auto px-6 py-4">
-      <div className="flex gap-4 min-w-max h-full">
+    <div className="flex-1 overflow-x-auto px-8 py-6">
+      <div className="flex gap-5 min-w-max h-full items-start">
         {stages.map((stage) => {
           const stageItems = data.filter((d) => d[stageField] === stage);
           const color = stageColors[stage] || "#6b7280";
           const isDragOver = dragOverStage === stage;
+          const meta = columnMeta?.[stage];
           return (
             <div
               key={stage}
-              className="w-64 flex-shrink-0 flex flex-col"
+              className="w-72 flex-shrink-0 flex flex-col rounded-2xl p-3 border border-gray-100/50"
+              style={{ backgroundColor: meta?.bg || "rgba(248,250,252,0.3)", borderTopWidth: meta?.borderColor ? 3 : undefined, borderTopColor: meta?.borderColor || undefined }}
               onDragOver={(e) => { if (draggingId != null) { e.preventDefault(); setDragOverStage(stage); } }}
               onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOverStage(null); }}
               onDrop={(e) => { e.preventDefault(); handleDrop(stage); }}
             >
-              {/* Column Header — 4px top border in the stage color */}
-              <div
-                className="flex items-center justify-between mb-3 px-2 py-2 bg-white rounded-t-lg border border-gray-200"
-                style={{ borderTop: `4px solid ${color}` }}
-              >
-                <span className="text-sm font-semibold text-gray-700">{stage}</span>
-                <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">{stageItems.length}</span>
+              {/* Column Header */}
+              <div className="flex items-center justify-between mb-4 px-1 py-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                  <span className="text-sm font-bold text-gray-800 tracking-tight">{stage}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {meta?.total && <span className="text-xs font-semibold text-gray-400">{meta.total}</span>}
+                  <span className="text-xs font-bold text-gray-500 bg-white px-2 py-0.5 rounded-lg border border-gray-200/60 shadow-sm">{stageItems.length}</span>
+                </div>
               </div>
 
               {/* Cards (drop zone) */}
               <div
-                className={`flex-1 space-y-2.5 rounded-lg transition-colors ${
-                  isDragOver ? "bg-indigo-50/60 ring-2 ring-indigo-200 ring-inset p-1" : ""
+                className={`flex-1 space-y-3 rounded-xl transition-all duration-200 p-1 min-h-[500px] ${
+                  isDragOver ? "bg-indigo-50/40 border border-dashed border-indigo-300 ring-4 ring-indigo-500/5 animate-pulse-glow" : ""
                 }`}
               >
                 {stageItems.map((item) => (
@@ -54,18 +67,22 @@ export default function KanbanBoard({ stages, data, stageField = "stage", onCard
                     onDragStart={() => setDraggingId(item.id)}
                     onDragEnd={() => { setDraggingId(null); setDragOverStage(null); }}
                     onClick={() => onCardClick?.(item)}
-                    className={`bg-white border border-gray-200 rounded-lg p-3 cursor-pointer hover:shadow-md hover:border-gray-300 transition-shadow ${
-                      draggingId === item.id ? "opacity-40" : ""
+                    className={`bg-white border border-gray-150 rounded-2xl p-4 cursor-pointer hover:shadow-[0_8px_20px_rgba(99,102,241,0.05)] hover:border-indigo-200 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.99] ${
+                      draggingId === item.id ? "opacity-35 scale-95" : ""
                     }`}
                   >
                     {renderCard ? renderCard(item) : (
                       <>
-                        <div className="font-medium text-sm text-gray-900 mb-1.5">{item.name}</div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span className="flex items-center gap-1"><User size={11} />{item.rep}</span>
-                          <span className="flex items-center gap-1"><Clock size={11} />{item.lastActivity}</span>
+                        <div className="font-bold text-sm text-gray-900 mb-2 tracking-tight">{item.name}</div>
+                        <div className="flex items-center gap-2.5 text-xs text-gray-500 mb-3">
+                          <div className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[9px] font-extrabold flex items-center justify-center shadow-sm">
+                            {repInitials(item.rep)}
+                          </div>
+                          <span className="font-medium text-gray-700">{item.rep || "Unassigned"}</span>
+                          <span className="text-gray-300">·</span>
+                          <span className="flex items-center gap-1"><Clock size={11} className="text-gray-400" />{item.lastActivity}</span>
                         </div>
-                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-50 text-xs text-gray-400">
                           <span>{item.contacts} contacts</span>
                           <span>·</span>
                           <span>{item.deals} deals</span>
@@ -75,7 +92,7 @@ export default function KanbanBoard({ stages, data, stageField = "stage", onCard
                   </div>
                 ))}
                 {stageItems.length === 0 && (
-                  <div className="border border-dashed border-gray-200 rounded-lg p-4 text-center text-xs text-gray-400">
+                  <div className="border border-dashed border-gray-200/80 rounded-xl p-6 text-center text-xs text-gray-400 bg-white/40">
                     {isDragOver ? "Drop here" : "No items"}
                   </div>
                 )}

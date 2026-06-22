@@ -2,10 +2,13 @@ import { useState } from "react";
 import { ArrowLeft, MoreHorizontal, CheckCircle } from "lucide-react";
 import StageBadge from "../components/shared/StageBadge";
 import SideSheet from "../components/shared/SideSheet";
+import ConfirmModal from "../components/shared/ConfirmModal";
 import PropertiesPanel from "../components/detail/PropertiesPanel";
 import ContactCenterTabs from "../components/detail/ContactCenterTabs";
 import ContactAssociations from "../components/detail/ContactAssociations";
 import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
+import { EditSheet } from "../components/side-sheets/EditSheet";
+import { CreateWizShopUserContent } from "../components/side-sheets/index";
 import { getContactDetail, repNames, leadSources } from "../data/constants";
 
 const CONTACT_STAGES = ["New", "Open", "In Progress", "Qualified", "Unqualified"];
@@ -46,6 +49,9 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [logSheet, setLogSheet] = useState(null); // activity action key or null
+  const [editOpen, setEditOpen] = useState(false);
+  const [wizShopOpen, setWizShopOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
   const updateField = (key, value) => setContact((c) => ({ ...c, [key]: value }));
 
@@ -73,46 +79,59 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── HEADER ─── */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-1 rounded hover:bg-gray-100" title="Back to listing">
-            <ArrowLeft size={18} className="text-gray-500" />
+          <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors" title="Back to listing">
+            <ArrowLeft size={18} />
           </button>
           <div>
-            <span className="text-xs text-gray-400 uppercase tracking-wide">Contact</span>
-            <h1 className="text-lg font-semibold text-gray-900">{fullName}</h1>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Contact</span>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">{fullName}</h1>
           </div>
           <StageBadge stage={contact.stage} />
           {contact.isWizShopUser && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
               WizShop {contact.wizShopRole || "User"}
             </span>
           )}
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => showToast("Edit contact — coming soon")}
-            className="px-3 py-1.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+            onClick={() => setEditOpen(true)}
+            className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200"
           >
             Edit
           </button>
           <div className="relative">
-            <button onClick={() => setMenuOpen((o) => !o)} className="p-1.5 border border-gray-200 rounded-lg hover:bg-gray-50">
+            <button onClick={() => setMenuOpen((o) => !o)} className="p-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 shadow-sm transition-all duration-200">
               <MoreHorizontal size={16} />
             </button>
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-44">
-                  {["Create WizShop User", "Archive"].map((item) => (
+                <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-48">
+                  {!contact.isWizShopUser && (
                     <button
-                      key={item}
-                      onClick={() => { console.log(item, fullName); setMenuOpen(false); }}
+                      onClick={() => { setMenuOpen(false); setWizShopOpen(true); }}
                       className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
                     >
-                      {item}
+                      Create WizShop User
                     </button>
-                  ))}
+                  )}
+                  {contact.isWizShopUser && (
+                    <button
+                      onClick={() => { setMenuOpen(false); showToast("WizShop role updated"); }}
+                      className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Change WizShop Role
+                    </button>
+                  )}
+                  <button
+                    onClick={() => { setMenuOpen(false); setArchiveOpen(true); }}
+                    className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                  >
+                    Archive Contact
+                  </button>
                 </div>
               </>
             )}
@@ -150,6 +169,53 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
           />
         )}
       </SideSheet>
+
+      {/* ─── EDIT SIDE SHEET ─── */}
+      <SideSheet open={editOpen} onClose={() => setEditOpen(false)} title={`Edit ${fullName}`}>
+        {editOpen && (
+          <EditSheet
+            groups={PROPERTY_GROUPS}
+            values={contact}
+            entityLabel="Contact"
+            onClose={() => setEditOpen(false)}
+            onSave={(updated) => {
+              setContact((c) => ({ ...c, ...updated }));
+              setEditOpen(false);
+              showToast("Contact updated");
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* ─── CREATE WIZSHOP USER SIDE SHEET ─── */}
+      <SideSheet open={wizShopOpen} onClose={() => setWizShopOpen(false)} title="Create WizShop User">
+        {wizShopOpen && (
+          <CreateWizShopUserContent
+            contact={contact}
+            onClose={() => setWizShopOpen(false)}
+            onDone={({ role }) => {
+              setContact((c) => ({ ...c, isWizShopUser: true, wizShopRole: role, wizShopStatus: "Active" }));
+              setWizShopOpen(false);
+              showToast(`WizShop ${role} account created for ${fullName}`);
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* ─── ARCHIVE CONFIRM ─── */}
+      <ConfirmModal
+        open={archiveOpen}
+        onClose={() => setArchiveOpen(false)}
+        title="Archive Contact"
+        message={`Archive ${fullName}? They will be hidden from the active contacts list but can be restored later.`}
+        confirmLabel="Archive"
+        destructive
+        onConfirm={() => {
+          setArchiveOpen(false);
+          showToast(`${fullName} archived`);
+          setTimeout(() => onBack?.(), 1800);
+        }}
+      />
 
       {/* ─── SUCCESS TOAST ─── */}
       {toast && (

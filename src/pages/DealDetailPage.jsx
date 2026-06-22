@@ -2,9 +2,11 @@ import { useState } from "react";
 import { ArrowLeft, MoreHorizontal, CheckCircle, Building2, Users, GitBranch, ChevronDown } from "lucide-react";
 import StageBadge from "../components/shared/StageBadge";
 import SideSheet from "../components/shared/SideSheet";
+import ConfirmModal from "../components/shared/ConfirmModal";
 import PropertiesPanel from "../components/detail/PropertiesPanel";
 import ActivityTimeline from "../components/detail/ActivityTimeline";
 import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
+import { EditSheet } from "../components/side-sheets/EditSheet";
 import { getDealDetail, repNames, formatDate, stageColors } from "../data/constants";
 
 // ─── PIPELINE CONFIG ───
@@ -311,7 +313,7 @@ function ChangeStageMenu({ stages, current, onSelect }) {
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+        className="flex items-center gap-1 px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200"
       >
         Change Stage
         <ChevronDown size={13} />
@@ -343,11 +345,13 @@ function ChangeStageMenu({ stages, current, onSelect }) {
 }
 
 // ─── MAIN PAGE ───
-export default function DealDetailPage({ dealId, onBack, onCompanyClick, onContactClick }) {
+export default function DealDetailPage({ dealId, onBack, onCompanyClick, onContactClick, onDuplicate }) {
   const [deal, setDeal] = useState(() => getDealDetail(dealId));
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [logSheet, setLogSheet] = useState(null); // activity action key or null
+  const [editOpen, setEditOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
   const pipelineConfig = PIPELINE_STAGES[deal.pipeline] ?? PIPELINE_STAGES["Default Sales Pipeline"];
 
@@ -382,30 +386,30 @@ export default function DealDetailPage({ dealId, onBack, onCompanyClick, onConta
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── HEADER ─── */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white flex-shrink-0">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white flex-shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={onBack}
-            className="p-1 rounded hover:bg-gray-100 flex-shrink-0"
+            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0"
             title="Back to deals"
           >
-            <ArrowLeft size={18} className="text-gray-500" />
+            <ArrowLeft size={18} />
           </button>
           <div className="min-w-0">
-            <span className="text-xs text-gray-400 uppercase tracking-wide">Deal</span>
-            <h1 className="text-lg font-semibold text-gray-900 truncate">{deal.name}</h1>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Deal</span>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight truncate">{deal.name}</h1>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <span className="text-sm text-gray-400">{deal.pipeline}</span>
             <StageBadge stage={deal.stage} />
           </div>
-          <span className="text-lg font-semibold text-emerald-600 flex-shrink-0">{deal.amount}</span>
+          <span className="text-lg font-bold text-emerald-600 flex-shrink-0 tracking-tight">{deal.amount}</span>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
-            onClick={() => showToast("Edit deal — coming soon")}
-            className="px-3 py-1.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+            onClick={() => setEditOpen(true)}
+            className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200"
           >
             Edit
           </button>
@@ -417,7 +421,7 @@ export default function DealDetailPage({ dealId, onBack, onCompanyClick, onConta
           <div className="relative">
             <button
               onClick={() => setMenuOpen((o) => !o)}
-              className="p-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"
+              className="p-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 shadow-sm transition-all duration-200"
             >
               <MoreHorizontal size={16} />
             </button>
@@ -425,15 +429,36 @@ export default function DealDetailPage({ dealId, onBack, onCompanyClick, onConta
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
                 <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-44">
-                  {["Duplicate Deal", "Archive Deal"].map((item) => (
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      // Flatten company back to a string so ListingPage table cells don't get a nested object
+                      const companyName = typeof deal.company === "object" ? deal.company?.name : deal.company;
+                      onDuplicate?.({
+                        ...deal,
+                        id: undefined,
+                        name: `${deal.name} (Copy)`,
+                        company: companyName,
+                        // Strip nested-only fields that don't belong in the listing row
+                        contacts: undefined,
+                        meetings: undefined,
+                        tasks: undefined,
+                        activities: undefined,
+                      });
+                      showToast(`Duplicated: ${deal.name} (Copy)`);
+                    }}
+                    className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Duplicate Deal
+                  </button>
+                  <div className="border-t border-gray-100 mt-1 pt-1">
                     <button
-                      key={item}
-                      onClick={() => { console.log(item, deal.name); setMenuOpen(false); }}
-                      className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { setMenuOpen(false); setArchiveOpen(true); }}
+                      className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
                     >
-                      {item}
+                      Archive Deal
                     </button>
-                  ))}
+                  </div>
                 </div>
               </>
             )}
@@ -476,6 +501,38 @@ export default function DealDetailPage({ dealId, onBack, onCompanyClick, onConta
           />
         )}
       </SideSheet>
+
+      {/* ─── EDIT SIDE SHEET ─── */}
+      <SideSheet open={editOpen} onClose={() => setEditOpen(false)} title={`Edit ${deal.name}`}>
+        {editOpen && (
+          <EditSheet
+            groups={propertyGroups}
+            values={deal}
+            entityLabel="Deal"
+            onClose={() => setEditOpen(false)}
+            onSave={(updated) => {
+              setDeal((d) => ({ ...d, ...updated }));
+              setEditOpen(false);
+              showToast("Deal updated");
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* ─── ARCHIVE CONFIRM ─── */}
+      <ConfirmModal
+        open={archiveOpen}
+        onClose={() => setArchiveOpen(false)}
+        title="Archive Deal"
+        message={`Archive "${deal.name}"? It will be hidden from the active deals list but can be restored later.`}
+        confirmLabel="Archive"
+        destructive
+        onConfirm={() => {
+          setArchiveOpen(false);
+          showToast(`"${deal.name}" archived`);
+          setTimeout(() => onBack?.(), 1800);
+        }}
+      />
 
       {/* ─── SUCCESS TOAST ─── */}
       {toast && (

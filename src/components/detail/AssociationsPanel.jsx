@@ -13,17 +13,17 @@ export default function AssociationsPanel({ company, stages, stage, onStageChang
   const wizshopUsers = (company.contacts || []).filter((c) => c.wizshop);
 
   return (
-    <div className="w-64 border-l border-gray-100 overflow-y-auto bg-white p-4 flex-shrink-0">
+    <div className="w-64 border-l border-gray-150 overflow-y-auto bg-white p-5 flex-shrink-0">
       {/* Contacts */}
       <Block title="Contacts" icon={Users} action={{ label: "+ Add Contact", onClick: () => onAction?.("addContact") }}>
         {(company.contacts || []).map((c) => (
-          <div key={c.id} onClick={() => onContactClick?.(c)} className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-gray-50 cursor-pointer">
-            <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-medium text-indigo-700 flex-shrink-0">
+          <div key={c.id} onClick={() => onContactClick?.(c)} className="flex items-center gap-2.5 py-2 px-2 rounded-xl hover:bg-indigo-50/40 cursor-pointer transition-colors duration-150">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0 shadow-sm">
               {initials(c.name)}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm text-gray-800 leading-tight truncate">{c.name}</span>
+                <span className="text-sm font-medium text-gray-800 leading-tight truncate">{c.name}</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${ROLE_COLOR[c.role] || "bg-gray-100 text-gray-600"}`}>{c.role}</span>
               </div>
               <div className="text-xs text-gray-400 truncate">{c.email}</div>
@@ -33,13 +33,13 @@ export default function AssociationsPanel({ company, stages, stage, onStageChang
       </Block>
 
       {/* Deals */}
-      <Block title="Deals" icon={DollarSign} action={{ label: "+ Add Deal", onClick: () => onAction?.("addDeal") }}>
+      <Block title="Deals" icon={DollarSign} action={{ label: "+ Create Deal", onClick: () => onAction?.("addDeal") }}>
         {(company.deals || []).map((d) => (
-          <div key={d.id} onClick={() => onDealClick?.(d)} className="py-1.5 px-2 rounded hover:bg-gray-50 cursor-pointer">
-            <div className="text-sm text-gray-800">{d.name}</div>
-            <div className="flex items-center gap-2 mt-0.5">
+          <div key={d.id} onClick={() => onDealClick?.(d)} className="py-2 px-2.5 rounded-xl border border-transparent hover:border-indigo-100 hover:bg-indigo-50/40 cursor-pointer transition-all duration-150">
+            <div className="text-sm font-medium text-gray-800">{d.name}</div>
+            <div className="flex items-center gap-2 mt-1">
               <StageBadge stage={d.stage} small />
-              <span className="text-xs text-gray-500">{d.amount}</span>
+              <span className="text-xs font-semibold text-gray-600">{d.amount}</span>
             </div>
           </div>
         ))}
@@ -145,14 +145,14 @@ function AddressLine({ label, addr, onEdit }) {
 
 function Block({ title, icon: Icon, action, children }) {
   return (
-    <div className="mb-5">
-      <div className="flex items-center justify-between mb-2">
+    <div className="mb-6 pb-5 border-b border-gray-100 last:border-0 last:pb-0">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5">
           {Icon && <Icon size={13} className="text-gray-400" />}
-          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{title}</h4>
+          <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{title}</h4>
         </div>
         {action && (
-          <button onClick={action.onClick} className="text-xs text-indigo-500 hover:text-indigo-700">{action.label}</button>
+          <button onClick={action.onClick} className="text-xs font-semibold text-indigo-500 hover:text-indigo-700 transition-colors">{action.label}</button>
         )}
       </div>
       {children}

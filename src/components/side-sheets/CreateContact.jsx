@@ -6,10 +6,23 @@ const DEPARTMENTS = ["Sales", "Marketing", "Operations", "Finance", "Engineering
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Resolve a companies[] row from an arbitrary company-like object (the detail
+// record carries extra nested data we don't want in the picker).
+function toPickerCompany(c) {
+  if (!c) return null;
+  const match = companies.find((co) => co.id === c.id) || companies.find((co) => co.name === c.name);
+  return match || { id: c.id, name: c.name, domain: c.domain || "" };
+}
+
 // Create Contact side sheet. `onClose`/`onDone` are owned by the host SideSheet.
 // onDone(contact, newCompany?) — newCompany is set when the inline create-company
 // path was used so the host can toast/persist both.
-export default function CreateContact({ onClose, onDone }) {
+// `initialCompany` — when launched from a Company detail page, pre-selects + locks
+// the company association.
+export default function CreateContact({ onClose, onDone, initialCompany = null }) {
+  const seedCompany = toPickerCompany(initialCompany);
+  const lockCompany = !!seedCompany;
+
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
@@ -19,7 +32,7 @@ export default function CreateContact({ onClose, onDone }) {
 
   // Company association — either a selected existing company or an inline new one.
   const [query, setQuery] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [selectedCompany, setSelectedCompany] = useState(seedCompany);
   const [createCompanyOpen, setCreateCompanyOpen] = useState(false);
   const [newCompanyName, setNewCompanyName] = useState("");
   const [newCompanyDomain, setNewCompanyDomain] = useState("");
@@ -138,9 +151,11 @@ export default function CreateContact({ onClose, onDone }) {
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 border border-indigo-200">
               <span className="text-sm font-medium text-indigo-800 flex-1 truncate">{selectedCompany.name}</span>
               <span className="text-xs text-indigo-400 truncate">{selectedCompany.domain}</span>
-              <button onClick={() => setSelectedCompany(null)} className="text-indigo-400 hover:text-indigo-700">
-                <X size={15} />
-              </button>
+              {!lockCompany && (
+                <button onClick={() => setSelectedCompany(null)} className="text-indigo-400 hover:text-indigo-700">
+                  <X size={15} />
+                </button>
+              )}
             </div>
           ) : (
             <>
