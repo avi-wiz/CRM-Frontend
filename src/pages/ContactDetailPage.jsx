@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, MoreHorizontal, CheckCircle } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, CheckCircle, Globe } from "lucide-react";
 import StageBadge from "../components/shared/StageBadge";
 import SideSheet from "../components/shared/SideSheet";
 import ConfirmModal from "../components/shared/ConfirmModal";
@@ -9,10 +9,9 @@ import ContactAssociations from "../components/detail/ContactAssociations";
 import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
 import { EditSheet } from "../components/side-sheets/EditSheet";
 import { CreateWizShopUserContent } from "../components/side-sheets/index";
-import { getContactDetail, repNames, leadSources } from "../data/constants";
+import CreateDeal from "../components/side-sheets/CreateDeal";
+import { getContactDetail, getContactStage, repNames, leadSources } from "../data/constants";
 import { logActivityFromEntity } from "../data/logActivity";
-
-const CONTACT_STAGES = ["New", "Open", "In Progress", "Qualified", "Unqualified"];
 
 // Property-group config for the Contact entity (left panel).
 const PROPERTY_GROUPS = [
@@ -30,7 +29,8 @@ const PROPERTY_GROUPS = [
   {
     title: "CRM Status",
     fields: [
-      { key: "stage", label: "Stage", type: "select", options: CONTACT_STAGES },
+      // Stage mirrors the associated company's pipeline stage 1:1 — read-only here.
+      { key: "stage", label: "Stage (from Company)", type: "text", readOnly: true },
       { key: "contactOwner", label: "Contact Owner", type: "select", options: repNames },
       { key: "leadSource", label: "Lead Source", type: "select", options: leadSources },
     ],
@@ -46,12 +46,18 @@ const PROPERTY_GROUPS = [
 ];
 
 export default function ContactDetailPage({ contactId, onBack, onCompanyClick, onDealClick, onVisitClick, onTaskClick, onMeetingClick }) {
-  const [contact, setContact] = useState(() => getContactDetail(contactId));
+  const [contact, setContact] = useState(() => {
+    const c = getContactDetail(contactId);
+    // Stage always mirrors the associated company's pipeline stage.
+    return { ...c, stage: getContactStage(c) };
+  });
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [logSheet, setLogSheet] = useState(null); // activity action key or null
   const [editOpen, setEditOpen] = useState(false);
   const [wizShopOpen, setWizShopOpen] = useState(false);
+  const [wizShopMode, setWizShopMode] = useState("create"); // "create" | "change"
+  const [dealOpen, setDealOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
 
   const updateField = (key, value) => setContact((c) => ({ ...c, [key]: value }));
@@ -94,12 +100,21 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setEditOpen(true)}
-            className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200"
-          >
-            Edit
-          </button>
+          {contact.isWizShopUser ? (
+            <button
+              onClick={() => { setWizShopMode("change"); setWizShopOpen(true); }}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-xl hover:bg-indigo-100 shadow-sm transition-all duration-200"
+            >
+              <Globe size={15} /> Change WizShop Role
+            </button>
+          ) : (
+            <button
+              onClick={() => { setWizShopMode("create"); setWizShopOpen(true); }}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm hover:shadow-[0_4px_12px_rgba(99,102,241,0.2)] transition-all duration-200"
+            >
+              <Globe size={15} /> Create WizShop User
+            </button>
+          )}
           <div className="relative">
             <button onClick={() => setMenuOpen((o) => !o)} className="p-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 shadow-sm transition-all duration-200">
               <MoreHorizontal size={16} />
@@ -108,22 +123,6 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
                 <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-48">
-                  {!contact.isWizShopUser && (
-                    <button
-                      onClick={() => { setMenuOpen(false); setWizShopOpen(true); }}
-                      className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Create WizShop User
-                    </button>
-                  )}
-                  {contact.isWizShopUser && (
-                    <button
-                      onClick={() => { setMenuOpen(false); showToast("WizShop role updated"); }}
-                      className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Change WizShop Role
-                    </button>
-                  )}
                   <button
                     onClick={() => { setMenuOpen(false); setArchiveOpen(true); }}
                     className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
@@ -139,11 +138,12 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
 
       {/* ─── 3-PANEL LAYOUT ─── */}
       <div className="flex-1 flex overflow-hidden">
-        <PropertiesPanel groups={PROPERTY_GROUPS} values={contact} onChange={updateField} />
+        <PropertiesPanel groups={PROPERTY_GROUPS} values={contact} onEdit={() => setEditOpen(true)} />
         <ContactCenterTabs
           contact={contact}
           onActivityAction={(type) => setLogSheet(type)}
           onDealClick={(d) => onDealClick?.(d.id)}
+          onCreateDeal={() => setDealOpen(true)}
           onVisitClick={(id) => onVisitClick?.(id)}
           onTaskClick={(id) => onTaskClick?.(id)}
           onMeetingClick={(id) => onMeetingClick?.(id)}
@@ -171,6 +171,20 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
         )}
       </SideSheet>
 
+      {/* ─── CREATE DEAL SIDE SHEET ─── */}
+      <SideSheet open={dealOpen} onClose={() => setDealOpen(false)} title="Create Deal" width="max-w-lg">
+        {dealOpen && (
+          <CreateDeal
+            initialCompany={contact.company}
+            onClose={() => setDealOpen(false)}
+            onDone={(deal) => {
+              setDealOpen(false);
+              showToast(`Deal "${deal.name}" created`);
+            }}
+          />
+        )}
+      </SideSheet>
+
       {/* ─── EDIT SIDE SHEET ─── */}
       <SideSheet open={editOpen} onClose={() => setEditOpen(false)} title={`Edit ${fullName}`}>
         {editOpen && (
@@ -188,16 +202,25 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
         )}
       </SideSheet>
 
-      {/* ─── CREATE WIZSHOP USER SIDE SHEET ─── */}
-      <SideSheet open={wizShopOpen} onClose={() => setWizShopOpen(false)} title="Create WizShop User">
+      {/* ─── WIZSHOP USER SIDE SHEET (create / change role) ─── */}
+      <SideSheet
+        open={wizShopOpen}
+        onClose={() => setWizShopOpen(false)}
+        title={wizShopMode === "change" ? "Change WizShop Role" : "Create WizShop User"}
+      >
         {wizShopOpen && (
           <CreateWizShopUserContent
             contact={contact}
+            mode={wizShopMode}
             onClose={() => setWizShopOpen(false)}
             onDone={({ role }) => {
               setContact((c) => ({ ...c, isWizShopUser: true, wizShopRole: role, wizShopStatus: "Active" }));
               setWizShopOpen(false);
-              showToast(`WizShop ${role} account created for ${fullName}`);
+              showToast(
+                wizShopMode === "change"
+                  ? `WizShop role updated to ${role} for ${fullName}`
+                  : `WizShop ${role} account created for ${fullName}`
+              );
             }}
           />
         )}

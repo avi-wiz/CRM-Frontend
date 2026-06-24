@@ -2,13 +2,20 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import StageBadge from "../shared/StageBadge";
 import ActivityTimeline from "./ActivityTimeline";
-import { formatDate, formatCurrency, quoteStatusStyles, isQuoteExpired } from "../../data/constants";
+import {
+  formatDate, formatCurrency, formatDuration, quoteStatusStyles, isQuoteExpired,
+  meetingOutcomeStyles, taskStatusStyles, taskPriorityStyles, visitPurposeStyles, visitOutcomeStyles,
+} from "../../data/constants";
 import { useEntityActivities } from "../../data/activitiesStore";
+import { useMeetings } from "../../data/meetingsStore";
+import { useTasks } from "../../data/tasksStore";
+import { useVisits } from "../../data/visitsStore";
 
-// Center panel — tab bar + tab content for the Company detail page.
-// `company` carries the nested orders/deals/wizshop data; activities come from
-// the unified store, filtered to this company by explicit association.
-const TABS = ["Sales", "Deals", "WizShop Activity", "Activities", "Quotes"];
+// Center panel — tab bar + tab content for the Company / Customer detail page.
+// Tab set + styling mirror the Contact detail page (ContactCenterTabs) for
+// consistency. `company` carries the nested orders/deals/wizshop data; the
+// Visits/Meetings/Tasks tabs source from their stores, filtered to this company.
+const TABS = ["Sales", "Deals", "Visits", "Meetings", "Tasks", "WizShop Activity", "Activities", "Quotes"];
 
 export default function CenterTabs({ company, onActivityAction, onDealClick, quotes = [], onQuoteClick, onCreateQuote, onVisitClick, onTaskClick, onMeetingClick }) {
   const [active, setActive] = useState("Activities");
@@ -16,30 +23,33 @@ export default function CenterTabs({ company, onActivityAction, onDealClick, quo
   const entityType = company.isCustomer ? "customer" : "company";
   const activities = useEntityActivities(entityType, company.id);
 
+  // Store-backed, company-scoped collections.
+  const companyVisits = useVisits().filter((v) => v.companyId === company.id);
+  const companyMeetings = useMeetings().filter((m) => m.companyId === company.id);
+  const companyTasks = useTasks().filter((t) => t.associations?.companyId === company.id);
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex border-b border-gray-150 bg-white px-6">
+      <div className="flex border-b border-gray-100 bg-white px-4 overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setActive(t)}
-            className={`relative px-4 py-3 text-sm font-semibold border-b-2 transition-all duration-200 ${
-              active === t
-                ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-gray-400 hover:text-gray-700"
+            className={`px-3 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              active === t ? "border-indigo-600 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
             {t}
-            {active === t && (
-              <span className="absolute -bottom-px left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
-            )}
           </button>
         ))}
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc]">
         {active === "Sales" && <SalesTab orders={company.orders} />}
-        {active === "Deals" && <DealsTab deals={company.deals} onDealClick={onDealClick} />}
+        {active === "Deals" && <DealsTab deals={company.deals} onDealClick={onDealClick} onCreateDeal={() => onActivityAction?.("addDeal")} />}
+        {active === "Visits" && <VisitsTab visits={companyVisits} onVisitClick={onVisitClick} onLogVisit={() => onActivityAction?.("visit")} />}
+        {active === "Meetings" && <MeetingsTab meetings={companyMeetings} onMeetingClick={onMeetingClick} onLogMeeting={() => onActivityAction?.("meeting")} />}
+        {active === "Tasks" && <TasksTab tasks={companyTasks} onTaskClick={onTaskClick} onCreateTask={() => onActivityAction?.("task")} />}
         {active === "Activities" && (
           <ActivityTimeline
             activities={activities}
@@ -52,6 +62,77 @@ export default function CenterTabs({ company, onActivityAction, onDealClick, quo
         {active === "WizShop Activity" && <WizShopTab company={company} />}
         {active === "Quotes" && <QuotesTab quotes={quotes} onQuoteClick={onQuoteClick} onCreateQuote={onCreateQuote} />}
       </div>
+    </div>
+  );
+}
+
+// Shared tab header: count + right-aligned CTA.
+function TabHeader({ count, noun, cta }) {
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <span className="text-sm text-gray-500">{count} {noun}{count === 1 ? "" : "s"}</span>
+      {cta && (
+        <button onClick={cta.onClick} className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200">
+          <Plus size={15} /> {cta.label}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ─── Visits (company-scoped SSRM + Log Visit CTA) ───
+function VisitsTab({ visits = [], onVisitClick, onLogVisit }) {
+  return (
+    <div>
+      <TabHeader count={visits.length} noun="visit" cta={{ label: "Log Visit", onClick: onLogVisit }} />
+      <MiniTable
+        head={["Date", "Rep", "Purpose", "Outcome", "Duration"]}
+        rows={visits.map((v) => [
+          <span onClick={() => onVisitClick?.(v.id)} className="font-medium text-gray-900 hover:underline cursor-pointer">{formatDate(v.visitDate)}</span>,
+          v.rep?.repName || "—",
+          <span className={`text-xs px-2 py-0.5 rounded-full ${visitPurposeStyles[v.purpose] || "bg-gray-100 text-gray-600"}`}>{v.purpose}</span>,
+          <span className={`text-xs px-2 py-0.5 rounded-full ${visitOutcomeStyles[v.outcome] || "bg-gray-100 text-gray-600"}`}>{v.outcome}</span>,
+          formatDuration(v.duration),
+        ])}
+      />
+    </div>
+  );
+}
+
+// ─── Meetings (company-scoped SSRM + Log Meeting CTA) ───
+function MeetingsTab({ meetings = [], onMeetingClick, onLogMeeting }) {
+  return (
+    <div>
+      <TabHeader count={meetings.length} noun="meeting" cta={{ label: "Log Meeting", onClick: onLogMeeting }} />
+      <MiniTable
+        head={["Title", "Date", "Duration", "Attendees", "Outcome"]}
+        rows={meetings.map((m) => [
+          <span onClick={() => onMeetingClick?.(m.id)} className="font-medium text-gray-900 hover:underline cursor-pointer">{m.title}</span>,
+          formatDate(m.date),
+          formatDuration(m.duration),
+          `${(m.attendees || []).length} contact${(m.attendees || []).length === 1 ? "" : "s"}`,
+          <span className={`text-xs px-2 py-0.5 rounded-full ${meetingOutcomeStyles[m.outcome] || "bg-gray-100 text-gray-600"}`}>{m.outcome}</span>,
+        ])}
+      />
+    </div>
+  );
+}
+
+// ─── Tasks (company-scoped SSRM + Create Task CTA) ───
+function TasksTab({ tasks = [], onTaskClick, onCreateTask }) {
+  return (
+    <div>
+      <TabHeader count={tasks.length} noun="task" cta={{ label: "Create Task", onClick: onCreateTask }} />
+      <MiniTable
+        head={["Title", "Assignee", "Due Date", "Priority", "Status"]}
+        rows={tasks.map((t) => [
+          <span onClick={() => onTaskClick?.(t.id)} className="font-medium text-gray-900 hover:underline cursor-pointer">{t.title}</span>,
+          t.assignee?.repName || "—",
+          formatDate(t.dueDate),
+          <span className={`text-xs px-2 py-0.5 rounded-full ${taskPriorityStyles[t.priority] || "bg-gray-100 text-gray-600"}`}>{t.priority}</span>,
+          <span className={`text-xs px-2 py-0.5 rounded-full ${taskStatusStyles[t.status] || "bg-gray-100 text-gray-600"}`}>{t.status}</span>,
+        ])}
+      />
     </div>
   );
 }
@@ -111,19 +192,22 @@ function SalesTab({ orders = [] }) {
   );
 }
 
-// ─── Tab 2: Deals (associated deals SSRM) ───
-function DealsTab({ deals = [], onDealClick }) {
+// ─── Tab 2: Deals (associated deals SSRM + Create Deal CTA) ───
+function DealsTab({ deals = [], onDealClick, onCreateDeal }) {
   return (
-    <MiniTable
-      head={["Deal Name", "Amount", "Stage", "Owner", "Close Date"]}
-      rows={deals.map((d) => [
-        <span onClick={() => onDealClick?.(d)} className="font-medium text-gray-900 hover:underline cursor-pointer">{d.name}</span>,
-        <span className="font-semibold">{d.amount}</span>,
-        <StageBadge stage={d.stage} small />,
-        d.owner,
-        formatDate(d.closeDate),
-      ])}
-    />
+    <div>
+      <TabHeader count={deals.length} noun="deal" cta={{ label: "Create Deal", onClick: onCreateDeal }} />
+      <MiniTable
+        head={["Deal Name", "Amount", "Stage", "Owner", "Close Date"]}
+        rows={deals.map((d) => [
+          <span onClick={() => onDealClick?.(d)} className="font-medium text-gray-900 hover:underline cursor-pointer">{d.name}</span>,
+          <span className="font-semibold">{d.amount}</span>,
+          <StageBadge stage={d.stage} small />,
+          d.owner,
+          formatDate(d.closeDate),
+        ])}
+      />
+    </div>
   );
 }
 

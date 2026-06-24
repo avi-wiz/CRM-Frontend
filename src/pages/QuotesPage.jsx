@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FileText, Plus, CheckCircle } from "lucide-react";
 import SideSheet from "../components/shared/SideSheet";
+import RowActions from "../components/shared/RowActions";
 import CreateQuote from "../components/side-sheets/CreateQuote";
 import {
   getQuoteCompany,
@@ -9,13 +10,13 @@ import {
   quoteStatusStyles,
   isQuoteExpired,
 } from "../data/constants";
-import { useQuotes, addQuote } from "../data/quotesStore";
+import { useQuotes, addQuote, updateQuote, duplicateQuote } from "../data/quotesStore";
 
-const HEAD = ["Quote #", "Company", "Amount", "Status", "Contact", "Valid Until", "Created"];
+const HEAD = ["Quote #", "Company", "Amount", "Status", "Contact", "Valid Until", "Created", ""];
 
 // Quotes listing — each row links to QuoteDetailPage.
 export default function QuotesPage({ onQuoteClick }) {
-  const quotes = useQuotes();
+  const quotes = useQuotes().filter((q) => !q.archived);
   const [createOpen, setCreateOpen] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -92,6 +93,19 @@ export default function QuotesPage({ onQuoteClick }) {
                     <td className="py-3 px-4 text-gray-600">{q.contactName || "—"}</td>
                     <td className={`py-3 px-4 ${expired ? "text-red-600 font-medium" : "text-gray-500"}`}>{formatDate(q.validUntil)}</td>
                     <td className="py-3 px-4 text-gray-500">{formatDate(q.createdAt)}</td>
+                    <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                      <RowActions
+                        actions={[
+                          { label: "View Detail", onClick: () => onQuoteClick?.(q.id) },
+                          ...(q.status === "Draft" ? [{ label: "Send Quote", onClick: () => { updateQuote(q.id, { status: "Sent" }); showToast(`${q.quoteNumber} sent`); } }] : []),
+                          { label: "Duplicate", onClick: () => { const copy = duplicateQuote(q.id); if (copy) showToast(`Duplicated as ${copy.quoteNumber}`); } },
+                          ...(q.status === "Accepted"
+                            ? [{ label: "Convert to Order", onClick: () => showToast(company?.isCustomer ? `Converting ${q.quoteNumber} to an order…` : `${q.companyName} must be a Customer first`) }]
+                            : []),
+                          { label: "Archive", onClick: () => { updateQuote(q.id, { archived: true }); showToast(`${q.quoteNumber} archived`); }, danger: true },
+                        ]}
+                      />
+                    </td>
                   </tr>
                 );
               })}

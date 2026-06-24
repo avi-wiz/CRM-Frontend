@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MoreHorizontal, CheckCircle } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, CheckCircle, Plus } from "lucide-react";
 import StageBadge from "../components/shared/StageBadge";
 import SideSheet from "../components/shared/SideSheet";
 import ConfirmModal from "../components/shared/ConfirmModal";
@@ -11,7 +11,7 @@ import { ConvertCustomerContent } from "../components/side-sheets/index";
 import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
 import GrantAccessContent, { normalizeContacts } from "../components/side-sheets/GrantAccess";
 import CreateDeal from "../components/side-sheets/CreateDeal";
-import CreateContact from "../components/side-sheets/CreateContact";
+import CreateContactPage from "./CreateContactPage";
 import { EditSheet } from "../components/side-sheets/EditSheet";
 import CreateQuote from "../components/side-sheets/CreateQuote";
 import { useCompanyQuotes, addQuote } from "../data/quotesStore";
@@ -56,13 +56,8 @@ const PROPERTY_GROUPS = [
       { key: "leadSource", label: "Lead Source", type: "select", options: leadSources },
     ],
   },
-  {
-    title: "Addresses",
-    fields: [
-      { key: "billingAddress", label: "Billing Address", type: "address" },
-      { key: "shippingAddress", label: "Shipping Address", type: "address" },
-    ],
-  },
+  // Addresses (Billing / Shipping) are managed from the right-side Associations
+  // panel, so they're intentionally omitted from this left panel.
 ];
 
 // Maps an action key → side sheet { title, content }. The 5 activity-logging
@@ -92,11 +87,6 @@ function sheetFor(action, company, handlers) {
     case "grantAccess": return {
       title: `Grant WizShop Access — ${company.name}`,
       content: <GrantAccessContent contacts={normalizeContacts(company.contacts)} onClose={onClose} onDone={onGrantDone} />,
-    };
-    case "addContact": return {
-      title: "Add Contact",
-      width: "max-w-lg",
-      content: <CreateContact initialCompany={company} onClose={onClose} onDone={onContactCreated} />,
     };
     case "addDeal": return {
       title: "Create Deal",
@@ -208,6 +198,18 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
       })
     : null;
 
+  // "Add Contact" opens as a full-screen form with the company pre-locked,
+  // replacing the detail page until done/cancelled.
+  if (sheet === "addContact") {
+    return (
+      <CreateContactPage
+        initialCompany={company}
+        onBack={() => setSheet(null)}
+        onDone={handleContactCreated}
+      />
+    );
+  }
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── HEADER ─── */}
@@ -231,15 +233,17 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setEditOpen(true)}
-            className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200"
-          >
-            Edit
-          </button>
           {!company.isCustomer && (
             <button onClick={() => setSheet("convert")} className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 shadow-sm hover:shadow-[0_4px_12px_rgba(99,102,241,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
               Convert to Customer
+            </button>
+          )}
+          {company.isCustomer && (
+            <button
+              onClick={handleCreateOrder}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm hover:shadow-[0_4px_12px_rgba(99,102,241,0.2)] transition-all duration-200"
+            >
+              <Plus size={15} /> Create Order
             </button>
           )}
           <div className="relative">
@@ -250,12 +254,6 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
                 <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-44">
-                  <button
-                    onClick={handleCreateOrder}
-                    className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    Create Order
-                  </button>
                   {["Merge", "Export"].map((item) => (
                     <button
                       key={item}
@@ -282,7 +280,7 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
 
       {/* ─── 3-PANEL LAYOUT ─── */}
       <div className="flex-1 flex overflow-hidden">
-        <PropertiesPanel groups={PROPERTY_GROUPS} values={company} onChange={updateField} />
+        <PropertiesPanel groups={PROPERTY_GROUPS} values={company} onEdit={() => setEditOpen(true)} />
         <CenterTabs
           company={company}
           onActivityAction={(type) => setSheet(type)}

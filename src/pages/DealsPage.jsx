@@ -6,6 +6,7 @@ import SideSheet from "../components/shared/SideSheet";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import CreateDeal from "../components/side-sheets/CreateDeal";
 import { CreateTask } from "../components/side-sheets/log/index.jsx";
+import { EditSheet } from "../components/side-sheets/EditSheet";
 import {
   deals as initialDeals, dealColumns, dealKanbanStages,
   dealStageMandatoryFields, dealFieldMeta, repNames,
@@ -13,6 +14,20 @@ import {
 
 const DEAL_STAGES = ["Qualification", "Proposal", "Negotiation", "Contract Sent", "Closed Won", "Closed Lost"];
 const PIPELINES = ["Default Sales Pipeline", "Enterprise Pipeline", "Renewal Pipeline"];
+
+// Editable fields for the row-level Edit sheet.
+const DEAL_EDIT_GROUPS = [
+  {
+    title: "Deal Info",
+    fields: [
+      { key: "name", label: "Deal Name", type: "text", required: true },
+      { key: "amount", label: "Amount", type: "text" },
+      { key: "stage", label: "Stage", type: "select", options: DEAL_STAGES },
+      { key: "owner", label: "Owner", type: "select", options: repNames },
+      { key: "closeDate", label: "Close Date", type: "text" },
+    ],
+  },
+];
 
 function isMissing(value) {
   return value === undefined || value === null || value === "" || value === false;
@@ -155,6 +170,7 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
   // Bulk action state
   const [bulkTask, setBulkTask] = useState(false);
   const [confirmState, setConfirmState] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
   const [stagePickerOpen, setStagePickerOpen] = useState(false);
   const [ownerPickerOpen, setOwnerPickerOpen] = useState(false);
   const [pipelinePickerOpen, setPipelinePickerOpen] = useState(false);
@@ -250,14 +266,14 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
 
   const buildRowActions = (row) => [
     { label: "View Detail", onClick: () => onDealClick?.(row) },
-    { label: "Edit", onClick: () => console.log("Edit deal", row.id) },
-    { label: "Archive", onClick: () => console.log("Archive deal", row.id), danger: true },
+    { label: "Edit", onClick: () => setEditTarget(row) },
+    { label: "Archive", onClick: () => setConfirmState({ type: "archive", count: 1, row }), danger: true },
   ];
 
   const BulkPickers = () => (
     <>
       {stagePickerOpen && (
-        <div ref={stageRef} className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
+        <div ref={stageRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
           {DEAL_STAGES.map((s) => (
             <button key={s} onClick={() => { setStagePickerOpen(false); setConfirmState({ type: "stage", count: null, extra: s }); }}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{s}</button>
@@ -265,7 +281,7 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
         </div>
       )}
       {ownerPickerOpen && (
-        <div ref={ownerRef} className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
+        <div ref={ownerRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
           {repNames.map((r) => (
             <button key={r} onClick={() => { setOwnerPickerOpen(false); setConfirmState({ type: "owner", count: null, extra: r }); }}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{r}</button>
@@ -273,7 +289,7 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
         </div>
       )}
       {pipelinePickerOpen && (
-        <div ref={pipelineRef} className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-60">
+        <div ref={pipelineRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-60">
           <p className="px-4 pt-2 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Select Pipeline</p>
           {PIPELINES.map((p) => (
             <button key={p} onClick={() => { setPipelinePickerOpen(false); setConfirmState({ type: "pipeline", count: null, extra: p }); }}
@@ -285,7 +301,7 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
         </div>
       )}
       {exportPickerOpen && (
-        <div ref={exportRef} className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-40">
+        <div ref={exportRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-40">
           {["CSV", "Excel"].map((fmt) => (
             <button key={fmt} onClick={() => { setExportPickerOpen(false); showToast(`Exporting records as ${fmt}…`); }}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{fmt}</button>
@@ -361,13 +377,37 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
         }
         confirmLabel={confirmState?.type === "archive" ? "Archive" : "Apply"}
         onConfirm={() => {
-          const { type, extra, count } = confirmState;
-          if (type === "archive") showToast(`Archived ${count} ${count === 1 ? "deal" : "deals"}`);
+          const { type, extra, count, row } = confirmState;
+          if (type === "archive") {
+            if (row) {
+              setDealData((prev) => prev.filter((d) => d.id !== row.id));
+              showToast(`Archived ${row.name}`);
+            } else {
+              showToast(`Archived ${count} ${count === 1 ? "deal" : "deals"}`);
+            }
+          }
           else if (type === "stage") showToast(`Changed stage to "${extra}"`);
           else if (type === "owner") showToast(`Changed owner to ${extra}`);
           else if (type === "pipeline") showToast(`Moved deals to "${extra}"`);
         }}
       />
+
+      {/* Row Edit */}
+      <SideSheet open={!!editTarget} onClose={() => setEditTarget(null)} title={editTarget ? `Edit ${editTarget.name}` : ""}>
+        {editTarget && (
+          <EditSheet
+            groups={DEAL_EDIT_GROUPS}
+            values={editTarget}
+            entityLabel="Deal"
+            onClose={() => setEditTarget(null)}
+            onSave={(updated) => {
+              setDealData((prev) => prev.map((d) => (d.id === editTarget.id ? { ...d, ...updated } : d)));
+              setEditTarget(null);
+              showToast(`${updated.name} updated`);
+            }}
+          />
+        )}
+      </SideSheet>
 
       {/* Mandatory-fields gate */}
       <SideSheet open={!!pendingMove} onClose={() => setPendingMove(null)} title="Complete Required Fields">

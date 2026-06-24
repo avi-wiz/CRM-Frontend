@@ -407,12 +407,6 @@ export default function DealDetailPage({ dealId, onBack, onCompanyClick, onConta
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            onClick={() => setEditOpen(true)}
-            className="px-3.5 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 shadow-sm transition-all duration-200"
-          >
-            Edit
-          </button>
           <ChangeStageMenu
             stages={pipelineConfig.stages}
             current={deal.stage}
@@ -471,7 +465,7 @@ export default function DealDetailPage({ dealId, onBack, onCompanyClick, onConta
         <PropertiesPanel
           groups={propertyGroups}
           values={deal}
-          onChange={updateField}
+          onEdit={() => setEditOpen(true)}
         />
         <DealCenterTabs
           deal={deal}

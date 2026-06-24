@@ -147,6 +147,17 @@ export const reps = [
 // Contact pipeline stages (used by the conversion "default contact stage" setting).
 export const contactStages = ["New", "Open", "In Progress", "Qualified", "Unqualified"];
 
+// A contact's stage mirrors its associated company's pipeline stage 1:1 — it is
+// always derived, never stored independently. Falls back to the first pipeline
+// stage when the company can't be resolved.
+export function getContactStage(contact) {
+  if (!contact) return kanbanStages[0];
+  const company =
+    companies.find((c) => c.id === contact.companyId) ||
+    companies.find((c) => c.name === (contact.companyName || contact.company?.name));
+  return company?.stage || kanbanStages[0];
+}
+
 // ─── ORG-LEVEL SETTINGS ───
 // Mirrors the "Customer Conversion Settings" panel in org-settings-admin.
 // `contactMovement` drives how the individual + bulk conversion flows behave.

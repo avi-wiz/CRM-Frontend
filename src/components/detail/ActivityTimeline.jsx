@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Activity, FileText, CalendarCheck, Mail, CheckSquare, Car } from "lucide-react";
+import { Activity, FileText, CalendarCheck, Mail, CheckSquare, Car, Plus, ChevronDown } from "lucide-react";
 import { formatRelativeTime } from "../../data/constants";
 
 // Per-type visual config: left-border color, icon, accent. Drives both the
@@ -24,11 +24,11 @@ const FILTERS = [
 ];
 
 const ACTIONS = [
-  { type: "note", label: "+ Note" },
-  { type: "meeting", label: "+ Meeting" },
-  { type: "task", label: "+ Task" },
-  { type: "email", label: "+ Email" },
-  { type: "visit", label: "+ Visit" },
+  { type: "note", label: "Log Note", icon: FileText },
+  { type: "meeting", label: "Log Meeting", icon: CalendarCheck },
+  { type: "task", label: "Create Task", icon: CheckSquare },
+  { type: "email", label: "Log Email", icon: Mail },
+  { type: "visit", label: "Log Visit", icon: Car },
 ];
 
 // Strict-association timeline. `activities` is ALREADY filtered to the records
@@ -37,37 +37,52 @@ const ACTIONS = [
 // no cross-entity inference or "show history" roll-up.
 export default function ActivityTimeline({ activities = [], onAction, onVisitClick, onTaskClick, onMeetingClick }) {
   const [filter, setFilter] = useState("all");
+  const [logOpen, setLogOpen] = useState(false);
 
   const visible = filter === "all" ? activities : activities.filter((a) => a.type === filter);
 
   return (
     <div>
-      {/* Action buttons */}
-      <div className="flex flex-wrap gap-2 mb-3">
-        {ACTIONS.map((a) => (
-          <button
-            key={a.type}
-            onClick={() => onAction?.(a.type)}
-            className="px-3 py-1.5 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg bg-white hover:bg-indigo-50/50 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all duration-200"
-          >
-            {a.label}
-          </button>
-        ))}
-      </div>
+      {/* Filter chips (left) + single Log Activity dropdown (right) */}
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex flex-wrap items-center gap-1.5">
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`px-3 py-1 text-xs rounded-full transition-all duration-200 ${
+                filter === f.key ? "bg-indigo-600 text-white font-semibold shadow-[0_2px_8px_rgba(99,102,241,0.25)]" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
 
-      {/* Filter pills */}
-      <div className="flex flex-wrap items-center gap-1.5 mb-4">
-        {FILTERS.map((f) => (
+        <div className="relative flex-shrink-0">
           <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={`px-3 py-1 text-xs rounded-full transition-all duration-200 ${
-              filter === f.key ? "bg-indigo-600 text-white font-semibold shadow-[0_2px_8px_rgba(99,102,241,0.25)]" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
+            onClick={() => setLogOpen((o) => !o)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm transition-all duration-200"
           >
-            {f.label}
+            <Plus size={13} /> Log Activity <ChevronDown size={13} className={`transition-transform ${logOpen ? "rotate-180" : ""}`} />
           </button>
-        ))}
+          {logOpen && (
+            <>
+              <div className="fixed inset-0 z-20" onClick={() => setLogOpen(false)} />
+              <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-44 overflow-hidden">
+                {ACTIONS.map((a) => (
+                  <button
+                    key={a.type}
+                    onClick={() => { setLogOpen(false); onAction?.(a.type); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50/60 hover:text-indigo-700 transition-colors"
+                  >
+                    <a.icon size={14} className="text-gray-400" /> {a.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Timeline */}

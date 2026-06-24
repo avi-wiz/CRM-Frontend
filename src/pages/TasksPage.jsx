@@ -8,7 +8,7 @@ import RowActions from "../components/shared/RowActions";
 import CreateTask from "../components/side-sheets/log/CreateTask";
 import {
   formatDate, formatRelativeTime, isTaskOverdue, isToday,
-  taskStatusStyles, taskPriorities,
+  taskStatusStyles, taskPriorities, repNames,
 } from "../data/constants";
 import { useTasks, addTask, updateTask } from "../data/tasksStore";
 
@@ -34,6 +34,7 @@ export default function TasksPage({ onTaskClick, onCompanyClick }) {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("All");
   const [createOpen, setCreateOpen] = useState(false);
+  const [reassignTarget, setReassignTarget] = useState(null);
   const [toast, setToast] = useState(null);
 
   const showToast = (msg) => {
@@ -186,7 +187,7 @@ export default function TasksPage({ onTaskClick, onCompanyClick }) {
                         actions={[
                           { label: "View Detail", onClick: () => onTaskClick?.(t.id) },
                           ...(done ? [] : [{ label: "Mark Complete", onClick: () => handleComplete(t) }]),
-                          { label: "Reassign", onClick: () => showToast("Reassign — coming soon") },
+                          { label: "Reassign", onClick: () => setReassignTarget(t) },
                           ...(done ? [] : [{ label: "Cancel", onClick: () => { updateTask(t.id, { status: "Cancelled" }); showToast(`"${t.title}" cancelled`); } }]),
                         ]}
                       />
@@ -212,6 +213,35 @@ export default function TasksPage({ onTaskClick, onCompanyClick }) {
               showToast(`"${created.title}" created`);
             }}
           />
+        )}
+      </SideSheet>
+
+      {/* ─── REASSIGN SIDE SHEET ─── */}
+      <SideSheet open={!!reassignTarget} onClose={() => setReassignTarget(null)} title="Reassign Task">
+        {reassignTarget && (
+          <div className="flex flex-col h-full">
+            <p className="text-sm text-gray-500 mb-1">Assign <span className="font-medium text-gray-800">{reassignTarget.title}</span> to:</p>
+            <div className="flex-1 overflow-y-auto -mx-1 mt-2">
+              {repNames.map((rep) => {
+                const current = reassignTarget.assignee?.repName === rep;
+                return (
+                  <button
+                    key={rep}
+                    onClick={() => {
+                      updateTask(reassignTarget.id, { assignee: { repName: rep } });
+                      const title = reassignTarget.title;
+                      setReassignTarget(null);
+                      showToast(`"${title}" reassigned to ${rep}`);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm text-left transition-colors ${current ? "bg-indigo-50 text-indigo-700 font-medium" : "text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    {rep}
+                    {current && <span className="text-xs text-indigo-500">Current</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         )}
       </SideSheet>
 

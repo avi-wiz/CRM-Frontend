@@ -3,11 +3,13 @@ import { Car, Plus, SlidersHorizontal, Search, CheckCircle, Users } from "lucide
 import SideSheet from "../components/shared/SideSheet";
 import RowActions from "../components/shared/RowActions";
 import LogVisit from "../components/side-sheets/log/LogVisit";
+import CreateTask from "../components/side-sheets/log/CreateTask";
 import {
   formatDate, formatDuration, isPastDate, isToday,
   visitPurposeStyles, visitOutcomeStyles,
 } from "../data/constants";
 import { useVisits, addVisit } from "../data/visitsStore";
+import { logActivityFromEntity } from "../data/logActivity";
 
 const HEAD = ["Date", "Company", "Rep", "Purpose", "Contacts Met", "Outcome", "Follow-up", "Duration", ""];
 const TABS = ["All", "Follow-up Needed", "This Week", "This Month"];
@@ -25,6 +27,8 @@ export default function VisitsPage({ onVisitClick, onCompanyClick }) {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("All");
   const [logOpen, setLogOpen] = useState(false);
+  const [followUpVisit, setFollowUpVisit] = useState(null); // source visit for a follow-up
+  const [taskTarget, setTaskTarget] = useState(null); // visit to create a task against
   const [toast, setToast] = useState(null);
 
   const showToast = (msg) => {
@@ -178,8 +182,8 @@ export default function VisitsPage({ onVisitClick, onCompanyClick }) {
                       <RowActions
                         actions={[
                           { label: "View Detail", onClick: () => onVisitClick?.(v.id) },
-                          { label: "Log Follow-up Visit", onClick: () => setLogOpen(true) },
-                          { label: "Create Task", onClick: () => showToast("Create task — open the visit to add a follow-up task") },
+                          { label: "Log Follow-up Visit", onClick: () => setFollowUpVisit(v) },
+                          { label: "Create Task", onClick: () => setTaskTarget(v) },
                         ]}
                       />
                     </td>
@@ -215,6 +219,52 @@ export default function VisitsPage({ onVisitClick, onCompanyClick }) {
               });
               setLogOpen(false);
               showToast(`Visit to ${created.companyName} logged`);
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* ─── LOG FOLLOW-UP VISIT (company pre-filled from source visit) ─── */}
+      <SideSheet open={!!followUpVisit} onClose={() => setFollowUpVisit(null)} title="Log Follow-up Visit" width="max-w-lg">
+        {followUpVisit && (
+          <LogVisit
+            entity={followUpVisit.companyId ? { id: followUpVisit.companyId, type: "company", name: followUpVisit.companyName } : null}
+            onClose={() => setFollowUpVisit(null)}
+            onSave={(payload) => {
+              const created = addVisit({
+                visitDate: payload.visitDate || payload.date,
+                rep: payload.rep,
+                purpose: payload.purpose,
+                duration: payload.duration,
+                location: payload.location,
+                companyId: payload.companyId,
+                companyName: payload.companyName,
+                contactIds: payload.contactIds || [],
+                notes: payload.notes || "",
+                outcome: payload.outcome,
+                followUpNeeded: payload.followUpNeeded,
+                followUpDate: payload.followUpDate,
+                followUpNotes: payload.followUpNotes,
+              });
+              setFollowUpVisit(null);
+              showToast(`Follow-up visit to ${created.companyName} logged`);
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* ─── CREATE TASK (associated to the visit's company) ─── */}
+      <SideSheet open={!!taskTarget} onClose={() => setTaskTarget(null)} title="Create Task" width="max-w-lg">
+        {taskTarget && (
+          <CreateTask
+            entity={taskTarget.companyId ? { id: taskTarget.companyId, type: "company", name: taskTarget.companyName } : null}
+            onClose={() => setTaskTarget(null)}
+            onSave={(payload) => {
+              if (taskTarget.companyId) {
+                logActivityFromEntity({ id: taskTarget.companyId, type: "company", name: taskTarget.companyName }, payload);
+              }
+              setTaskTarget(null);
+              showToast(`Task created for ${taskTarget.companyName}`);
             }}
           />
         )}

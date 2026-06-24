@@ -1,15 +1,8 @@
 import { Building2, DollarSign, GitBranch, Globe } from "lucide-react";
 import StageBadge from "../shared/StageBadge";
+import { kanbanStages, stageColors } from "../../data/constants";
 
-// Contact pipeline stages + colors (distinct from the company deal pipeline).
-const CONTACT_STAGES = ["New", "Open", "In Progress", "Qualified", "Unqualified"];
-const CONTACT_STAGE_COLORS = {
-  New: "#3b82f6",
-  Open: "#f59e0b",
-  "In Progress": "#8b5cf6",
-  Qualified: "#10b981",
-  Unqualified: "#ef4444",
-};
+// A contact's stage mirrors its company's pipeline stage 1:1.
 
 // Right panel — association blocks for the Contact detail page.
 export default function ContactAssociations({ contact, onCompanyClick, onDealClick }) {
@@ -47,12 +40,13 @@ export default function ContactAssociations({ contact, onCompanyClick, onDealCli
         ))}
       </Block>
 
-      {/* Pipeline */}
+      {/* Pipeline — mirrors the company's stage */}
       <Block title="Pipeline" icon={GitBranch}>
-        <MiniPipeline stages={CONTACT_STAGES} current={contact.stage} />
+        <MiniPipeline stages={kanbanStages} current={contact.stage} />
         <div className="text-xs text-gray-500 mt-2">
           Current stage: <span className="text-gray-800 font-medium">{contact.stage}</span>
         </div>
+        <div className="text-[10px] text-gray-400 mt-1">Inherited from {company?.name || "company"}</div>
       </Block>
 
       {/* WizShop User */}
@@ -85,7 +79,7 @@ function MiniPipeline({ stages, current }) {
       {stages.map((s, i) => {
         const reached = i <= idx;
         const isCurrent = i === idx;
-        const color = CONTACT_STAGE_COLORS[s] || "#9ca3af";
+        const color = stageColors[s] || "#9ca3af";
         return (
           <div key={s} className="flex items-center flex-1 last:flex-none" title={s}>
             <div

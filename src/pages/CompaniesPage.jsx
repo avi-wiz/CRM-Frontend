@@ -9,7 +9,7 @@ import MergeConvertContent from "../components/side-sheets/MergeConvert";
 import ConvertCustomer from "../components/side-sheets/ConvertCustomer";
 import GrantAccessContent, { normalizeContacts } from "../components/side-sheets/GrantAccess";
 import { CreateTask } from "../components/side-sheets/log/index.jsx";
-import CreateCompany from "../components/side-sheets/CreateCompany";
+import CreateCompanyPage from "./CreateCompanyPage";
 import {
   companies, companyColumns, kanbanStages, formatRelativeTime,
   stageMandatoryFields, companyFieldMeta, contacts as allContacts, repNames,
@@ -247,7 +247,7 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
     { label: "View Detail", onClick: () => onRowClick?.(row) },
     { label: "Merge / Convert", onClick: () => { setMergeTitle("Merge / Convert"); setMergeSource(row); } },
     { label: "Grant Web Access", onClick: () => setGrantTarget(row) },
-    { label: "Archive", onClick: () => console.log("Archive", row.name), danger: true },
+    { label: "Archive", onClick: () => setConfirmState({ type: "archive", count: 1, row }), danger: true },
   ];
 
   // Bulk picker dropdowns (stage / owner / export) rendered absolutely relative to toolbar area.
@@ -256,7 +256,7 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
     <>
       {/* Stage picker */}
       {stagePickerOpen && (
-        <div ref={stageRef} className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
+        <div ref={stageRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
           {COMPANY_STAGES.map((s) => (
             <button
               key={s}
@@ -274,7 +274,7 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
 
       {/* Owner picker */}
       {ownerPickerOpen && (
-        <div ref={ownerRef} className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
+        <div ref={ownerRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
           {repNames.map((r) => (
             <button
               key={r}
@@ -292,7 +292,7 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
 
       {/* Export picker */}
       {exportPickerOpen && (
-        <div ref={exportRef} className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-40">
+        <div ref={exportRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-40">
           {["CSV", "Excel"].map((fmt) => (
             <button
               key={fmt}
@@ -309,6 +309,25 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
       )}
     </>
   );
+
+  // Full-screen create flow replaces the listing while open.
+  if (createOpen) {
+    return (
+      <CreateCompanyPage
+        isCustomer={customerFilter}
+        onBack={() => setCreateOpen(false)}
+        onCreate={(company) => {
+          const today = new Date().toISOString().slice(0, 10);
+          setCompanyData((rows) => {
+            const nextId = Math.max(0, ...rows.map((r) => r.id || 0)) + 1;
+            return [{ id: nextId, createdAt: today, lastActivity: today, ...company }, ...rows];
+          });
+          setCreateOpen(false);
+          showToast(`${company.name} created`);
+        }}
+      />
+    );
+  }
 
   return (
     <>
@@ -404,7 +423,15 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
           const type = confirmState?.type;
           const extra = confirmState?.extra;
           const count = confirmState?.count;
-          if (type === "archive") showToast(`Archived ${count} ${count === 1 ? "company" : "companies"}`);
+          if (type === "archive") {
+            const row = confirmState?.row;
+            if (row) {
+              setCompanyData((prev) => prev.filter((c) => c.id !== row.id));
+              showToast(`Archived ${row.name}`);
+            } else {
+              showToast(`Archived ${count} ${count === 1 ? "company" : "companies"}`);
+            }
+          }
           else if (type === "stage") showToast(`Changed stage to "${extra}"`);
           else if (type === "owner") showToast(`Assigned ${extra} as owner`);
           else if (type === "convert") runBulkConvert(count);
@@ -412,23 +439,6 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
       />
 
       {/* Create company */}
-      <SideSheet open={createOpen} onClose={() => setCreateOpen(false)} title="Create Company" width="max-w-lg">
-        {createOpen && (
-          <CreateCompany
-            onClose={() => setCreateOpen(false)}
-            onCreate={(company) => {
-              const today = new Date().toISOString().slice(0, 10);
-              setCompanyData((rows) => {
-                const nextId = Math.max(0, ...rows.map((r) => r.id || 0)) + 1;
-                return [{ id: nextId, createdAt: today, lastActivity: today, ...company }, ...rows];
-              });
-              setCreateOpen(false);
-              showToast(`${company.name} created`);
-            }}
-          />
-        )}
-      </SideSheet>
-
       {/* Merge / Convert */}
       <SideSheet open={!!mergeSource} onClose={() => setMergeSource(null)} title={mergeTitle} width="max-w-lg">
         {mergeSource && (

@@ -3,13 +3,28 @@ import { Calendar, Plus, SlidersHorizontal, Search, CheckCircle, Users } from "l
 import SideSheet from "../components/shared/SideSheet";
 import RowActions from "../components/shared/RowActions";
 import LogMeeting from "../components/side-sheets/log/LogMeeting";
+import LogNote from "../components/side-sheets/log/LogNote";
+import { EditSheet } from "../components/side-sheets/EditSheet";
 import {
   formatDate,
   formatDuration,
   isPastDate,
   meetingOutcomeStyles,
 } from "../data/constants";
-import { useMeetings, addMeeting } from "../data/meetingsStore";
+import { useMeetings, addMeeting, updateMeeting } from "../data/meetingsStore";
+import { logActivityFromEntity } from "../data/logActivity";
+
+// Editable fields for the Reschedule sheet.
+const RESCHEDULE_GROUPS = [
+  {
+    title: "Reschedule",
+    fields: [
+      { key: "date", label: "Date", type: "text" },
+      { key: "startTime", label: "Start Time", type: "text" },
+      { key: "duration", label: "Duration (min)", type: "number" },
+    ],
+  },
+];
 
 const HEAD = ["Title", "Date", "Time", "Duration", "Company", "Attendees", "Outcome", "Owner", ""];
 
@@ -25,6 +40,8 @@ export default function MeetingsPage({ onMeetingClick, onCompanyClick }) {
   const meetings = useMeetings();
   const [query, setQuery] = useState("");
   const [logOpen, setLogOpen] = useState(false);
+  const [rescheduleTarget, setRescheduleTarget] = useState(null);
+  const [noteTarget, setNoteTarget] = useState(null);
   const [toast, setToast] = useState(null);
 
   const showToast = (msg) => {
@@ -142,9 +159,9 @@ export default function MeetingsPage({ onMeetingClick, onCompanyClick }) {
                       <RowActions
                         actions={[
                           { label: "View Detail", onClick: () => onMeetingClick?.(m.id) },
-                          { label: "Reschedule", onClick: () => showToast("Reschedule — coming soon") },
-                          { label: "Cancel", onClick: () => showToast("Cancel meeting — coming soon") },
-                          { label: "Log Note", onClick: () => showToast("Log note — coming soon") },
+                          { label: "Reschedule", onClick: () => setRescheduleTarget(m) },
+                          ...(m.outcome === "Cancelled" ? [] : [{ label: "Cancel", onClick: () => { updateMeeting(m.id, { outcome: "Cancelled" }); showToast(`"${m.title}" cancelled`); } }]),
+                          { label: "Log Note", onClick: () => setNoteTarget(m) },
                         ]}
                       />
                     </td>
@@ -179,6 +196,45 @@ export default function MeetingsPage({ onMeetingClick, onCompanyClick }) {
               });
               setLogOpen(false);
               showToast(`"${created.title}" logged`);
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* Reschedule */}
+      <SideSheet open={!!rescheduleTarget} onClose={() => setRescheduleTarget(null)} title={rescheduleTarget ? `Reschedule — ${rescheduleTarget.title}` : ""}>
+        {rescheduleTarget && (
+          <EditSheet
+            groups={RESCHEDULE_GROUPS}
+            values={rescheduleTarget}
+            entityLabel="Meeting"
+            onClose={() => setRescheduleTarget(null)}
+            onSave={(updated) => {
+              updateMeeting(rescheduleTarget.id, {
+                date: updated.date,
+                startTime: updated.startTime,
+                duration: Number(updated.duration) || rescheduleTarget.duration,
+                outcome: rescheduleTarget.outcome === "Cancelled" ? "Scheduled" : rescheduleTarget.outcome,
+              });
+              setRescheduleTarget(null);
+              showToast(`"${rescheduleTarget.title}" rescheduled`);
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* Log Note (associated to the meeting's company) */}
+      <SideSheet open={!!noteTarget} onClose={() => setNoteTarget(null)} title="Log Note">
+        {noteTarget && (
+          <LogNote
+            entity={noteTarget.companyId ? { id: noteTarget.companyId, type: "company", name: noteTarget.companyName } : null}
+            onClose={() => setNoteTarget(null)}
+            onSave={(activity) => {
+              if (noteTarget.companyId) {
+                logActivityFromEntity({ id: noteTarget.companyId, type: "company", name: noteTarget.companyName }, activity);
+              }
+              setNoteTarget(null);
+              showToast(`Note added to "${noteTarget.title}"`);
             }}
           />
         )}

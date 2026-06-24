@@ -39,7 +39,6 @@ export function ConvertCustomerContent({ entity, onDone }) {
   const companyContacts = entity?.contacts || contacts.slice(0, 4);
   const [movement, setMovement] = useState("all"); // all | selected | none
   const [checked, setChecked] = useState(() => Object.fromEntries(companyContacts.map((c) => [c.id, true])));
-  const [contactStages, setContactStages] = useState(() => Object.fromEntries(companyContacts.map((c) => [c.id, c.stage || "Active"])));
 
   const toggleCheck = (id) => setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
 
@@ -98,8 +97,6 @@ export function ConvertCustomerContent({ entity, onDone }) {
           setMovement={setMovement}
           effectiveChecked={effectiveChecked}
           toggleCheck={toggleCheck}
-          contactStages={contactStages}
-          setContactStages={setContactStages}
           onComplete={handleComplete}
           companyName={entity?.name}
         />
@@ -223,9 +220,7 @@ function Step1({ entity, fields, set, step1Valid, showSuccess, onSubmit }) {
   );
 }
 
-const CONTACT_STAGES = ["Active", "Inactive", "Prospect", "Churned"];
-
-function Step2({ companyContacts, movement, setMovement, effectiveChecked, toggleCheck, contactStages, setContactStages, onComplete, companyName }) {
+function Step2({ companyContacts, movement, setMovement, effectiveChecked, toggleCheck, onComplete, companyName }) {
   return (
     <div className="flex-1 overflow-y-auto flex flex-col gap-4">
       {/* Radio options */}
@@ -272,14 +267,6 @@ function Step2({ companyContacts, movement, setMovement, effectiveChecked, toggl
                 <div className="text-sm font-medium text-gray-900">{c.name}</div>
                 <div className="text-xs text-gray-400">{c.email} · {c.role}</div>
               </div>
-              <select
-                value={contactStages[c.id]}
-                onChange={(e) => setContactStages((s) => ({ ...s, [c.id]: e.target.value }))}
-                disabled={!isChecked}
-                className="text-xs border border-gray-200 rounded px-1.5 py-1 bg-white disabled:opacity-40"
-              >
-                {CONTACT_STAGES.map((s) => <option key={s}>{s}</option>)}
-              </select>
             </div>
           );
         })}
@@ -378,9 +365,10 @@ function TextInput({ label, placeholder, value, onChange, required }) {
 }
 
 // ─── CREATE WIZSHOP USER (from Contact detail "Create WizShop User") ───
-export function CreateWizShopUserContent({ contact, onDone, onClose }) {
-  const [role, setRole] = useState("Buyer");
-  const [sendInvite, setSendInvite] = useState(true);
+export function CreateWizShopUserContent({ contact, onDone, onClose, mode = "create" }) {
+  const isChange = mode === "change";
+  const [role, setRole] = useState(isChange ? (contact?.wizShopRole || "Buyer") : "Buyer");
+  const [sendInvite, setSendInvite] = useState(!isChange);
   const [done, setDone] = useState(false);
 
   const handleCreate = () => {
@@ -395,7 +383,7 @@ export function CreateWizShopUserContent({ contact, onDone, onClose }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="bg-indigo-50/60 rounded-xl p-3 border border-indigo-100">
-        <div className="text-xs font-semibold text-indigo-700 mb-0.5">Creating account for</div>
+        <div className="text-xs font-semibold text-indigo-700 mb-0.5">{isChange ? "WizShop account" : "Creating account for"}</div>
         <div className="text-sm font-bold text-gray-900">{fullName}</div>
         <div className="text-xs text-gray-500">{contact?.email}</div>
       </div>
@@ -416,27 +404,29 @@ export function CreateWizShopUserContent({ contact, onDone, onClose }) {
         </p>
       </div>
 
-      <label className="flex items-center gap-2.5 cursor-pointer select-none">
-        <div
-          onClick={() => setSendInvite((v) => !v)}
-          className={`w-9 h-5 rounded-full transition-colors cursor-pointer flex-shrink-0 ${sendInvite ? "bg-indigo-600" : "bg-gray-200"}`}
-        >
-          <span className={`block w-4 h-4 rounded-full bg-white shadow-sm transition-transform mt-0.5 mx-0.5 ${sendInvite ? "translate-x-4" : "translate-x-0"}`} />
-        </div>
-        <span className="text-sm text-gray-700">Send invite email to {contact?.email}</span>
-      </label>
+      {!isChange && (
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <div
+            onClick={() => setSendInvite((v) => !v)}
+            className={`w-9 h-5 rounded-full transition-colors cursor-pointer flex-shrink-0 ${sendInvite ? "bg-indigo-600" : "bg-gray-200"}`}
+          >
+            <span className={`block w-4 h-4 rounded-full bg-white shadow-sm transition-transform mt-0.5 mx-0.5 ${sendInvite ? "translate-x-4" : "translate-x-0"}`} />
+          </div>
+          <span className="text-sm text-gray-700">Send invite email to {contact?.email}</span>
+        </label>
+      )}
 
       <div className="pt-2 border-t border-gray-100 space-y-2">
         {done ? (
           <div className="w-full py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
-            <CheckCircle size={15} /> WizShop user created!
+            <CheckCircle size={15} /> {isChange ? "Role updated!" : "WizShop user created!"}
           </div>
         ) : (
           <button
             onClick={handleCreate}
             className="w-full py-2.5 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:opacity-90 transition-all"
           >
-            Create WizShop User
+            {isChange ? "Update Role" : "Create WizShop User"}
           </button>
         )}
         <button onClick={onClose} className="w-full py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>

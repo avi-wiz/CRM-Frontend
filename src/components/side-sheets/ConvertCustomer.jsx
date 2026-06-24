@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Star, Check, ArrowRight, Users, Info } from "lucide-react";
-import { repNames, contacts as allContacts, contactStages, orgSettings } from "../../data/constants";
+import { repNames, contacts as allContacts, orgSettings } from "../../data/constants";
 
 const TERMS = ["Net 15", "Net 30", "Net 60", "Due on Receipt", "Prepaid"];
 
@@ -214,11 +214,9 @@ export default function ConvertCustomer({ company, onClose, onDone }) {
               <p className="text-sm text-gray-700">
                 Select which contacts to move to <strong className="text-gray-900">{company?.name}</strong> (Customer).
               </p>
-              {cc.defaultContactStage && (
-                <p className="text-xs text-gray-400 mt-0.5">
-                  Moved contacts will be set to stage <strong>{cc.defaultContactStage}</strong>.
-                </p>
-              )}
+              <p className="text-xs text-gray-400 mt-0.5">
+                Moved contacts inherit this company's pipeline stage.
+              </p>
             </div>
           </div>
 

@@ -79,9 +79,10 @@ export default function AssociationsPanel({ company, stages, stage, onStageChang
 
       {/* Payment */}
       <Block title="Payment" icon={CreditCard} action={{ label: "Edit", onClick: () => onAction?.("editPayment") }}>
-        <div className="text-xs text-gray-600 space-y-1">
-          <div className="flex justify-between"><span className="text-gray-400">Terms</span><span className="text-gray-800">{company.payment?.terms || "—"}</span></div>
-          <div className="flex justify-between"><span className="text-gray-400">Credit Limit</span><span className="text-gray-800">{company.payment?.creditLimit || "—"}</span></div>
+        <div className="space-y-1.5">
+          {(company.payment?.cards || DEFAULT_CARDS).map((card, i) => (
+            <CardRow key={i} card={card} />
+          ))}
         </div>
       </Block>
 
@@ -162,4 +163,23 @@ function Block({ title, icon: Icon, action, children }) {
 
 function initials(name = "") {
   return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+}
+
+// Sample cards on file (prototype) — overridden by company.payment.cards if present.
+const DEFAULT_CARDS = [
+  { brand: "Visa", last4: "4242" },
+  { brand: "Mastercard", last4: "8319" },
+];
+
+// A masked card on file: all digits shown as "X" except the last 4.
+function CardRow({ card }) {
+  return (
+    <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-gray-150 bg-gray-50/50">
+      <CreditCard size={13} className="text-gray-400 flex-shrink-0" />
+      <span className="text-xs text-gray-700 font-mono tracking-tight">
+        XXXX XXXX XXXX {card.last4}
+      </span>
+      {card.brand && <span className="text-[10px] text-gray-400 ml-auto">{card.brand}</span>}
+    </div>
+  );
 }
