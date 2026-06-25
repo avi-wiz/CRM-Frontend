@@ -58,7 +58,7 @@ export default function LogEmail({ entity, contacts = [], onClose, onSave }) {
         {/* Direction segmented control */}
         <div>
           <Label>Direction</Label>
-          <div className="inline-flex border border-gray-200 rounded-lg overflow-hidden w-full">
+          <div className="inline-flex border border-border rounded-lg overflow-hidden w-full">
             {[
               { v: "sent", l: "Sent" },
               { v: "received", l: "Received" },
@@ -69,8 +69,8 @@ export default function LogEmail({ entity, contacts = [], onClose, onSave }) {
                 onClick={() => setDirection(opt.v)}
                 className={`flex-1 px-3 py-2 text-sm transition-colors ${
                   direction === opt.v
-                    ? "bg-indigo-50 text-indigo-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-50"
+                    ? "bg-tonal text-primary-dark font-medium"
+                    : "text-muted hover:bg-action-hover"
                 }`}
               >
                 {opt.l}
@@ -85,8 +85,8 @@ export default function LogEmail({ entity, contacts = [], onClose, onSave }) {
         {isSent ? (
           <>
             <Field label="From">
-              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
-                {CURRENT_USER} <span className="text-gray-400">(you)</span>
+              <div className="px-3 py-2 bg-default border border-border rounded-lg text-sm text-muted">
+                {CURRENT_USER} <span className="text-disabled">(you)</span>
               </div>
             </Field>
             <Field label="To" required>
@@ -104,12 +104,12 @@ export default function LogEmail({ entity, contacts = [], onClose, onSave }) {
           <>
             <Field label="From" required>
               {fromContact ? (
-                <div className="flex items-center justify-between px-3 py-2 bg-indigo-50 border border-indigo-200 rounded-lg">
-                  <span className="text-sm text-gray-800">{fromContact.label}</span>
+                <div className="flex items-center justify-between px-3 py-2 bg-tonal border border-primary rounded-lg">
+                  <span className="text-sm text-ink">{fromContact.label}</span>
                   <button
                     type="button"
                     onClick={() => setFromContact(null)}
-                    className="text-xs text-indigo-600 hover:underline"
+                    className="text-xs text-primary hover:underline"
                   >
                     Change
                   </button>
@@ -126,8 +126,8 @@ export default function LogEmail({ entity, contacts = [], onClose, onSave }) {
               )}
             </Field>
             <Field label="To">
-              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
-                {CURRENT_USER} <span className="text-gray-400">(you)</span>
+              <div className="px-3 py-2 bg-default border border-border rounded-lg text-sm text-muted">
+                {CURRENT_USER} <span className="text-disabled">(you)</span>
               </div>
             </Field>
           </>

@@ -1,29 +1,33 @@
 import { Building2, Users, Star, DollarSign, Calendar, CheckSquare, Car, Activity, BarChart3, FileText, Globe, Upload, UserPlus, ShoppingCart } from "lucide-react";
 
 // ─── STAGE COLORS (single source of truth) ───
+// Mapped to the WizCommerce "Molten" palette (tokens.css). StageBadge consumes
+// these as hex + alpha suffix (color+"18"/"30"), so they stay hex literals.
+// Semantic intent per stage: early=info, active=warning, mid=secondary,
+// late=primary(-light), won=success, lost=error.
 export const stageColors = {
   // Company pipeline stages (PRD)
-  "New Lead": "#3b82f6",
-  Contacted: "#f59e0b",
-  Qualified: "#8b5cf6",
-  "Proposal Sent": "#6366f1",
-  Negotiation: "#ec4899",
-  Won: "#10b981",
-  Lost: "#ef4444",
+  "New Lead": "#4bbed1",        // info (teal)
+  Contacted: "#f5ba20",         // warning (amber)
+  Qualified: "#8a2fc8",         // secondary (purple)
+  "Proposal Sent": "#ff7e3d",   // primary-light
+  Negotiation: "#fd691f",       // primary (molten orange)
+  Won: "#0db873",               // success (green)
+  Lost: "#f03d3d",              // error (red)
   // Deal stages (legacy — still used by deals sample data)
-  Proposal: "#8b5cf6",
-  "Closed - Won": "#10b981",
-  "Closed - Lost": "#ef4444",
+  Proposal: "#8a2fc8",          // secondary
+  "Closed - Won": "#0db873",    // success
+  "Closed - Lost": "#f03d3d",   // error
   // Deal pipeline stages (DealsPage bulk actions + Enterprise pipeline)
-  Qualification: "#8b5cf6",
-  "Contract Sent": "#6366f1",
-  "Closed Won": "#10b981",
-  "Closed Lost": "#ef4444",
-  Discovery: "#3b82f6",
-  "Technical Review": "#f59e0b",
-  Pilot: "#8b5cf6",
-  Procurement: "#6366f1",
-  Contract: "#ec4899",
+  Qualification: "#8a2fc8",     // secondary
+  "Contract Sent": "#ff7e3d",   // primary-light
+  "Closed Won": "#0db873",      // success
+  "Closed Lost": "#f03d3d",     // error
+  Discovery: "#4bbed1",         // info
+  "Technical Review": "#f5ba20",// warning
+  Pilot: "#8a2fc8",             // secondary
+  Procurement: "#ff7e3d",       // primary-light
+  Contract: "#fd691f",          // primary
 };
 
 // Company kanban columns, in pipeline order.
@@ -161,11 +165,9 @@ export function getContactStage(contact) {
 // ─── ORG-LEVEL SETTINGS ───
 // Mirrors the "Customer Conversion Settings" panel in org-settings-admin.
 // `contactMovement` drives how the individual + bulk conversion flows behave.
-// Mutable in the prototype so the [DEV] toggle on CompaniesPage can swap modes
-// without a settings round-trip.
 export const orgSettings = {
   customerConversion: {
-    contactMovement: "prompt", // "auto_move_all" | "prompt" | "do_not_move"
+    contactMovement: "auto_move_all", // "auto_move_all" | "prompt" | "do_not_move"
     defaultContactStage: null, // null = keep current, or a stage name
     autoCreateWizShopUsers: false,
     defaultWizShopRole: "Buyer",
@@ -180,39 +182,73 @@ export const repNames = ["John Carmichael", "Tyler Jones", "Jon Morales", "Saul 
 export const industries = ["Technology", "Manufacturing", "Retail", "Healthcare", "Finance", "Food & Beverage", "Other"];
 export const leadSources = ["Inbound", "Outbound", "Referral", "WizShop", "Trade Show", "Other"];
 export const wizShopRoles = ["Admin", "Buyer", "Viewer"];
+// Reasons captured when a company/deal is moved to a Lost stage.
+export const lostReasons = ["Price", "Lost to Competitor", "No Budget", "No Decision", "Timing", "Lost Contact", "Other"];
 
 // ─── MANDATORY FIELDS ON STAGE MOVEMENT (Kanban gate, Flow 10) ───
 // Stage name → fields that must be filled before a record can enter that stage.
 // When a card is dropped on one of these stages and any listed field is
 // empty/null on the record, the Kanban opens a "Complete Required Fields" sheet.
+// Each progression stage demands the data a rep would realistically capture
+// before a lead can advance. Cumulative by design — later stages also assume
+// (but don't re-list) earlier requirements, since a record that skipped ahead
+// will still be caught for whatever it's missing.
 export const stageMandatoryFields = {
-  Qualified: ["industry", "employeeCount"],
-  "Proposal Sent": ["annualRevenue", "leadSource"],
-  Won: ["isCustomer"], // triggers the Customer gate
+  Contacted: ["leadSource", "phone"],
+  Qualified: ["industry", "employeeCount", "rep"],
+  "Proposal Sent": ["annualRevenue", "decisionMaker"],
+  Negotiation: ["budgetConfirmed", "expectedCloseDate"],
+  Won: ["isCustomer"], // also triggers the Customer gate
+  Lost: ["lostReason"],
 };
 
 // Field metadata used to render the missing-field form in the Kanban gate sheet.
 // `type` mirrors PropertiesPanel field types: text | number | currency | select | boolean.
 export const companyFieldMeta = {
+  name: { label: "Company Name", type: "text" },
+  domain: { label: "Domain", type: "text" },
   industry: { label: "Industry", type: "select", options: industries },
   employeeCount: { label: "Employee Count", type: "number" },
   annualRevenue: { label: "Annual Revenue", type: "currency" },
   leadSource: { label: "Lead Source", type: "select", options: leadSources },
+  source: { label: "Source", type: "text" },
   isCustomer: { label: "Is Customer", type: "boolean" },
+  rep: { label: "Account Owner", type: "select", options: repNames },
+  phone: { label: "Phone", type: "text" },
+  decisionMaker: { label: "Decision Maker", type: "text" },
+  budgetConfirmed: { label: "Budget Confirmed", type: "boolean" },
+  expectedCloseDate: { label: "Expected Close Date", type: "text" },
+  lostReason: { label: "Lost Reason", type: "select", options: lostReasons },
 };
+
+// Record keys that are system/internal — never shown as editable gate fields.
+export const companyGateExcludedKeys = ["id", "stage", "contactCount", "dealCount", "createdAt", "lastActivity", "address", "contacts", "deals", "activities", "orders", "quotes", "meetings", "tasks", "visits"];
 
 // ─── MANDATORY FIELDS ON DEAL STAGE MOVEMENT (Deal Kanban gate) ───
 export const dealStageMandatoryFields = {
-  Proposal: ["amountRaw", "closeDate"],
-  Negotiation: ["amountRaw", "closeDate", "source"],
-  "Closed Won": ["amountRaw", "closeDate"],
+  Qualification: ["owner", "source"],
+  Proposal: ["amountRaw", "closeDate", "contact"],
+  Negotiation: ["amountRaw", "closeDate", "source", "nextStep"],
+  "Closed Won": ["amountRaw", "closeDate", "poNumber"],
+  "Closed Lost": ["lostReason", "competitor"],
 };
 
 export const dealFieldMeta = {
+  name: { label: "Deal Name", type: "text" },
   amountRaw: { label: "Amount", type: "currency" },
   closeDate: { label: "Close Date", type: "text" },
   source: { label: "Source", type: "select", options: leadSources },
+  owner: { label: "Deal Owner", type: "select", options: repNames },
+  company: { label: "Company", type: "text" },
+  contact: { label: "Primary Contact", type: "text" },
+  nextStep: { label: "Next Step", type: "text" },
+  poNumber: { label: "PO Number", type: "text" },
+  lostReason: { label: "Lost Reason", type: "select", options: lostReasons },
+  competitor: { label: "Lost To (Competitor)", type: "text" },
 };
+
+// Record keys that are system/internal — never shown as editable gate fields.
+export const dealGateExcludedKeys = ["id", "stage", "amount", "isCustomerCompany", "daysInStage", "pipeline", "createdAt", "lastActivity", "activities", "contacts"];
 
 // ─── KAI MERGE-MATCH RECOMMENDATIONS (sample) ───
 // Keyed by source company id → ranked merge candidates surfaced by "KAI".
@@ -557,13 +593,13 @@ export function getDealDetail(id) {
 // or plain muted text for "Manual". `title` shows the full source on hover.
 export function SourceBadge({ source }) {
   if (!source || source === "Manual") {
-    return <span className="text-xs text-gray-400">Manual</span>;
+    return <span className="text-xs text-disabled">Manual</span>;
   }
   if (source.startsWith("WizShop")) {
     return (
       <span
         title={source}
-        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200"
+        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-warning-bg text-warning-dark border border-warning"
       >
         <Globe size={11} /> WizShop
       </span>
@@ -573,7 +609,7 @@ export function SourceBadge({ source }) {
     return (
       <span
         title={source}
-        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700"
+        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-info-bg text-info-dark"
       >
         <Upload size={11} /> Import
       </span>
@@ -583,7 +619,7 @@ export function SourceBadge({ source }) {
     return (
       <span
         title={source}
-        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-700"
+        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-secondary-bg text-secondary-dark"
       >
         <UserPlus size={11} /> Referral
       </span>
@@ -609,9 +645,9 @@ export const companyColumns = [
     label: "Customer",
     render: (v) =>
       v ? (
-        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Customer</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-success-bg text-success-dark">Customer</span>
       ) : (
-        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Company</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-default text-muted">Company</span>
       ),
   },
   { key: "rep", label: "Rep" },
@@ -639,7 +675,7 @@ export const contactColumns = [
     key: "companyName",
     label: "Company",
     render: (v) => (
-      <span className="text-sm text-indigo-600 hover:underline cursor-pointer">{v}</span>
+      <span className="text-sm text-primary hover:underline cursor-pointer">{v}</span>
     ),
   },
   {
@@ -647,11 +683,11 @@ export const contactColumns = [
     label: "WizShop",
     render: (v, row) =>
       v ? (
-        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+        <span className="text-xs px-2 py-0.5 rounded-full bg-success-bg text-success-dark">
           Active · {row.wizShopRole}
         </span>
       ) : (
-        <span className="text-xs text-gray-400">—</span>
+        <span className="text-xs text-disabled">—</span>
       ),
   },
   { key: "stage", label: "Stage", render: "stage_badge" },
@@ -868,10 +904,10 @@ export const meetings = [
 
 // Outcome badge color map for meetings.
 export const meetingOutcomeStyles = {
-  Scheduled: "bg-blue-50 text-blue-700",
-  Completed: "bg-emerald-50 text-emerald-700",
-  Cancelled: "bg-gray-100 text-gray-600",
-  "No-Show": "bg-red-50 text-red-700",
+  Scheduled: "bg-info-bg text-info-dark",
+  Completed: "bg-success-bg text-success-dark",
+  Cancelled: "bg-default text-muted",
+  "No-Show": "bg-danger-bg text-danger-dark",
 };
 
 export const meetingOutcomes = ["Scheduled", "Completed", "Cancelled", "No-Show"];
@@ -1151,10 +1187,10 @@ export const tasks = [
 
 // Status + priority style maps for tasks.
 export const taskStatusStyles = {
-  Open: "bg-blue-50 text-blue-700",
-  "In Progress": "bg-amber-50 text-amber-700",
-  Completed: "bg-emerald-50 text-emerald-700",
-  Cancelled: "bg-gray-100 text-gray-600",
+  Open: "bg-info-bg text-info-dark",
+  "In Progress": "bg-warning-bg text-warning-dark",
+  Completed: "bg-success-bg text-success-dark",
+  Cancelled: "bg-default text-muted",
 };
 
 export const taskStatuses = ["Open", "In Progress", "Completed", "Cancelled"];
@@ -1169,10 +1205,10 @@ export const taskPriorities = [
 ];
 
 export const taskPriorityStyles = {
-  Low: "bg-gray-100 text-gray-600",
-  Medium: "bg-blue-50 text-blue-700",
-  High: "bg-amber-50 text-amber-700",
-  Urgent: "bg-red-50 text-red-700",
+  Low: "bg-default text-muted",
+  Medium: "bg-info-bg text-info-dark",
+  High: "bg-warning-bg text-warning-dark",
+  Urgent: "bg-danger-bg text-danger-dark",
 };
 
 // True when the due date is strictly before today (date-only comparison).
@@ -1319,22 +1355,22 @@ export const visits = [
 export const visitPurposes = ["Sales Call", "Support", "Onboarding", "Relationship", "Product Demo", "Collection Follow-up", "Other"];
 
 export const visitPurposeStyles = {
-  "Sales Call": "bg-indigo-50 text-indigo-700",
-  Support: "bg-amber-50 text-amber-700",
-  Onboarding: "bg-blue-50 text-blue-700",
-  Relationship: "bg-purple-50 text-purple-700",
-  "Product Demo": "bg-emerald-50 text-emerald-700",
+  "Sales Call": "bg-tonal text-primary-dark",
+  Support: "bg-warning-bg text-warning-dark",
+  Onboarding: "bg-info-bg text-info-dark",
+  Relationship: "bg-secondary-bg text-secondary-dark",
+  "Product Demo": "bg-success-bg text-success-dark",
   "Collection Follow-up": "bg-orange-50 text-orange-700",
-  Other: "bg-gray-100 text-gray-600",
+  Other: "bg-default text-muted",
 };
 
 export const visitOutcomes = ["Positive", "Neutral", "Negative", "Follow-up Required"];
 
 export const visitOutcomeStyles = {
-  Positive: "bg-emerald-50 text-emerald-700",
-  Neutral: "bg-gray-100 text-gray-600",
-  Negative: "bg-red-50 text-red-700",
-  "Follow-up Required": "bg-amber-50 text-amber-700",
+  Positive: "bg-success-bg text-success-dark",
+  Neutral: "bg-default text-muted",
+  Negative: "bg-danger-bg text-danger-dark",
+  "Follow-up Required": "bg-warning-bg text-warning-dark",
 };
 
 export function getVisitCompany(visit) {
@@ -1695,31 +1731,31 @@ export const activitiesAggregate = [
 
 // Filter-pill config + per-type styling for the Activities aggregate page.
 export const activityTypeMeta = {
-  note: { label: "Note", iconBg: "bg-blue-100", iconColor: "text-blue-600" },
-  email: { label: "Email", iconBg: "bg-amber-100", iconColor: "text-amber-600" },
-  meeting: { label: "Meeting", iconBg: "bg-purple-100", iconColor: "text-purple-600" },
-  task: { label: "Task", iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+  note: { label: "Note", iconBg: "bg-info-bg", iconColor: "text-info-dark" },
+  email: { label: "Email", iconBg: "bg-warning-bg", iconColor: "text-warning-dark" },
+  meeting: { label: "Meeting", iconBg: "bg-secondary-bg", iconColor: "text-secondary-dark" },
+  task: { label: "Task", iconBg: "bg-success-bg", iconColor: "text-success-dark" },
   visit: { label: "Visit", iconBg: "bg-orange-100", iconColor: "text-orange-600" },
   stage_change: { label: "Stage Change", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
   conversion: { label: "Conversion", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
   merge: { label: "Merge", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
-  quote: { label: "Quote", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+  quote: { label: "Quote", iconBg: "bg-tonal", iconColor: "text-primary-dark" },
   order: { label: "Order", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
   wizshop_event: { label: "WizShop Event", iconBg: "bg-gray-200", iconColor: "text-gray-500" },
 };
 
 // Action badge colors for the Show History modal.
 export const historyActionStyles = {
-  Created: "bg-blue-50 text-blue-700",
-  Updated: "bg-amber-50 text-amber-700",
-  Completed: "bg-emerald-50 text-emerald-700",
-  Cancelled: "bg-gray-100 text-gray-600",
-  "Stage Changed": "bg-purple-50 text-purple-700",
-  "Note Added": "bg-blue-50 text-blue-700",
-  "Notes Added": "bg-blue-50 text-blue-700",
-  "Outcome Set": "bg-emerald-50 text-emerald-700",
+  Created: "bg-info-bg text-info-dark",
+  Updated: "bg-warning-bg text-warning-dark",
+  Completed: "bg-success-bg text-success-dark",
+  Cancelled: "bg-default text-muted",
+  "Stage Changed": "bg-secondary-bg text-secondary-dark",
+  "Note Added": "bg-info-bg text-info-dark",
+  "Notes Added": "bg-info-bg text-info-dark",
+  "Outcome Set": "bg-success-bg text-success-dark",
   "Follow-up Set": "bg-orange-50 text-orange-700",
-  "Task Created": "bg-emerald-50 text-emerald-700",
+  "Task Created": "bg-success-bg text-success-dark",
 };
 
 // ─── SAMPLE DATA: QUOTES ───
@@ -1834,12 +1870,12 @@ export const quotes = [
 
 // Status → badge classes used across the Quotes UI.
 export const quoteStatusStyles = {
-  Draft: "bg-gray-100 text-gray-600",
-  Sent: "bg-blue-50 text-blue-700",
-  Viewed: "bg-amber-50 text-amber-700",
-  Accepted: "bg-emerald-50 text-emerald-700",
-  Rejected: "bg-red-50 text-red-700",
-  Expired: "bg-gray-100 text-gray-500",
+  Draft: "bg-default text-muted",
+  Sent: "bg-info-bg text-info-dark",
+  Viewed: "bg-warning-bg text-warning-dark",
+  Accepted: "bg-success-bg text-success-dark",
+  Rejected: "bg-danger-bg text-danger-dark",
+  Expired: "bg-default text-muted",
 };
 
 export const quoteStatuses = ["Draft", "Sent", "Viewed", "Accepted", "Rejected", "Expired"];

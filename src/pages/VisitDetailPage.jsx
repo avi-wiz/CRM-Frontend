@@ -44,39 +44,39 @@ export default function VisitDetailPage({ visitId, onBack, onCompanyClick, onCon
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── Header ─── */}
-      <div className="px-8 py-4 border-b border-gray-150 bg-white">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-3">
+      <div className="px-8 py-4 border-b border-divider bg-surface">
+        <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted hover:text-ink mb-3">
           <ArrowLeft size={15} /> Back to Visits
         </button>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-lg font-semibold text-gray-900 truncate">Visit — {visit.companyName}</h1>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${visitPurposeStyles[visit.purpose] || "bg-gray-100 text-gray-600"}`}>{visit.purpose}</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${visitOutcomeStyles[visit.outcome] || "bg-gray-100 text-gray-600"}`}>{visit.outcome}</span>
+              <h1 className="text-lg font-semibold text-ink truncate">Visit — {visit.companyName}</h1>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${visitPurposeStyles[visit.purpose] || "bg-default text-muted"}`}>{visit.purpose}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${visitOutcomeStyles[visit.outcome] || "bg-default text-muted"}`}>{visit.outcome}</span>
             </div>
-            <div className="mt-1.5 text-sm text-gray-500">{formatDate(visit.visitDate)} · {formatDuration(visit.duration)} · {visit.location}</div>
+            <div className="mt-1.5 text-sm text-muted">{formatDate(visit.visitDate)} · {formatDuration(visit.duration)} · {visit.location}</div>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            <button onClick={() => showToast("Edit — coming soon")} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            <button onClick={() => showToast("Edit — coming soon")} className="wiz-btn wiz-btn--secondary flex items-center gap-1.5">
               <Edit2 size={14} /> Edit
             </button>
-            <button onClick={() => setTaskOpen(true)} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            <button onClick={() => setTaskOpen(true)} className="wiz-btn wiz-btn--secondary flex items-center gap-1.5">
               <CheckSquare size={14} /> Create Follow-up Task
             </button>
-            <button onClick={() => setFollowVisitOpen(true)} className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200">
+            <button onClick={() => setFollowVisitOpen(true)} className="wiz-btn wiz-btn--primary flex items-center gap-1.5">
               <Car size={14} /> Log Follow-up Visit
             </button>
             <div className="relative">
-              <button onClick={() => setMenuOpen((o) => !o)} className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-500">
+              <button onClick={() => setMenuOpen((o) => !o)} className="p-2 rounded-xl border border-border hover:bg-action-hover text-muted">
                 <MoreHorizontal size={16} />
               </button>
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 top-11 z-30 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-36">
-                    <button onClick={() => { setMenuOpen(false); showToast("Delete — coming soon"); }} className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50">Delete</button>
+                  <div className="absolute right-0 top-11 z-30 bg-surface border border-border rounded-xl shadow-3 py-1 w-36">
+                    <button onClick={() => { setMenuOpen(false); showToast("Delete — coming soon"); }} className="w-full text-left px-3 py-1.5 text-sm text-danger-dark hover:bg-danger-bg">Delete</button>
                   </div>
                 </>
               )}
@@ -86,40 +86,40 @@ export default function VisitDetailPage({ visitId, onBack, onCompanyClick, onCon
       </div>
 
       {/* ─── Body: 2-column ─── */}
-      <div className="flex-1 overflow-auto bg-[#f8fafc] p-8">
+      <div className="flex-1 overflow-auto bg-default p-8">
         <div className="flex gap-6 max-w-6xl">
           {/* Left (~60%) */}
           <div className="flex-1 min-w-0 space-y-6">
             {/* Visit Notes */}
             <Card title="Visit Notes">
               {visit.notes ? (
-                <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
+                <div className="space-y-3 text-sm text-ink leading-relaxed">
                   {visit.notes.split("\n").filter(Boolean).map((p, i) => <p key={i}>{p}</p>)}
                 </div>
               ) : (
-                <p className="text-sm text-gray-400 py-1">No visit notes recorded.</p>
+                <p className="text-sm text-disabled py-1">No visit notes recorded.</p>
               )}
             </Card>
 
             {/* Follow-up (only if needed) */}
             {visit.followUpNeeded && (
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+              <div className="bg-warning-bg border border-warning rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <AlertTriangle size={15} className="text-amber-500" />
-                  <h3 className="text-sm font-semibold text-amber-800">Follow-up Required</h3>
+                  <AlertTriangle size={15} className="text-warning" />
+                  <h3 className="text-sm font-semibold text-warning-dark">Follow-up Required</h3>
                 </div>
                 <div className="text-sm mb-1">
-                  <span className="text-amber-700">Due: </span>
-                  <span className={fuOverdue ? "text-red-600 font-semibold" : "text-amber-900 font-medium"}>
+                  <span className="text-warning-dark">Due: </span>
+                  <span className={fuOverdue ? "text-danger-dark font-semibold" : "text-warning-dark font-medium"}>
                     {formatDate(visit.followUpDate)}{fuOverdue ? " · Overdue" : ""}
                   </span>
                 </div>
-                {visit.followUpNotes && <p className="text-sm text-amber-900 mb-3">{visit.followUpNotes}</p>}
+                {visit.followUpNotes && <p className="text-sm text-warning-dark mb-3">{visit.followUpNotes}</p>}
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setTaskOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-white text-amber-700 border border-amber-300 rounded-lg hover:bg-amber-100 transition-colors">
+                  <button onClick={() => setTaskOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-surface text-warning-dark border border-warning rounded-lg hover:bg-warning-bg transition-colors">
                     <CheckSquare size={14} /> Create Follow-up Task
                   </button>
-                  <button onClick={() => setFollowVisitOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-white text-amber-700 border border-amber-300 rounded-lg hover:bg-amber-100 transition-colors">
+                  <button onClick={() => setFollowVisitOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-surface text-warning-dark border border-warning rounded-lg hover:bg-warning-bg transition-colors">
                     <Car size={14} /> Log Follow-up Visit
                   </button>
                 </div>
@@ -131,10 +131,10 @@ export default function VisitDetailPage({ visitId, onBack, onCompanyClick, onCon
               <div className="space-y-3">
                 {log.map((entry, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                     <div className="min-w-0">
-                      <div className="text-sm text-gray-700">{entry.text}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">{entry.time}</div>
+                      <div className="text-sm text-ink">{entry.text}</div>
+                      <div className="text-xs text-disabled mt-0.5">{entry.time}</div>
                     </div>
                   </div>
                 ))}
@@ -152,9 +152,9 @@ export default function VisitDetailPage({ visitId, onBack, onCompanyClick, onCon
                 <Row label="Location" value={visit.location || "—"} />
                 <Row label="Purpose" value={visit.purpose} />
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="text-gray-400">Outcome</dt>
+                  <dt className="text-disabled">Outcome</dt>
                   <dd>
-                    <select value={visit.outcome} onChange={(e) => handleOutcome(e.target.value)} className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-300">
+                    <select value={visit.outcome} onChange={(e) => handleOutcome(e.target.value)} className="wiz-input text-xs">
                       {visitOutcomes.map((o) => <option key={o}>{o}</option>)}
                     </select>
                   </dd>
@@ -167,17 +167,17 @@ export default function VisitDetailPage({ visitId, onBack, onCompanyClick, onCon
             {/* Contacts Met */}
             <Card title="Contacts Met">
               {contactsMet.length === 0 ? (
-                <p className="text-sm text-gray-400 py-1">No contacts specified</p>
+                <p className="text-sm text-disabled py-1">No contacts specified</p>
               ) : (
                 <div className="space-y-1.5">
                   {contactsMet.map((ct) => {
                     const full = contacts.find((c) => c.id === ct.contactId);
                     return (
-                      <button key={ct.contactId} onClick={() => onContactClick?.(ct.contactId)} className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-indigo-50/40 text-left transition-colors">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0">{initials(ct.contactName)}</div>
+                      <button key={ct.contactId} onClick={() => onContactClick?.(ct.contactId)} className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-action-hover text-left transition-colors">
+                        <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0">{initials(ct.contactName)}</div>
                         <div className="min-w-0">
-                          <div className="text-sm font-medium text-gray-800 truncate">{ct.contactName}</div>
-                          {full && <div className="text-xs text-gray-400 truncate flex items-center gap-1"><Mail size={10} /> {full.email} · {full.jobTitle}</div>}
+                          <div className="text-sm font-medium text-ink truncate">{ct.contactName}</div>
+                          {full && <div className="text-xs text-disabled truncate flex items-center gap-1"><Mail size={10} /> {full.email} · {full.jobTitle}</div>}
                         </div>
                       </button>
                     );
@@ -191,30 +191,30 @@ export default function VisitDetailPage({ visitId, onBack, onCompanyClick, onCon
               <button
                 onClick={() => onCompanyClick?.(visit.companyId)}
                 disabled={!visit.companyId}
-                className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all disabled:opacity-60"
+                className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all disabled:opacity-60"
               >
-                <Building2 size={15} className="text-gray-400 flex-shrink-0" />
+                <Building2 size={15} className="text-disabled flex-shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wide text-gray-400">Company</div>
-                  <div className="text-sm text-gray-800 truncate">{visit.companyName || "—"}</div>
+                  <div className="text-[10px] uppercase tracking-wide text-disabled">Company</div>
+                  <div className="text-sm text-ink truncate">{visit.companyName || "—"}</div>
                 </div>
               </button>
 
               {relatedVisits.length > 0 && (
                 <div className="mt-4">
-                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Related Visits</h4>
+                  <h4 className="text-[10px] font-bold text-disabled uppercase tracking-widest mb-2">Related Visits</h4>
                   <div className="space-y-2">
                     {relatedVisits.map((rv) => (
-                      <button key={rv.id} onClick={() => onVisitClick?.(rv.id)} className="w-full flex items-center justify-between gap-2 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all">
+                      <button key={rv.id} onClick={() => onVisitClick?.(rv.id)} className="w-full flex items-center justify-between gap-2 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all">
                         <div className="min-w-0">
-                          <div className="text-sm text-gray-800">{formatDate(rv.visitDate)}</div>
-                          <div className="text-xs text-gray-400 truncate">{rv.rep?.repName}</div>
+                          <div className="text-sm text-ink">{formatDate(rv.visitDate)}</div>
+                          <div className="text-xs text-disabled truncate">{rv.rep?.repName}</div>
                         </div>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 ${visitOutcomeStyles[rv.outcome] || "bg-gray-100 text-gray-600"}`}>{rv.outcome}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 ${visitOutcomeStyles[rv.outcome] || "bg-default text-muted"}`}>{rv.outcome}</span>
                       </button>
                     ))}
                   </div>
-                  <button onClick={() => onCompanyClick?.(visit.companyId)} className="mt-3 text-xs font-semibold text-indigo-500 hover:text-indigo-700">View all visits →</button>
+                  <button onClick={() => onCompanyClick?.(visit.companyId)} className="mt-3 text-xs font-semibold text-primary hover:text-primary-dark">View all visits →</button>
                 </div>
               )}
             </Card>
@@ -257,7 +257,7 @@ export default function VisitDetailPage({ visitId, onBack, onCompanyClick, onCon
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast}
         </div>
       )}
@@ -275,8 +275,8 @@ function buildActivityLog(visit) {
 
 function Card({ title, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-5">
-      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{title}</h3>
+    <div className="bg-surface rounded-2xl border border-border shadow-2 p-5">
+      <h3 className="text-xs font-bold text-disabled uppercase tracking-widest mb-3">{title}</h3>
       {children}
     </div>
   );
@@ -285,8 +285,8 @@ function Card({ title, children }) {
 function Row({ label, value }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <dt className="text-gray-400">{label}</dt>
-      <dd className="text-gray-800 text-right truncate">{value}</dd>
+      <dt className="text-disabled">{label}</dt>
+      <dd className="text-ink text-right truncate">{value}</dd>
     </div>
   );
 }

@@ -13,19 +13,19 @@ export default function RowActions({ actions = [] }) {
   const menuItems = actions.length > 0 ? actions : defaultActions;
 
   return (
-    <div className="relative">
-      <button onClick={() => setOpen(!open)} className="p-1 rounded hover:bg-gray-100">
-        <MoreHorizontal size={16} className="text-gray-400" />
+    <div className="relative inline-flex">
+      <button onClick={() => setOpen(!open)} className="inline-flex items-center justify-center w-8 h-8 rounded-full text-muted hover:text-ink hover:bg-action-hover transition-colors">
+        <MoreHorizontal size={18} className="shrink-0" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-7 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-44">
+          <div className="absolute right-0 top-7 z-30 bg-surface border border-border rounded-lg shadow-2 py-1 w-44">
             {menuItems.map((item, i) => (
               <button
                 key={i}
                 onClick={() => { item.onClick?.(); setOpen(false); }}
-                className={`w-full text-left px-3 py-1.5 text-sm ${item.danger ? "text-red-600 hover:bg-red-50" : "text-gray-700 hover:bg-gray-50"}`}
+                className={`w-full text-left px-3 py-1.5 text-sm ${item.danger ? "text-danger hover:bg-danger-bg" : "text-muted hover:bg-action-hover"}`}
               >
                 {item.label}
               </button>

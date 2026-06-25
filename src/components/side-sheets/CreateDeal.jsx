@@ -27,9 +27,9 @@ function firstActiveStage(pipeline) {
 // ─── FIELD COMPONENTS ───
 function Label({ children, required }) {
   return (
-    <label className="block text-xs font-medium text-gray-600 mb-1">
+    <label className="block text-xs font-medium text-muted mb-1">
       {children}
-      {required && <span className="text-red-400 ml-0.5">*</span>}
+      {required && <span className="text-danger ml-0.5">*</span>}
     </label>
   );
 }
@@ -40,7 +40,7 @@ function Select({ value, onChange, options, placeholder }) {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 pr-8"
+        className="wiz-input w-full appearance-none pr-8"
       >
         {placeholder && <option value="">{placeholder}</option>}
         {options.map((o) => (
@@ -49,7 +49,7 @@ function Select({ value, onChange, options, placeholder }) {
           </option>
         ))}
       </select>
-      <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+      <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-disabled pointer-events-none" />
     </div>
   );
 }
@@ -61,14 +61,14 @@ function TextInput({ value, onChange, placeholder, type = "text" }) {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+      className="wiz-input w-full"
     />
   );
 }
 
 function SectionHeader({ children }) {
   return (
-    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{children}</h3>
+    <h3 className="text-xs font-semibold text-disabled uppercase tracking-wider mb-3">{children}</h3>
   );
 }
 
@@ -93,15 +93,15 @@ function CompanySearch({ selected, onSelect, locked }) {
 
   if (selected) {
     return (
-      <div className="flex items-center justify-between px-3 py-2 bg-indigo-50 border border-indigo-200 rounded-lg">
+      <div className="flex items-center justify-between px-3 py-2 bg-tonal border border-primary rounded-lg">
         <div>
-          <div className="text-sm font-medium text-gray-900">{selected.name}</div>
-          <div className="text-xs text-gray-500">{selected.domain}</div>
+          <div className="text-sm font-medium text-primary-dark">{selected.name}</div>
+          <div className="text-xs text-muted">{selected.domain}</div>
         </div>
         {!locked && (
           <button
             onClick={() => onSelect(null)}
-            className="p-1 rounded hover:bg-indigo-100 text-gray-400 hover:text-gray-600"
+            className="p-1 rounded hover:bg-action-hover text-disabled hover:text-muted"
           >
             <X size={14} />
           </button>
@@ -113,35 +113,35 @@ function CompanySearch({ selected, onSelect, locked }) {
   return (
     <div className="relative">
       <div className="relative">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-disabled" />
         <input
           type="text"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
           placeholder="Search company…"
-          className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+          className="wiz-input w-full pl-8"
         />
       </div>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+          <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-surface border border-border rounded-lg shadow-3 overflow-hidden">
             {filtered.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-gray-400 text-center">No results</div>
+              <div className="px-3 py-4 text-sm text-disabled text-center">No results</div>
             ) : (
               filtered.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => handleSelect(c)}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-50 flex items-center justify-between"
+                  className="w-full text-left px-3 py-2 hover:bg-action-hover flex items-center justify-between"
                 >
                   <div>
-                    <div className="text-sm text-gray-900">{c.name}</div>
-                    <div className="text-xs text-gray-400">{c.domain}</div>
+                    <div className="text-sm text-ink">{c.name}</div>
+                    <div className="text-xs text-disabled">{c.domain}</div>
                   </div>
                   {c.isCustomer && (
-                    <span className="text-xs px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded-full">Customer</span>
+                    <span className="text-xs px-1.5 py-0.5 bg-success-bg text-success-dark rounded-full">Customer</span>
                   )}
                 </button>
               ))
@@ -180,12 +180,12 @@ function ContactChips({ chips, onRemove, onAdd, companyId }) {
         {chips.map((c) => (
           <span
             key={c.id}
-            className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+            className="inline-flex items-center gap-1 px-2 py-1 bg-action-hover text-muted text-xs rounded-full"
           >
             {c.firstName} {c.lastName}
             <button
               onClick={() => onRemove(c.id)}
-              className="hover:text-red-500 transition-colors"
+              className="hover:text-danger transition-colors"
             >
               <X size={11} />
             </button>
@@ -196,23 +196,23 @@ function ContactChips({ chips, onRemove, onAdd, companyId }) {
         <button
           type="button"
           onClick={() => setAddOpen((o) => !o)}
-          className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+          className="text-xs text-primary hover:text-primary-dark font-medium"
         >
           + Add Contact
         </button>
         {addOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setAddOpen(false)} />
-            <div className="absolute z-20 top-6 left-0 w-64 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
-              <div className="p-2 border-b border-gray-100">
+            <div className="absolute z-20 top-6 left-0 w-64 bg-surface border border-border rounded-lg shadow-3 overflow-hidden">
+              <div className="p-2 border-b border-divider">
                 <div className="relative">
-                  <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-disabled" />
                   <input
                     autoFocus
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search contacts…"
-                    className="w-full pl-6 pr-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                    className="wiz-input w-full pl-6 text-xs"
                   />
                 </div>
               </div>
@@ -220,14 +220,14 @@ function ContactChips({ chips, onRemove, onAdd, companyId }) {
                 <button
                   key={c.id}
                   onClick={() => handleAdd(c)}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs"
+                  className="w-full text-left px-3 py-2 hover:bg-action-hover text-xs"
                 >
-                  <div className="font-medium text-gray-800">{c.firstName} {c.lastName}</div>
-                  <div className="text-gray-400">{c.companyName}</div>
+                  <div className="font-medium text-ink">{c.firstName} {c.lastName}</div>
+                  <div className="text-disabled">{c.companyName}</div>
                 </button>
               ))}
               {available.length === 0 && (
-                <div className="px-3 py-3 text-xs text-gray-400 text-center">No contacts found</div>
+                <div className="px-3 py-3 text-xs text-disabled text-center">No contacts found</div>
               )}
             </div>
           </>
@@ -333,7 +333,7 @@ export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
                 options={PIPELINES.map((p) => p.name)}
                 placeholder="Select pipeline…"
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-disabled mt-1">
                 The deal will enter at the first stage of the selected pipeline
               </p>
             </div>
@@ -360,14 +360,14 @@ export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
             <div>
               <Label required>Amount</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-disabled text-sm">$</span>
                 <input
                   type="number"
                   min="0"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0"
-                  className="w-full border border-gray-200 rounded-lg pl-6 pr-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+                  className="wiz-input w-full pl-6"
                 />
               </div>
             </div>
@@ -403,7 +403,7 @@ export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
                 companyId={company?.id}
               />
               {contactChips.length === 0 && !company && (
-                <p className="text-xs text-gray-400">Select a company to auto-populate contacts</p>
+                <p className="text-xs text-disabled">Select a company to auto-populate contacts</p>
               )}
             </div>
           </div>
@@ -411,21 +411,17 @@ export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-gray-100 px-5 py-4 flex items-center justify-between bg-white">
+      <div className="border-t border-divider px-5 py-4 flex items-center justify-between bg-surface">
         <button
           onClick={onClose}
-          className="text-sm text-gray-500 hover:text-gray-700"
+          className="wiz-btn wiz-btn--text"
         >
           Cancel
         </button>
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${
-            canSubmit
-              ? "bg-indigo-600 hover:bg-indigo-700"
-              : "bg-indigo-200 cursor-not-allowed"
-          }`}
+          className="wiz-btn wiz-btn--primary"
         >
           Create Deal
         </button>

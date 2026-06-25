@@ -111,7 +111,7 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
       <div className="flex-1 overflow-y-auto space-y-5">
         {/* ── Contact Information ── */}
         <section>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Contact Information</h3>
+          <h3 className="text-xs font-semibold text-disabled uppercase tracking-wider mb-2">Contact Information</h3>
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <Field label="First Name" required>
@@ -127,11 +127,11 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => setEmailTouched(true)}
-                className={`${inputCls} ${emailTouched && email && !emailValid ? "border-red-300 focus:ring-red-300" : ""}`}
+                className={`${inputCls} ${emailTouched && email && !emailValid ? "wiz-input--error" : ""}`}
                 placeholder="jane@example.com"
               />
               {emailTouched && email && !emailValid && (
-                <span className="text-[11px] text-red-500 mt-1 block">Enter a valid email address.</span>
+                <span className="text-[11px] text-danger mt-1 block">Enter a valid email address.</span>
               )}
             </Field>
             <Field label="Phone">
@@ -151,16 +151,16 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
 
         {/* ── Company Association ── */}
         <section>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-            Company Association <span className="text-red-500">*</span>
+          <h3 className="text-xs font-semibold text-disabled uppercase tracking-wider mb-2">
+            Company Association <span className="text-danger">*</span>
           </h3>
 
           {selectedCompany ? (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 border border-indigo-200">
-              <span className="text-sm font-medium text-indigo-800 flex-1 truncate">{selectedCompany.name}</span>
-              <span className="text-xs text-indigo-400 truncate">{selectedCompany.domain}</span>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-tonal border border-primary">
+              <span className="text-sm font-medium text-primary-dark flex-1 truncate">{selectedCompany.name}</span>
+              <span className="text-xs text-primary truncate">{selectedCompany.domain}</span>
               {!lockCompany && (
-                <button onClick={() => setSelectedCompany(null)} className="text-indigo-400 hover:text-indigo-700">
+                <button onClick={() => setSelectedCompany(null)} className="text-primary hover:text-primary-dark">
                   <X size={15} />
                 </button>
               )}
@@ -169,24 +169,24 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
             <>
               {!createCompanyOpen && (
                 <div className="relative">
-                  <Search size={15} className="absolute left-3 top-2.5 text-gray-400" />
+                  <Search size={15} className="absolute left-3 top-2.5 text-disabled" />
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search companies..."
-                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                    className="wiz-input w-full pl-9"
                   />
                   {query.trim() && (
                     <div className="mt-1.5 space-y-1">
-                      {results.length === 0 && <div className="text-xs text-gray-400 px-1 py-2">No companies match “{query}”.</div>}
+                      {results.length === 0 && <div className="text-xs text-disabled px-1 py-2">No companies match “{query}”.</div>}
                       {results.map((c) => (
                         <button
                           key={c.id}
                           onClick={() => selectCompany(c)}
-                          className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-gray-200 hover:border-indigo-300 text-left"
+                          className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-border hover:border-primary text-left"
                         >
-                          <span className="text-sm text-gray-800 truncate">{c.name}</span>
-                          <span className="text-xs text-gray-400 truncate">{c.domain}</span>
+                          <span className="text-sm text-ink truncate">{c.name}</span>
+                          <span className="text-xs text-disabled truncate">{c.domain}</span>
                         </button>
                       ))}
                     </div>
@@ -198,21 +198,21 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
               <div className="mt-2">
                 <button
                   onClick={() => setCreateCompanyOpen((o) => !o)}
-                  className="flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                  className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary-dark"
                 >
                   {createCompanyOpen ? <ChevronDown size={13} /> : <Plus size={13} />}
                   {createCompanyOpen ? "Back to search" : "Or create a new company"}
                 </button>
 
                 {createCompanyOpen && (
-                  <div className="mt-2 p-3 rounded-lg border border-gray-200 bg-gray-50/60 space-y-3">
+                  <div className="mt-2 p-3 rounded-lg border border-border bg-default space-y-3">
                     <Field label="Company Name" required>
                       <input value={newCompanyName} onChange={(e) => setNewCompanyName(e.target.value)} className={inputCls} placeholder="Acme Inc." />
                     </Field>
                     <Field label="Domain">
                       <input value={newCompanyDomain} onChange={(e) => setNewCompanyDomain(e.target.value)} className={inputCls} placeholder="acme.com" />
                     </Field>
-                    <p className="text-[11px] text-gray-500">Both the company and contact will be created.</p>
+                    <p className="text-[11px] text-muted">Both the company and contact will be created.</p>
                   </div>
                 )}
               </div>
@@ -222,10 +222,10 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
 
         {/* ── WizShop Access ── */}
         <section>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">WizShop Access</h3>
+          <h3 className="text-xs font-semibold text-disabled uppercase tracking-wider mb-2">WizShop Access</h3>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={wizEnabled} onChange={(e) => setWizEnabled(e.target.checked)} className="rounded accent-indigo-600" />
-            <span className="text-sm text-gray-700">Create as WizShop User</span>
+            <input type="checkbox" checked={wizEnabled} onChange={(e) => setWizEnabled(e.target.checked)} className="rounded accent-primary" />
+            <span className="text-sm text-muted">Create as WizShop User</span>
           </label>
           {wizEnabled && (
             <div className="mt-3 pl-6 space-y-3">
@@ -235,12 +235,12 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
                 </select>
               </Field>
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={wizInvite} onChange={(e) => setWizInvite(e.target.checked)} className="rounded accent-indigo-600" />
-                <span className="text-sm text-gray-700">Send invite email</span>
+                <input type="checkbox" checked={wizInvite} onChange={(e) => setWizInvite(e.target.checked)} className="rounded accent-primary" />
+                <span className="text-sm text-muted">Send invite email</span>
               </label>
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-gray-400">Status</span>
-                <span className="px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Active</span>
+                <span className="text-disabled">Status</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-success-bg text-success-dark">Active</span>
               </div>
             </div>
           )}
@@ -248,17 +248,15 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
       </div>
 
       {/* Footer */}
-      <div className="pt-3 border-t border-gray-100 flex items-center gap-2">
+      <div className="pt-3 border-t border-divider flex items-center gap-2">
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium ${
-            canSubmit ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-gray-100 text-gray-400 cursor-not-allowed"
-          }`}
+          className="wiz-btn wiz-btn--primary flex-1"
         >
           Create Contact
         </button>
-        <button onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">
+        <button onClick={onClose} className="wiz-btn wiz-btn--text">
           Cancel
         </button>
       </div>
@@ -266,13 +264,13 @@ export default function CreateContact({ onClose, onDone, initialCompany = null }
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-indigo-300";
+const inputCls = "wiz-input w-full";
 
 function Field({ label, required, children }) {
   return (
     <div>
-      <label className="text-xs text-gray-500 block mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
+      <label className="text-xs text-muted block mb-1">
+        {label} {required && <span className="text-danger">*</span>}
       </label>
       {children}
     </div>

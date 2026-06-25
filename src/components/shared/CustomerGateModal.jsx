@@ -31,9 +31,9 @@ export default function CustomerGateModal({
 
   const defaultMessage = (
     <>
-      <strong className="text-gray-900">{companyName}</strong> is a{" "}
-      <strong className="text-gray-900">Company</strong>, not yet a{" "}
-      <strong className="text-gray-900">Customer</strong>. Customers are required
+      <strong className="text-ink">{companyName}</strong> is a{" "}
+      <strong className="text-ink">Company</strong>, not yet a{" "}
+      <strong className="text-ink">Customer</strong>. Customers are required
       to place orders.
     </>
   );
@@ -42,11 +42,11 @@ export default function CustomerGateModal({
     <div
       className={`fixed inset-0 z-[70] flex items-center justify-center transition-all duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
     >
-      <div className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
-      <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-gray-150 flex flex-col transition-all duration-300 ease-out transform ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
+      <div className={`absolute inset-0 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} style={{ background: "var(--wiz-overlay-scrim)" }} onClick={onClose} />
+      <div className={`relative bg-surface rounded-2xl shadow-4 w-full max-w-md mx-4 overflow-hidden border border-border flex flex-col transition-all duration-300 ease-out transform ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
         {/* Close */}
         <div className="flex justify-end px-3 pt-3">
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} className="text-disabled hover:text-muted transition-colors">
             <X size={18} />
           </button>
         </div>
@@ -56,26 +56,26 @@ export default function CustomerGateModal({
           <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mb-3">
             <AlertTriangle size={26} className="text-amber-600" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">{resolvedTitle}</h3>
-          <p className="text-sm text-gray-600 leading-relaxed mt-2 max-w-xs">
+          <h3 className="text-lg font-semibold text-ink">{resolvedTitle}</h3>
+          <p className="text-sm text-muted leading-relaxed mt-2 max-w-xs">
             {message || defaultMessage}
           </p>
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-100 mt-4" />
+        <div className="border-t border-divider mt-4" />
 
         {/* Actions */}
         <div className="px-6 py-4 flex flex-col gap-2">
           <button
             onClick={onConvert}
-            className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+            className="wiz-btn wiz-btn--primary w-full"
           >
             Convert to Customer Now <ArrowRight size={15} />
           </button>
           <button
             onClick={onClose}
-            className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="wiz-btn wiz-btn--text w-full"
           >
             Cancel
           </button>

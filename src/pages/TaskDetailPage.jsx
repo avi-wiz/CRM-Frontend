@@ -4,7 +4,7 @@ import {
   Mail, Calendar, CheckSquare, Send,
 } from "lucide-react";
 import StageBadge from "../components/shared/StageBadge";
-import { PriorityCell } from "./TasksPage";
+import { PriorityCell, AssigneeCell } from "./TasksPage";
 import {
   formatDate, getTaskCompany, isTaskOverdue, isToday,
   taskStatusStyles, taskStatuses, taskPriorities, taskPriorityStyles,
@@ -73,23 +73,23 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── Header ─── */}
-      <div className="px-8 py-4 border-b border-gray-150 bg-white">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-3">
+      <div className="px-8 py-4 border-b border-divider bg-surface">
+        <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted hover:text-ink mb-3">
           <ArrowLeft size={15} /> Back to Tasks
         </button>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className={`text-lg font-semibold truncate ${done ? "text-gray-400" : "text-gray-900"}`}>{task.title}</h1>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${taskStatusStyles[task.status] || "bg-gray-100 text-gray-600"}`}>
+              <h1 className={`text-lg font-semibold truncate ${done ? "text-disabled" : "text-ink"}`}>{task.title}</h1>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${taskStatusStyles[task.status] || "bg-default text-muted"}`}>
                 {task.status}
               </span>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${taskPriorityStyles[task.priority] || "bg-gray-100 text-gray-600"}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${taskPriorityStyles[task.priority] || "bg-default text-muted"}`}>
                 {task.priority}
               </span>
             </div>
             <div className="mt-1.5 text-sm">
-              <span className={overdue ? "text-red-600 font-medium" : dueToday ? "text-amber-600" : "text-gray-500"}>
+              <span className={overdue ? "text-danger-dark font-medium" : dueToday ? "text-warning-dark" : "text-muted"}>
                 Due {formatDate(task.dueDate)}{overdue ? " · Overdue" : dueToday ? " · Today" : ""}
               </span>
             </div>
@@ -97,24 +97,24 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
 
           <div className="flex items-center gap-2 flex-shrink-0">
             {!done && (
-              <button onClick={() => handleStatus("Completed")} className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-sm transition-all duration-200">
+              <button onClick={() => handleStatus("Completed")} className="wiz-btn flex items-center gap-1.5 bg-success text-white hover:bg-success-dark border-success">
                 <CheckCircle size={14} /> Mark Complete
               </button>
             )}
-            <button onClick={() => showToast("Edit — coming soon")} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            <button onClick={() => showToast("Edit — coming soon")} className="wiz-btn wiz-btn--secondary flex items-center gap-1.5">
               <Edit2 size={14} /> Edit
             </button>
             <div className="relative">
-              <button onClick={() => setMenuOpen((o) => !o)} className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-500">
+              <button onClick={() => setMenuOpen((o) => !o)} className="p-2 rounded-xl border border-border hover:bg-action-hover text-muted">
                 <MoreHorizontal size={16} />
               </button>
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 top-11 z-30 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-40">
-                    <button onClick={() => { setMenuOpen(false); showToast("Reassign — coming soon"); }} className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">Reassign</button>
-                    <button onClick={() => { setMenuOpen(false); handleStatus("Cancelled"); }} className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">Cancel Task</button>
-                    <button onClick={() => { setMenuOpen(false); showToast("Delete — coming soon"); }} className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50">Delete</button>
+                  <div className="absolute right-0 top-11 z-30 bg-surface border border-border rounded-xl shadow-3 py-1 w-40">
+                    <button onClick={() => { setMenuOpen(false); showToast("Reassign — coming soon"); }} className="w-full text-left px-3 py-1.5 text-sm text-muted hover:bg-action-hover">Reassign</button>
+                    <button onClick={() => { setMenuOpen(false); handleStatus("Cancelled"); }} className="w-full text-left px-3 py-1.5 text-sm text-muted hover:bg-action-hover">Cancel Task</button>
+                    <button onClick={() => { setMenuOpen(false); showToast("Delete — coming soon"); }} className="w-full text-left px-3 py-1.5 text-sm text-danger-dark hover:bg-danger-bg">Delete</button>
                   </div>
                 </>
               )}
@@ -124,16 +124,16 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
       </div>
 
       {/* ─── Body: 2-column ─── */}
-      <div className="flex-1 overflow-auto bg-[#f8fafc] p-8">
+      <div className="flex-1 overflow-auto bg-default p-8">
         <div className="flex gap-6 max-w-6xl">
           {/* Left column (~60%) */}
           <div className="flex-1 min-w-0 space-y-6">
             {/* Description */}
             <Card title="Description">
               {task.description ? (
-                <p className="text-sm text-gray-700 leading-relaxed">{task.description}</p>
+                <p className="text-sm text-ink leading-relaxed">{task.description}</p>
               ) : (
-                <p className="text-sm text-gray-400 py-1">No description provided.</p>
+                <p className="text-sm text-disabled py-1">No description provided.</p>
               )}
             </Card>
 
@@ -142,10 +142,10 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
               <div className="space-y-3">
                 {log.map((entry, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                     <div className="min-w-0">
-                      <div className="text-sm text-gray-700">{entry.text}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">{entry.time}</div>
+                      <div className="text-sm text-ink">{entry.text}</div>
+                      <div className="text-xs text-disabled mt-0.5">{entry.time}</div>
                     </div>
                   </div>
                 ))}
@@ -157,33 +157,33 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
               <div className="space-y-3 mb-4">
                 {comments.map((c) => (
                   <div key={c.id} className="flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0">
                       {initials(c.author)}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-800">{c.author}</span>
-                        <span className="text-xs text-gray-400">{c.time}</span>
+                        <span className="text-sm font-medium text-ink">{c.author}</span>
+                        <span className="text-xs text-disabled">{c.time}</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-0.5">{c.text}</p>
+                      <p className="text-sm text-muted mt-0.5">{c.text}</p>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="border-t border-gray-100 pt-3">
+              <div className="border-t border-divider pt-3">
                 <textarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   rows={2}
                   placeholder="Add a comment…"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300"
+                  className="wiz-input w-full resize-none"
                 />
                 <div className="flex justify-end mt-2">
                   <button
                     onClick={handlePostComment}
                     disabled={!draft.trim()}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      draft.trim() ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      draft.trim() ? "bg-primary text-white hover:bg-primary-dark" : "bg-default text-disabled cursor-not-allowed"
                     }`}
                   >
                     <Send size={13} /> Post
@@ -199,33 +199,33 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
             <Card title="Details">
               <dl className="space-y-3 text-sm">
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="text-gray-400">Status</dt>
+                  <dt className="text-disabled">Status</dt>
                   <dd>
-                    <select value={task.status} onChange={(e) => handleStatus(e.target.value)} className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-300">
+                    <select value={task.status} onChange={(e) => handleStatus(e.target.value)} className="wiz-input text-xs">
                       {taskStatuses.map((s) => <option key={s}>{s}</option>)}
                     </select>
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="text-gray-400">Priority</dt>
+                  <dt className="text-disabled">Priority</dt>
                   <dd>
-                    <select value={task.priority} onChange={(e) => { updateTask(task.id, { priority: e.target.value }); showToast(`Priority set to ${e.target.value}`); }} className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-300">
+                    <select value={task.priority} onChange={(e) => { updateTask(task.id, { priority: e.target.value }); showToast(`Priority set to ${e.target.value}`); }} className="wiz-input text-xs">
                       {taskPriorities.map((p) => <option key={p.value}>{p.value}</option>)}
                     </select>
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="text-gray-400">Assignee</dt>
+                  <dt className="text-disabled">Assignee</dt>
                   <dd className="flex items-center gap-2">
-                    <span className="text-gray-800">{task.assignee?.repName || "—"}</span>
-                    <button onClick={() => showToast("Reassign — coming soon")} className="text-xs font-semibold text-indigo-500 hover:text-indigo-700">Reassign</button>
+                    <AssigneeCell assignees={task.assignees} assignee={task.assignee} />
+                    <button onClick={() => showToast("Reassign — coming soon")} className="text-xs font-semibold text-primary hover:text-primary-dark">Reassign</button>
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="text-gray-400">Due Date</dt>
+                  <dt className="text-disabled">Due Date</dt>
                   <dd className="flex items-center gap-2">
-                    <span className={overdue ? "text-red-600 font-medium" : "text-gray-800"}>{formatDate(task.dueDate)}</span>
-                    <button onClick={() => showToast("Change due date — coming soon")} className="text-xs font-semibold text-indigo-500 hover:text-indigo-700">Change</button>
+                    <span className={overdue ? "text-danger-dark font-medium" : "text-ink"}>{formatDate(task.dueDate)}</span>
+                    <button onClick={() => showToast("Change due date — coming soon")} className="text-xs font-semibold text-primary hover:text-primary-dark">Change</button>
                   </dd>
                 </div>
                 <Row label="Created By" value={task.createdBy} />
@@ -239,12 +239,12 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
               <div className="space-y-2">
                 {/* Company */}
                 {assoc.companyId && (
-                  <button onClick={() => onCompanyClick?.(assoc.companyId)} className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all">
-                    <Building2 size={15} className="text-gray-400 flex-shrink-0" />
+                  <button onClick={() => onCompanyClick?.(assoc.companyId)} className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all">
+                    <Building2 size={15} className="text-disabled flex-shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <div className="text-[10px] uppercase tracking-wide text-gray-400">Company</div>
+                      <div className="text-[10px] uppercase tracking-wide text-disabled">Company</div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-800 truncate">{assoc.companyName}</span>
+                        <span className="text-sm text-ink truncate">{assoc.companyName}</span>
                         {company && <StageBadge stage={company.stage} small />}
                       </div>
                     </div>
@@ -255,13 +255,13 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
                 {(assoc.contactIds || []).map((ct) => {
                   const full = contactById(ct.contactId);
                   return (
-                    <button key={ct.contactId} onClick={() => onContactClick?.(ct.contactId)} className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0">
+                    <button key={ct.contactId} onClick={() => onContactClick?.(ct.contactId)} className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all">
+                      <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0">
                         {initials(ct.contactName)}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-800 truncate">{ct.contactName}</div>
-                        {full?.email && <div className="text-xs text-gray-400 truncate flex items-center gap-1"><Mail size={10} /> {full.email}</div>}
+                        <div className="text-sm font-medium text-ink truncate">{ct.contactName}</div>
+                        {full?.email && <div className="text-xs text-disabled truncate flex items-center gap-1"><Mail size={10} /> {full.email}</div>}
                       </div>
                     </button>
                   );
@@ -269,13 +269,13 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
 
                 {/* Deal */}
                 {assoc.dealId && (
-                  <button onClick={() => onDealClick?.(assoc.dealId)} className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all">
-                    <DollarSign size={15} className="text-gray-400 flex-shrink-0" />
+                  <button onClick={() => onDealClick?.(assoc.dealId)} className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all">
+                    <DollarSign size={15} className="text-disabled flex-shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <div className="text-[10px] uppercase tracking-wide text-gray-400">Deal</div>
+                      <div className="text-[10px] uppercase tracking-wide text-disabled">Deal</div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-800 truncate">{assoc.dealName}</span>
-                        {linkedDeal && <span className="text-xs font-semibold text-gray-600">{linkedDeal.amount}</span>}
+                        <span className="text-sm text-ink truncate">{assoc.dealName}</span>
+                        {linkedDeal && <span className="text-xs font-semibold text-muted">{linkedDeal.amount}</span>}
                       </div>
                     </div>
                   </button>
@@ -283,17 +283,17 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
 
                 {/* Meeting (follow-up source) */}
                 {assoc.meetingId && (
-                  <button onClick={() => onMeetingClick?.(assoc.meetingId)} className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all">
-                    <Calendar size={15} className="text-gray-400 flex-shrink-0" />
+                  <button onClick={() => onMeetingClick?.(assoc.meetingId)} className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all">
+                    <Calendar size={15} className="text-disabled flex-shrink-0" />
                     <div className="min-w-0">
-                      <div className="text-[10px] uppercase tracking-wide text-gray-400">Follow-up from</div>
-                      <div className="text-sm text-gray-800 truncate">{assoc.meetingTitle}</div>
+                      <div className="text-[10px] uppercase tracking-wide text-disabled">Follow-up from</div>
+                      <div className="text-sm text-ink truncate">{assoc.meetingTitle}</div>
                     </div>
                   </button>
                 )}
 
                 {!assoc.companyId && !(assoc.contactIds || []).length && !assoc.dealId && !assoc.meetingId && (
-                  <p className="text-sm text-gray-400 py-1">No associations</p>
+                  <p className="text-sm text-disabled py-1">No associations</p>
                 )}
               </div>
             </Card>
@@ -303,17 +303,17 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
               <Card title="Related Tasks">
                 <div className="space-y-2">
                   {relatedTasks.map((rt) => (
-                    <button key={rt.id} onClick={() => onTaskClick?.(rt.id)} className="w-full flex items-start justify-between gap-2 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all">
+                    <button key={rt.id} onClick={() => onTaskClick?.(rt.id)} className="w-full flex items-start justify-between gap-2 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all">
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-800 truncate">{rt.title}</div>
-                        <div className="text-xs text-gray-400 mt-0.5">{rt.assignee?.repName}</div>
+                        <div className="text-sm font-medium text-ink truncate">{rt.title}</div>
+                        <div className="text-xs text-disabled mt-0.5">{rt.assignee?.repName}</div>
                       </div>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 ${taskStatusStyles[rt.status] || "bg-gray-100 text-gray-600"}`}>{rt.status}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 ${taskStatusStyles[rt.status] || "bg-default text-muted"}`}>{rt.status}</span>
                     </button>
                   ))}
                 </div>
                 {assoc.companyId && (
-                  <button onClick={() => onCompanyClick?.(assoc.companyId)} className="mt-3 text-xs font-semibold text-indigo-500 hover:text-indigo-700">
+                  <button onClick={() => onCompanyClick?.(assoc.companyId)} className="mt-3 text-xs font-semibold text-primary hover:text-primary-dark">
                     View all tasks for {assoc.companyName} →
                   </button>
                 )}
@@ -325,7 +325,7 @@ export default function TaskDetailPage({ taskId, onBack, onCompanyClick, onConta
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast}
         </div>
       )}
@@ -346,8 +346,8 @@ function buildActivityLog(task) {
 
 function Card({ title, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-5">
-      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{title}</h3>
+    <div className="bg-surface rounded-2xl border border-border shadow-2 p-5">
+      <h3 className="text-xs font-bold text-disabled uppercase tracking-widest mb-3">{title}</h3>
       {children}
     </div>
   );
@@ -356,8 +356,8 @@ function Card({ title, children }) {
 function Row({ label, value }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <dt className="text-gray-400">{label}</dt>
-      <dd className="text-gray-800 text-right truncate">{value}</dd>
+      <dt className="text-disabled">{label}</dt>
+      <dd className="text-ink text-right truncate">{value}</dd>
     </div>
   );
 }

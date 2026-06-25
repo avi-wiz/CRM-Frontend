@@ -31,18 +31,18 @@ function CompanySearch({ selected, onSelect }) {
   // always a valid Customer.)
   if (selected) {
     return (
-      <div className="flex items-center justify-between px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+      <div className="flex items-center justify-between px-3 py-2 bg-success-bg border border-success rounded-lg">
         <div className="flex items-center gap-2 min-w-0">
-          <CheckCircle size={16} className="text-emerald-600 flex-shrink-0" />
+          <CheckCircle size={16} className="text-success-dark flex-shrink-0" />
           <div className="min-w-0">
-            <div className="text-sm font-medium text-gray-900 truncate">{selected.name}</div>
-            <div className="text-xs text-gray-500 truncate">{selected.domain}</div>
+            <div className="text-sm font-medium text-ink truncate">{selected.name}</div>
+            <div className="text-xs text-muted truncate">{selected.domain}</div>
           </div>
-          <span className="text-xs px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full flex-shrink-0">Customer</span>
+          <span className="text-xs px-1.5 py-0.5 bg-success-bg text-success-dark rounded-full flex-shrink-0">Customer</span>
         </div>
         <button
           onClick={() => onSelect(null)}
-          className="p-1 rounded hover:bg-emerald-100 text-gray-400 hover:text-gray-600 flex-shrink-0"
+          className="p-1 rounded hover:bg-action-hover text-disabled hover:text-muted flex-shrink-0"
         >
           <X size={14} />
         </button>
@@ -53,37 +53,37 @@ function CompanySearch({ selected, onSelect }) {
   return (
     <div className="relative">
       <div className="relative">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-disabled" />
         <input
           type="text"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
           placeholder="Search company or customer…"
-          className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+          className="wiz-input w-full pl-8"
         />
       </div>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-72 overflow-y-auto">
+          <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-surface border border-border rounded-lg shadow-3 overflow-hidden max-h-72 overflow-y-auto">
             {filtered.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-gray-400 text-center">No results</div>
+              <div className="px-3 py-4 text-sm text-disabled text-center">No results</div>
             ) : (
               filtered.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => handleSelect(c)}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-50 flex items-center justify-between"
+                  className="w-full text-left px-3 py-2 hover:bg-action-hover flex items-center justify-between"
                 >
                   <div className="min-w-0">
-                    <div className="text-sm text-gray-900 truncate">{c.name}</div>
-                    <div className="text-xs text-gray-400 truncate">{c.domain}</div>
+                    <div className="text-sm text-ink truncate">{c.name}</div>
+                    <div className="text-xs text-disabled truncate">{c.domain}</div>
                   </div>
                   {c.isCustomer ? (
-                    <span className="text-xs px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded-full flex-shrink-0">Customer</span>
+                    <span className="text-xs px-1.5 py-0.5 bg-success-bg text-success-dark rounded-full flex-shrink-0">Customer</span>
                   ) : (
-                    <span className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded-full flex-shrink-0">Company</span>
+                    <span className="text-xs px-1.5 py-0.5 bg-action-hover text-muted rounded-full flex-shrink-0">Company</span>
                   )}
                 </button>
               ))
@@ -96,7 +96,7 @@ function CompanySearch({ selected, onSelect }) {
 }
 
 function SectionHeader({ children }) {
-  return <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{children}</h3>;
+  return <h3 className="text-xs font-semibold text-disabled uppercase tracking-wider mb-3">{children}</h3>;
 }
 
 export default function CreateOrderPage({ onBack }) {
@@ -148,17 +148,17 @@ export default function CreateOrderPage({ onBack }) {
   return (
     <div className="flex-1 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-divider bg-surface">
         <div className="flex items-center gap-3 min-w-0">
           {onBack && (
-            <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+            <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-action-hover text-muted">
               <ArrowLeft size={18} />
             </button>
           )}
-          <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-            <ShoppingCart size={18} className="text-indigo-600" />
+          <div className="w-9 h-9 rounded-lg bg-tonal flex items-center justify-center flex-shrink-0">
+            <ShoppingCart size={18} className="text-primary" />
           </div>
-          <h1 className="text-lg font-semibold text-gray-900">Create Order</h1>
+          <h1 className="text-lg font-semibold text-ink">Create Order</h1>
         </div>
       </div>
 
@@ -168,12 +168,12 @@ export default function CreateOrderPage({ onBack }) {
           {/* CUSTOMER — the gate trigger point */}
           <div>
             <SectionHeader>Customer</SectionHeader>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Company / Customer <span className="text-red-400">*</span>
+            <label className="block text-xs font-medium text-muted mb-1">
+              Company / Customer <span className="text-danger">*</span>
             </label>
             <CompanySearch selected={customer} onSelect={handleSelect} />
             {!customer && (
-              <p className="text-xs text-gray-400 mt-1.5">
+              <p className="text-xs text-disabled mt-1.5">
                 Pick the customer this order is for. Only Customers can have orders.
               </p>
             )}
@@ -182,34 +182,34 @@ export default function CreateOrderPage({ onBack }) {
           {/* ORDER DETAILS — placeholder (outside CRM scope) */}
           <div>
             <SectionHeader>Order Details</SectionHeader>
-            <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
-              <p className="text-xs text-gray-500 mb-4">
+            <div className="rounded-xl border border-border bg-default p-4">
+              <p className="text-xs text-muted mb-4">
                 This order form is outside CRM scope — shown here to demonstrate the Customer gate only.
               </p>
 
               <div className="space-y-3 opacity-60 pointer-events-none select-none">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Order Type</label>
+                  <label className="block text-xs font-medium text-muted mb-1">Order Type</label>
                   <div className="relative">
-                    <select disabled className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-500 bg-white pr-8">
+                    <select disabled className="wiz-input w-full appearance-none pr-8">
                       <option>Standard Order</option>
                       <option>Sample Order</option>
                       <option>Reorder</option>
                     </select>
-                    <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-disabled pointer-events-none" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">PO Number</label>
-                  <input disabled placeholder="—" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white placeholder-gray-300" />
+                  <label className="block text-xs font-medium text-muted mb-1">PO Number</label>
+                  <input disabled placeholder="—" className="wiz-input w-full" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Requested Ship Date</label>
-                  <input disabled type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-400" />
+                  <label className="block text-xs font-medium text-muted mb-1">Requested Ship Date</label>
+                  <input disabled type="date" className="wiz-input w-full" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Line Items</label>
-                  <div className="border border-dashed border-gray-200 rounded-lg px-3 py-6 text-center text-xs text-gray-400">
+                  <label className="block text-xs font-medium text-muted mb-1">Line Items</label>
+                  <div className="border border-dashed border-border rounded-lg px-3 py-6 text-center text-xs text-disabled">
                     Line-item builder lives in WizOrder
                   </div>
                 </div>
@@ -218,16 +218,14 @@ export default function CreateOrderPage({ onBack }) {
           </div>
 
           {/* Footer actions */}
-          <div className="flex items-center justify-end gap-2 border-t border-gray-100 pt-4">
-            <button onClick={onBack} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">
+          <div className="flex items-center justify-end gap-2 border-t border-divider pt-4">
+            <button onClick={onBack} className="wiz-btn wiz-btn--text">
               Cancel
             </button>
             <button
               disabled={!customer}
               onClick={() => showToast("Order draft created (demo).")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${
-                customer ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-200 cursor-not-allowed"
-              }`}
+              className="wiz-btn wiz-btn--primary"
             >
               Create Order
             </button>
@@ -244,9 +242,9 @@ export default function CreateOrderPage({ onBack }) {
         title="Customer Required for Orders"
         message={
           <>
-            <strong className="text-gray-900">{gateCompany?.name}</strong> is a{" "}
-            <strong className="text-gray-900">Company</strong>, not yet a{" "}
-            <strong className="text-gray-900">Customer</strong>. Only Customers can have orders created.
+            <strong className="text-ink">{gateCompany?.name}</strong> is a{" "}
+            <strong className="text-ink">Company</strong>, not yet a{" "}
+            <strong className="text-ink">Customer</strong>. Only Customers can have orders created.
           </>
         }
         onConvert={handleConvertNow}
@@ -264,8 +262,8 @@ export default function CreateOrderPage({ onBack }) {
       </SideSheet>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-3">
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast}
         </div>
       )}

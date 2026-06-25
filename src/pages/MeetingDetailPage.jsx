@@ -12,10 +12,10 @@ import {
 import { useMeeting, useMeetings, updateMeeting } from "../data/meetingsStore";
 
 const PRIORITY_STYLES = {
-  Low: "bg-gray-100 text-gray-600",
-  Medium: "bg-blue-50 text-blue-700",
-  High: "bg-amber-50 text-amber-700",
-  Urgent: "bg-red-50 text-red-700",
+  Low: "bg-default text-muted",
+  Medium: "bg-info-bg text-info-dark",
+  High: "bg-warning-bg text-warning-dark",
+  Urgent: "bg-danger-bg text-danger-dark",
 };
 
 // Meeting detail — 2-column layout (not the standard 3-panel).
@@ -50,45 +50,45 @@ export default function MeetingDetailPage({ meetingId, onBack, onCompanyClick, o
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── Header ─── */}
-      <div className="px-8 py-4 border-b border-gray-150 bg-white">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-3">
+      <div className="px-8 py-4 border-b border-divider bg-surface">
+        <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted hover:text-ink mb-3">
           <ArrowLeft size={15} /> Back to Meetings
         </button>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <h1 className="text-lg font-semibold text-gray-900 truncate">{meeting.title}</h1>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${meetingOutcomeStyles[meeting.outcome] || "bg-gray-100 text-gray-600"}`}>
+              <h1 className="text-lg font-semibold text-ink truncate">{meeting.title}</h1>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${meetingOutcomeStyles[meeting.outcome] || "bg-default text-muted"}`}>
                 {meeting.outcome}
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-sm text-gray-500">
-              <span className="flex items-center gap-1.5"><Calendar size={13} className="text-gray-400" /> {formatDate(meeting.date)}</span>
-              <span className="flex items-center gap-1.5"><Clock size={13} className="text-gray-400" /> {meeting.startTime} · {formatDuration(meeting.duration)}</span>
-              <span className="flex items-center gap-1.5"><MapPin size={13} className="text-gray-400" /> {meeting.location || "—"}</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-sm text-muted">
+              <span className="flex items-center gap-1.5"><Calendar size={13} className="text-disabled" /> {formatDate(meeting.date)}</span>
+              <span className="flex items-center gap-1.5"><Clock size={13} className="text-disabled" /> {meeting.startTime} · {formatDuration(meeting.duration)}</span>
+              <span className="flex items-center gap-1.5"><MapPin size={13} className="text-disabled" /> {meeting.location || "—"}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            <button onClick={() => showToast("Edit — coming soon")} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            <button onClick={() => showToast("Edit — coming soon")} className="wiz-btn wiz-btn--secondary flex items-center gap-1.5">
               <Edit2 size={14} /> Edit
             </button>
-            <button onClick={() => showToast("Log note — coming soon")} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            <button onClick={() => showToast("Log note — coming soon")} className="wiz-btn wiz-btn--secondary flex items-center gap-1.5">
               <FileText size={14} /> Log Note
             </button>
-            <button onClick={() => setTaskOpen(true)} className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200">
+            <button onClick={() => setTaskOpen(true)} className="wiz-btn wiz-btn--primary flex items-center gap-1.5">
               <CheckSquare size={14} /> Create Follow-up Task
             </button>
             <div className="relative">
-              <button onClick={() => setMenuOpen((o) => !o)} className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-500">
+              <button onClick={() => setMenuOpen((o) => !o)} className="p-2 rounded-xl border border-border hover:bg-action-hover text-muted">
                 <MoreHorizontal size={16} />
               </button>
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 top-11 z-30 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-44">
-                    <button onClick={() => { setMenuOpen(false); handleOutcomeChange("Cancelled"); }} className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">Cancel Meeting</button>
-                    <button onClick={() => { setMenuOpen(false); showToast("Delete — coming soon"); }} className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50">Delete</button>
+                  <div className="absolute right-0 top-11 z-30 bg-surface border border-border rounded-xl shadow-3 py-1 w-44">
+                    <button onClick={() => { setMenuOpen(false); handleOutcomeChange("Cancelled"); }} className="w-full text-left px-3 py-1.5 text-sm text-muted hover:bg-action-hover">Cancel Meeting</button>
+                    <button onClick={() => { setMenuOpen(false); showToast("Delete — coming soon"); }} className="w-full text-left px-3 py-1.5 text-sm text-danger-dark hover:bg-danger-bg">Delete</button>
                   </div>
                 </>
               )}
@@ -98,14 +98,14 @@ export default function MeetingDetailPage({ meetingId, onBack, onCompanyClick, o
       </div>
 
       {/* ─── Body: 2-column ─── */}
-      <div className="flex-1 overflow-auto bg-[#f8fafc] p-8">
+      <div className="flex-1 overflow-auto bg-default p-8">
         <div className="flex gap-6 max-w-6xl">
           {/* Left column (~60%) */}
           <div className="flex-1 min-w-0 space-y-6">
             {/* Summary */}
             <Card title="Summary">
               {meeting.notes ? (
-                <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
+                <div className="space-y-3 text-sm text-ink leading-relaxed">
                   {meeting.notes.split("\n").filter(Boolean).map((p, i) => <p key={i}>{p}</p>)}
                 </div>
               ) : (
@@ -120,26 +120,26 @@ export default function MeetingDetailPage({ meetingId, onBack, onCompanyClick, o
             >
               {tasks.length === 0 ? (
                 <div className="flex flex-col items-center gap-3 py-6">
-                  <p className="text-sm text-gray-400">No follow-up tasks created</p>
-                  <button onClick={() => setTaskOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors">
+                  <p className="text-sm text-disabled">No follow-up tasks created</p>
+                  <button onClick={() => setTaskOpen(true)} className="wiz-btn wiz-btn--secondary flex items-center gap-1.5">
                     <CheckSquare size={14} /> Create Task
                   </button>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {tasks.map((t) => (
-                    <div key={t.id} className="flex items-start justify-between gap-3 p-3 rounded-xl border border-gray-150 hover:border-indigo-100 transition-colors">
+                    <div key={t.id} className="flex items-start justify-between gap-3 p-3 rounded-xl border border-border hover:border-primary transition-colors">
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-800">{t.title}</div>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                        <div className="text-sm font-medium text-ink">{t.title}</div>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-muted">
                           <span>{t.assignee}</span>
                           <span>·</span>
                           <span>Due {formatDate(t.due)}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${PRIORITY_STYLES[t.priority] || "bg-gray-100 text-gray-600"}`}>{t.priority}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600">{t.status}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${PRIORITY_STYLES[t.priority] || "bg-default text-muted"}`}>{t.priority}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-default text-muted">{t.status}</span>
                       </div>
                     </div>
                   ))}
@@ -152,10 +152,10 @@ export default function MeetingDetailPage({ meetingId, onBack, onCompanyClick, o
               <div className="space-y-3">
                 {log.map((entry, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                     <div className="min-w-0">
-                      <div className="text-sm text-gray-700">{entry.text}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">{entry.time}</div>
+                      <div className="text-sm text-ink">{entry.text}</div>
+                      <div className="text-xs text-disabled mt-0.5">{entry.time}</div>
                     </div>
                   </div>
                 ))}
@@ -173,12 +173,12 @@ export default function MeetingDetailPage({ meetingId, onBack, onCompanyClick, o
                 <Row label="Duration" value={formatDuration(meeting.duration)} />
                 <Row label="Location" value={meeting.location || "—"} />
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="text-gray-400">Outcome</dt>
+                  <dt className="text-disabled">Outcome</dt>
                   <dd>
                     <select
                       value={meeting.outcome}
                       onChange={(e) => handleOutcomeChange(e.target.value)}
-                      className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                      className="wiz-input text-xs"
                     >
                       {meetingOutcomes.map((o) => <option key={o}>{o}</option>)}
                     </select>
@@ -191,40 +191,40 @@ export default function MeetingDetailPage({ meetingId, onBack, onCompanyClick, o
 
             {/* Attendees */}
             <Card title="Attendees">
-              <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">External</h4>
+              <h4 className="text-[10px] font-bold text-disabled uppercase tracking-widest mb-2">External</h4>
               {externalAttendees.length === 0 ? (
-                <p className="text-xs text-gray-400 mb-3">No external attendees</p>
+                <p className="text-xs text-disabled mb-3">No external attendees</p>
               ) : (
                 <div className="space-y-1.5 mb-4">
                   {externalAttendees.map((a) => (
                     <button
                       key={a.contactId}
                       onClick={() => onContactClick?.(a.contactId)}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-indigo-50/40 text-left transition-colors"
+                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-action-hover text-left transition-colors"
                     >
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0">
+                      <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0">
                         {initials(a.contactName)}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-800 truncate">{a.contactName}</div>
-                        <div className="text-xs text-gray-400 truncate flex items-center gap-1"><Mail size={10} /> {a.email}</div>
+                        <div className="text-sm font-medium text-ink truncate">{a.contactName}</div>
+                        <div className="text-xs text-disabled truncate flex items-center gap-1"><Mail size={10} /> {a.email}</div>
                       </div>
                     </button>
                   ))}
                 </div>
               )}
 
-              <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Internal</h4>
+              <h4 className="text-[10px] font-bold text-disabled uppercase tracking-widest mb-2">Internal</h4>
               {internalAttendees.length === 0 ? (
-                <p className="text-xs text-gray-400">No internal attendees</p>
+                <p className="text-xs text-disabled">No internal attendees</p>
               ) : (
                 <div className="space-y-1.5">
                   {internalAttendees.map((a, i) => (
                     <div key={i} className="flex items-center gap-2.5 p-2 rounded-xl">
-                      <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 flex-shrink-0">
+                      <div className="w-7 h-7 rounded-full bg-default flex items-center justify-center text-[10px] font-bold text-muted flex-shrink-0">
                         {initials(a.repName)}
                       </div>
-                      <span className="text-sm text-gray-700">{a.repName}</span>
+                      <span className="text-sm text-ink">{a.repName}</span>
                     </div>
                   ))}
                 </div>
@@ -237,30 +237,30 @@ export default function MeetingDetailPage({ meetingId, onBack, onCompanyClick, o
                 <button
                   onClick={() => onCompanyClick?.(meeting.companyId)}
                   disabled={!meeting.companyId}
-                  className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all disabled:opacity-60 disabled:hover:bg-transparent"
+                  className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all disabled:opacity-60 disabled:hover:bg-transparent"
                 >
-                  <Building2 size={15} className="text-gray-400 flex-shrink-0" />
+                  <Building2 size={15} className="text-disabled flex-shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-[10px] uppercase tracking-wide text-gray-400">Company</div>
-                    <div className="text-sm text-gray-800 truncate">{meeting.companyName || "—"}</div>
+                    <div className="text-[10px] uppercase tracking-wide text-disabled">Company</div>
+                    <div className="text-sm text-ink truncate">{meeting.companyName || "—"}</div>
                   </div>
                 </button>
 
                 {meeting.dealId ? (
                   <button
                     onClick={() => onDealClick?.(meeting.dealId)}
-                    className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-gray-150 hover:border-indigo-100 hover:bg-indigo-50/40 text-left transition-all"
+                    className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border hover:border-primary hover:bg-action-hover text-left transition-all"
                   >
-                    <DollarSign size={15} className="text-gray-400 flex-shrink-0" />
+                    <DollarSign size={15} className="text-disabled flex-shrink-0" />
                     <div className="min-w-0">
-                      <div className="text-[10px] uppercase tracking-wide text-gray-400">Deal</div>
-                      <div className="text-sm text-gray-800 truncate">{meeting.dealName}</div>
+                      <div className="text-[10px] uppercase tracking-wide text-disabled">Deal</div>
+                      <div className="text-sm text-ink truncate">{meeting.dealName}</div>
                     </div>
                   </button>
                 ) : (
-                  <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl border border-dashed border-gray-200">
-                    <span className="text-sm text-gray-400">No deal linked</span>
-                    <button onClick={() => showToast("Link deal — coming soon")} className="text-xs font-semibold text-indigo-500 hover:text-indigo-700">Link Deal</button>
+                  <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl border border-dashed border-border">
+                    <span className="text-sm text-disabled">No deal linked</span>
+                    <button onClick={() => showToast("Link deal — coming soon")} className="text-xs font-semibold text-primary hover:text-primary-dark">Link Deal</button>
                   </div>
                 )}
               </div>
@@ -287,7 +287,7 @@ export default function MeetingDetailPage({ meetingId, onBack, onCompanyClick, o
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast}
         </div>
       )}
@@ -310,11 +310,11 @@ function buildActivityLog(meeting) {
 
 function Card({ title, action, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-5">
+    <div className="bg-surface rounded-2xl border border-border shadow-2 p-5">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{title}</h3>
+        <h3 className="text-xs font-bold text-disabled uppercase tracking-widest">{title}</h3>
         {action && (
-          <button onClick={action.onClick} className="text-xs font-semibold text-indigo-500 hover:text-indigo-700 transition-colors">{action.label}</button>
+          <button onClick={action.onClick} className="text-xs font-semibold text-primary hover:text-primary-dark transition-colors">{action.label}</button>
         )}
       </div>
       {children}
@@ -325,14 +325,14 @@ function Card({ title, action, children }) {
 function Row({ label, value }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <dt className="text-gray-400">{label}</dt>
-      <dd className="text-gray-800 text-right truncate">{value}</dd>
+      <dt className="text-disabled">{label}</dt>
+      <dd className="text-ink text-right truncate">{value}</dd>
     </div>
   );
 }
 
 function EmptyState({ text }) {
-  return <p className="text-sm text-gray-400 py-2">{text}</p>;
+  return <p className="text-sm text-disabled py-2">{text}</p>;
 }
 
 function initials(name = "") {

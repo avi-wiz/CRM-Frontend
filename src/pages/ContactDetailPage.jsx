@@ -83,18 +83,18 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── HEADER ─── */}
-      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-divider bg-surface">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors" title="Back to listing">
+          <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-action-hover text-muted hover:text-ink transition-colors" title="Back to listing">
             <ArrowLeft size={18} />
           </button>
           <div>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Contact</span>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">{fullName}</h1>
+            <span className="text-[10px] font-bold text-disabled uppercase tracking-widest">Contact</span>
+            <h1 className="text-xl font-bold text-ink tracking-tight">{fullName}</h1>
           </div>
           <StageBadge stage={contact.stage} />
           {contact.isWizShopUser && (
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-success-bg text-success-dark">
               WizShop {contact.wizShopRole || "User"}
             </span>
           )}
@@ -103,29 +103,29 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
           {contact.isWizShopUser ? (
             <button
               onClick={() => { setWizShopMode("change"); setWizShopOpen(true); }}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-xl hover:bg-indigo-100 shadow-sm transition-all duration-200"
+              className="wiz-btn flex items-center gap-1.5 bg-tonal text-primary-dark border-tonal hover:bg-tonal-hover"
             >
               <Globe size={15} /> Change WizShop Role
             </button>
           ) : (
             <button
               onClick={() => { setWizShopMode("create"); setWizShopOpen(true); }}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm hover:shadow-[0_4px_12px_rgba(99,102,241,0.2)] transition-all duration-200"
+              className="wiz-btn wiz-btn--primary flex items-center gap-1.5"
             >
               <Globe size={15} /> Create WizShop User
             </button>
           )}
           <div className="relative">
-            <button onClick={() => setMenuOpen((o) => !o)} className="p-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 shadow-sm transition-all duration-200">
+            <button onClick={() => setMenuOpen((o) => !o)} className="p-2 border border-border rounded-xl text-muted hover:bg-action-hover hover:text-ink shadow-1 transition-all duration-200">
               <MoreHorizontal size={16} />
             </button>
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-48">
+                <div className="absolute right-0 top-9 z-30 bg-surface border border-border rounded-lg shadow-3 py-1 w-48">
                   <button
                     onClick={() => { setMenuOpen(false); setArchiveOpen(true); }}
-                    className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                    className="w-full text-left px-3 py-1.5 text-sm text-danger-dark hover:bg-danger-bg"
                   >
                     Archive Contact
                   </button>
@@ -244,7 +244,7 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
       {/* ─── SUCCESS TOAST ─── */}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast}
         </div>
       )}

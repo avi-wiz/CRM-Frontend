@@ -118,7 +118,7 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
               ...col,
               render: (v, row) => (
                 <span
-                  className="text-sm text-indigo-600 hover:underline cursor-pointer"
+                  className="text-sm text-primary hover:underline cursor-pointer"
                   onClick={(e) => { e.stopPropagation(); onCompanyClick(row.companyId); }}
                 >
                   {v}
@@ -133,18 +133,18 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
   const BulkPickers = () => (
     <>
       {ownerPickerOpen && (
-        <div ref={ownerRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
+        <div ref={ownerRef} className="fixed top-24 right-8 bg-surface border border-border rounded-xl shadow-4 py-1 z-50 w-52">
           {repNames.map((r) => (
             <button key={r} onClick={() => { setOwnerPickerOpen(false); setConfirmState({ type: "owner", count: null, extra: r }); }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{r}</button>
+              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-action-hover">{r}</button>
           ))}
         </div>
       )}
       {exportPickerOpen && (
-        <div ref={exportRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-40">
+        <div ref={exportRef} className="fixed top-24 right-8 bg-surface border border-border rounded-xl shadow-4 py-1 z-50 w-40">
           {["CSV", "Excel"].map((fmt) => (
             <button key={fmt} onClick={() => { setExportPickerOpen(false); showToast(`Exporting records as ${fmt}…`); }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{fmt}</button>
+              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-action-hover">{fmt}</button>
           ))}
         </div>
       )}
@@ -164,14 +164,14 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
   // Read-only Kanban card — stage is owned by the company, so no drag.
   const renderContactCard = (item) => (
     <>
-      <div className="font-semibold text-sm text-gray-900 mb-1.5">{item.firstName} {item.lastName}</div>
-      <div className="text-xs text-gray-500 mb-1.5">{item.jobTitle || "—"}</div>
-      <div className="flex items-center gap-3 text-xs text-gray-500 mb-1.5">
+      <div className="font-semibold text-sm text-ink mb-1.5">{item.firstName} {item.lastName}</div>
+      <div className="text-xs text-muted mb-1.5">{item.jobTitle || "—"}</div>
+      <div className="flex items-center gap-3 text-xs text-muted mb-1.5">
         <span className="flex items-center gap-1 truncate"><User size={11} />{item.companyName}</span>
         <span className="flex items-center gap-1 flex-shrink-0"><Clock size={11} />{formatRelativeTime(item.lastActivity)}</span>
       </div>
       {item.isWizShopUser && (
-        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">WizShop · {item.wizShopRole}</span>
+        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-success-bg text-success-dark">WizShop · {item.wizShopRole}</span>
       )}
     </>
   );
@@ -180,16 +180,16 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
     return (
       <>
         <div className="flex-1 flex flex-col">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-surface">
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-900">Contacts</h1>
-              <span className="text-xs text-gray-400 font-medium px-2 py-0.5 rounded-full bg-gray-100">Stage mirrors company pipeline</span>
+              <h1 className="text-lg font-semibold text-ink">Contacts</h1>
+              <span className="text-xs text-disabled font-medium px-2 py-0.5 rounded-full bg-default">Stage mirrors company pipeline</span>
             </div>
             <div className="flex items-center gap-2">
               <ViewToggle mode={viewMode} onChange={setViewMode} />
               <button
                 onClick={() => setCreateOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                className="wiz-btn wiz-btn--primary flex items-center gap-1.5 px-3 py-1.5"
               >
                 <Plus size={14} />Create Contact
               </button>
@@ -204,7 +204,7 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
         </div>
         {toast && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-start gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-            <CheckCircle size={15} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+            <CheckCircle size={15} className="text-success flex-shrink-0 mt-0.5" />
             <div>{toast.map((line, i) => <div key={i}>{line}</div>)}</div>
           </div>
         )}
@@ -318,7 +318,7 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-start gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+          <CheckCircle size={15} className="text-success flex-shrink-0 mt-0.5" />
           <div>{toast.map((line, i) => <div key={i}>{line}</div>)}</div>
         </div>
       )}
@@ -328,9 +328,9 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
 
 function ViewToggle({ mode, onChange }) {
   return (
-    <div className="flex border border-gray-200 rounded-lg overflow-hidden mr-2">
-      <button onClick={() => onChange("table")} className={`p-1.5 ${mode === "table" ? "bg-gray-100" : "hover:bg-gray-50"}`}><List size={16} /></button>
-      <button onClick={() => onChange("kanban")} className={`p-1.5 ${mode === "kanban" ? "bg-gray-100" : "hover:bg-gray-50"}`}><LayoutGrid size={16} /></button>
+    <div className="flex border border-border rounded-lg overflow-hidden mr-2">
+      <button onClick={() => onChange("table")} className={`p-1.5 ${mode === "table" ? "bg-action-selected" : "hover:bg-action-hover"}`}><List size={16} /></button>
+      <button onClick={() => onChange("kanban")} className={`p-1.5 ${mode === "kanban" ? "bg-action-selected" : "hover:bg-action-hover"}`}><LayoutGrid size={16} /></button>
     </div>
   );
 }

@@ -27,37 +27,37 @@ export default function QuotesPage({ onQuoteClick }) {
 
   return (
     <div className="flex-1 flex flex-col">
-      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-border bg-surface">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">Quotes</h1>
-          <span className="text-sm text-gray-400">{quotes.length} quotes</span>
+          <h1 className="text-xl font-bold text-ink tracking-tight">Quotes</h1>
+          <span className="text-sm text-disabled">{quotes.length} quotes</span>
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200"
+          className="wiz-btn wiz-btn--primary flex items-center gap-1.5 px-3.5 py-2"
         >
           <Plus size={15} /> Create Quote
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto p-8 bg-[#f8fafc]">
-        <div className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden">
+      <div className="flex-1 overflow-auto p-8 bg-default">
+        <div className="bg-surface rounded-2xl border border-border shadow-2 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-150 bg-gray-50/70">
+              <tr className="border-b border-divider bg-default">
                 {HEAD.map((h) => (
-                  <th key={h} className="py-3 px-4 text-left font-bold text-gray-400 text-[10px] uppercase tracking-wider">
+                  <th key={h} className="py-3 px-4 text-left font-bold text-muted text-[10px] uppercase tracking-wider">
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-divider">
               {quotes.length === 0 && (
                 <tr>
                   <td colSpan={HEAD.length} className="py-12 text-center">
-                    <div className="text-sm text-gray-500">No quotes found</div>
-                    <div className="text-xs text-gray-400 mt-1">Quotes will appear here once created.</div>
+                    <div className="text-sm text-muted">No quotes found</div>
+                    <div className="text-xs text-disabled mt-1">Quotes will appear here once created.</div>
                   </td>
                 </tr>
               )}
@@ -67,32 +67,32 @@ export default function QuotesPage({ onQuoteClick }) {
                 return (
                   <tr
                     key={q.id}
-                    className="hover:bg-slate-50/50 cursor-pointer transition-colors duration-150"
+                    className="hover:bg-action-hover cursor-pointer transition-colors duration-150"
                     onClick={() => onQuoteClick?.(q.id)}
                   >
                     <td className="py-3 px-4">
-                      <span className="flex items-center gap-2 font-medium text-gray-900">
-                        <FileText size={14} className="text-indigo-500" />
+                      <span className="flex items-center gap-2 font-medium text-ink">
+                        <FileText size={14} className="text-primary" />
                         {q.quoteNumber}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-700">
+                    <td className="py-3 px-4 text-ink">
                       <span className="flex items-center gap-2">
                         {q.companyName}
                         {!company?.isCustomer && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700">Not a Customer</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-warning-bg text-warning-dark">Not a Customer</span>
                         )}
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-semibold text-gray-900">{formatCurrency(q.grandTotal)}</td>
+                    <td className="py-3 px-4 font-semibold text-ink">{formatCurrency(q.grandTotal)}</td>
                     <td className="py-3 px-4">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${quoteStatusStyles[q.status] || "bg-gray-100 text-gray-600"}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${quoteStatusStyles[q.status] || "bg-default text-muted"}`}>
                         {q.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-600">{q.contactName || "—"}</td>
-                    <td className={`py-3 px-4 ${expired ? "text-red-600 font-medium" : "text-gray-500"}`}>{formatDate(q.validUntil)}</td>
-                    <td className="py-3 px-4 text-gray-500">{formatDate(q.createdAt)}</td>
+                    <td className="py-3 px-4 text-muted">{q.contactName || "—"}</td>
+                    <td className={`py-3 px-4 ${expired ? "text-danger font-medium" : "text-muted"}`}>{formatDate(q.validUntil)}</td>
+                    <td className="py-3 px-4 text-muted">{formatDate(q.createdAt)}</td>
                     <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <RowActions
                         actions={[
@@ -130,7 +130,7 @@ export default function QuotesPage({ onQuoteClick }) {
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast}
         </div>
       )}

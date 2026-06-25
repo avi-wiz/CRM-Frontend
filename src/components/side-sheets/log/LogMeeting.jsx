@@ -182,11 +182,11 @@ function CompanyPicker({ company, onSelect, onClear, locked }) {
 
   if (company) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 border border-indigo-200">
-        <Building2 size={14} className="text-indigo-400 flex-shrink-0" />
-        <span className="text-sm font-medium text-indigo-800 flex-1 truncate">{company.name}</span>
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-tonal border border-primary">
+        <Building2 size={14} className="text-primary flex-shrink-0" />
+        <span className="text-sm font-medium text-primary-dark flex-1 truncate">{company.name}</span>
         {!locked && (
-          <button type="button" onClick={onClear} className="text-indigo-400 hover:text-indigo-700">
+          <button type="button" onClick={onClear} className="text-primary hover:text-primary-dark">
             <X size={14} />
           </button>
         )}
@@ -196,30 +196,30 @@ function CompanyPicker({ company, onSelect, onClear, locked }) {
 
   return (
     <div className="relative">
-      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-disabled" />
       <input
         value={query}
         onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
         placeholder="Search companies…"
-        className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-300"
+        className="wiz-input w-full pl-8"
       />
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-56 overflow-y-auto">
+          <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-surface border border-border rounded-lg shadow-3 overflow-hidden max-h-56 overflow-y-auto">
             {results.length === 0 ? (
-              <div className="px-3 py-3 text-xs text-gray-400 text-center">No companies match “{query}”.</div>
+              <div className="px-3 py-3 text-xs text-disabled text-center">No companies match “{query}”.</div>
             ) : (
               results.map((c) => (
                 <button
                   key={c.id}
                   type="button"
                   onClick={() => { onSelect(c); setQuery(""); setOpen(false); }}
-                  className="w-full flex items-center justify-between gap-2 text-left px-3 py-2 hover:bg-gray-50 text-sm text-gray-700"
+                  className="w-full flex items-center justify-between gap-2 text-left px-3 py-2 hover:bg-action-hover text-sm text-muted"
                 >
                   <span className="truncate">{c.name}</span>
-                  <span className="text-xs text-gray-400 truncate">{c.domain}</span>
+                  <span className="text-xs text-disabled truncate">{c.domain}</span>
                 </button>
               ))
             )}

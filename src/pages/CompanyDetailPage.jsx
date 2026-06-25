@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, MoreHorizontal, CheckCircle, Plus } from "lucide-react";
 import StageBadge from "../components/shared/StageBadge";
 import SideSheet from "../components/shared/SideSheet";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import CustomerGateModal from "../components/shared/CustomerGateModal";
+import { getMissingFieldsForStage, RequiredFieldsForm } from "../components/shared/stageGate";
 import PropertiesPanel from "../components/detail/PropertiesPanel";
 import CenterTabs from "../components/detail/CenterTabs";
 import AssociationsPanel from "../components/detail/AssociationsPanel";
@@ -102,7 +103,7 @@ function sheetFor(action, company, handlers) {
 }
 
 function Placeholder({ flow }) {
-  return <div className="text-sm text-gray-500">Form coming{flow ? ` in ${flow}` : " soon"}.</div>;
+  return <div className="text-sm text-muted">Form coming{flow ? ` in ${flow}` : " soon"}.</div>;
 }
 
 export default function CompanyDetailPage({ companyId, onBack, onContactClick, onDealClick, onQuoteClick, onVisitClick, onTaskClick, onMeetingClick }) {
@@ -115,6 +116,10 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
   const [editOpen, setEditOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
+  // Mandatory-field gate for stage changes: { stage, missing } or null.
+  const [pendingStageMove, setPendingStageMove] = useState(null);
+  // Stage to advance to after a Won-triggered conversion completes.
+  const convertThenStage = useRef(null);
   const quotes = useCompanyQuotes(companyId);
 
   // "Create Order" entry point — gate inline if this company isn't a Customer.
@@ -129,15 +134,37 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
 
   const updateField = (key, value) => setCompany((c) => ({ ...c, [key]: value }));
 
+  // Stage change from the pipeline control — gate on mandatory fields the same
+  // way the Kanban board does. If fields are missing, prompt before moving.
+  const handleStageChange = (nextStage) => {
+    if (nextStage === company.stage) return;
+    const missing = getMissingFieldsForStage(company, nextStage, "company");
+    if (missing.length === 0) {
+      updateField("stage", nextStage);
+      showToast(`Moved to ${nextStage}`);
+    } else if (missing.length === 1 && missing[0] === "isCustomer") {
+      // "Won" with only the customer requirement outstanding → run the real
+      // Convert-to-Customer flow rather than a bare "Mark as Customer" checkbox.
+      // Remember the stage so we can complete the move once converted.
+      convertThenStage.current = nextStage;
+      setPendingStageMove(null);
+      setSheet("convert");
+    } else {
+      setPendingStageMove({ stage: nextStage, missing });
+    }
+  };
+
   const showToast = (message) => {
     setToast({ message });
     setTimeout(() => setToast(null), 3500);
   };
 
   const handleConversionDone = () => {
-    setCompany((c) => ({ ...c, isCustomer: true }));
+    const advanceTo = convertThenStage.current;
+    convertThenStage.current = null;
+    setCompany((c) => ({ ...c, isCustomer: true, ...(advanceTo ? { stage: advanceTo } : {}) }));
     setSheet(null);
-    showToast(`${company.name} is now a Customer`);
+    showToast(advanceTo ? `${company.name} is now a Customer · moved to ${advanceTo}` : `${company.name} is now a Customer`);
   };
 
   const handleGrantDone = (count) => {
@@ -213,60 +240,60 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ─── HEADER ─── */}
-      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-divider bg-surface">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors" title="Back to listing">
+          <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-action-hover text-muted hover:text-ink transition-colors" title="Back to listing">
             <ArrowLeft size={18} />
           </button>
           <div>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Company</span>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">{company.name}</h1>
+            <span className="text-[10px] font-bold text-disabled uppercase tracking-widest">Company</span>
+            <h1 className="text-xl font-bold text-ink tracking-tight">{company.name}</h1>
           </div>
           <StageBadge stage={company.stage} />
           {company.isCustomer ? (
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Customer</span>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-success-bg text-success-dark">Customer</span>
           ) : (
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Company</span>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-default text-muted">Company</span>
           )}
           {company.source && (
-            <span className="text-xs text-gray-400">Source: {company.source}</span>
+            <span className="text-xs text-disabled">Source: {company.source}</span>
           )}
         </div>
         <div className="flex items-center gap-2">
           {!company.isCustomer && (
-            <button onClick={() => setSheet("convert")} className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 shadow-sm hover:shadow-[0_4px_12px_rgba(99,102,241,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+            <button onClick={() => setSheet("convert")} className="wiz-btn wiz-btn--primary">
               Convert to Customer
             </button>
           )}
           {company.isCustomer && (
             <button
               onClick={handleCreateOrder}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm hover:shadow-[0_4px_12px_rgba(99,102,241,0.2)] transition-all duration-200"
+              className="wiz-btn wiz-btn--primary flex items-center gap-1.5"
             >
               <Plus size={15} /> Create Order
             </button>
           )}
           <div className="relative">
-            <button onClick={() => setMenuOpen((o) => !o)} className="p-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 shadow-sm transition-all duration-200">
+            <button onClick={() => setMenuOpen((o) => !o)} className="p-2 border border-border rounded-xl text-muted hover:bg-action-hover hover:text-ink shadow-1 transition-all duration-200">
               <MoreHorizontal size={16} />
             </button>
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-9 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-44">
+                <div className="absolute right-0 top-9 z-30 bg-surface border border-border rounded-lg shadow-3 py-1 w-44">
                   {["Merge", "Export"].map((item) => (
                     <button
                       key={item}
                       onClick={() => { showToast(`${item} — coming soon`); setMenuOpen(false); }}
-                      className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-3 py-1.5 text-sm text-muted hover:bg-action-hover"
                     >
                       {item}
                     </button>
                   ))}
-                  <div className="border-t border-gray-100 mt-1 pt-1">
+                  <div className="border-t border-divider mt-1 pt-1">
                     <button
                       onClick={() => { setMenuOpen(false); setArchiveOpen(true); }}
-                      className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                      className="w-full text-left px-3 py-1.5 text-sm text-danger-dark hover:bg-danger-bg"
                     >
                       Archive
                     </button>
@@ -296,7 +323,7 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
           company={company}
           stages={kanbanStages}
           stage={company.stage}
-          onStageChange={(s) => updateField("stage", s)}
+          onStageChange={handleStageChange}
           onContactClick={(c) => onContactClick?.(c.id)}
           onDealClick={(d) => onDealClick?.(d.id)}
           onAction={(action) => setSheet(action)}
@@ -308,6 +335,24 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
         {activeSheet?.content}
       </SideSheet>
 
+      {/* ─── STAGE-CHANGE MANDATORY FIELDS GATE ─── */}
+      <SideSheet open={!!pendingStageMove} onClose={() => setPendingStageMove(null)} title="Complete Required Fields">
+        {pendingStageMove && (
+          <RequiredFieldsForm
+            record={company}
+            entityName={company.name}
+            entityType="company"
+            stage={pendingStageMove.stage}
+            onCancel={() => setPendingStageMove(null)}
+            onSave={(values) => {
+              setCompany((c) => ({ ...c, ...values, stage: pendingStageMove.stage }));
+              showToast(`Moved to ${pendingStageMove.stage}`);
+              setPendingStageMove(null);
+            }}
+          />
+        )}
+      </SideSheet>
+
       {/* ─── CUSTOMER GATE (Create Order on a non-Customer company) ─── */}
       <CustomerGateModal
         open={orderGateOpen && !sheet}
@@ -317,9 +362,9 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
         title="Customer Required for Orders"
         message={
           <>
-            <strong className="text-gray-900">{company.name}</strong> is a{" "}
-            <strong className="text-gray-900">Company</strong>, not yet a{" "}
-            <strong className="text-gray-900">Customer</strong>. Only Customers can have orders created.
+            <strong className="text-ink">{company.name}</strong> is a{" "}
+            <strong className="text-ink">Company</strong>, not yet a{" "}
+            <strong className="text-ink">Customer</strong>. Only Customers can have orders created.
           </>
         }
         onConvert={() => { setOrderGateOpen(false); setSheet("convert"); }}
@@ -375,7 +420,7 @@ export default function CompanyDetailPage({ companyId, onBack, onContactClick, o
       {/* ─── SUCCESS TOAST ─── */}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast.message}
         </div>
       )}

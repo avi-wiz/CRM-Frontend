@@ -2,9 +2,8 @@ import { useState } from "react";
 import { CheckCircle } from "lucide-react";
 import { industries, leadSources, repNames, kanbanStages } from "../../data/constants";
 
-const inputCls =
-  "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200";
-const selectCls = `${inputCls} bg-white`;
+const inputCls = "wiz-input w-full";
+const selectCls = inputCls;
 
 // Create Company side-sheet content. Render inside a <SideSheet title="Create Company">.
 // `onCreate(company)` — called with the assembled company row.
@@ -117,21 +116,21 @@ export default function CreateCompany({ onCreate, onClose }) {
         </Section>
       </div>
 
-      <div className="pt-3 border-t border-gray-100 space-y-2">
+      <div className="pt-3 border-t border-divider space-y-2">
         {created ? (
-          <div className="w-full py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
+          <div className="w-full py-2.5 bg-success text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
             <CheckCircle size={15} /> Company created!
           </div>
         ) : (
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="w-full py-2.5 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="wiz-btn wiz-btn--primary w-full"
           >
             Create Company
           </button>
         )}
-        <button onClick={onClose} className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+        <button onClick={onClose} className="wiz-btn wiz-btn--text w-full">
           Cancel
         </button>
       </div>
@@ -142,7 +141,7 @@ export default function CreateCompany({ onCreate, onClose }) {
 function Section({ title, children }) {
   return (
     <section>
-      <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">{title}</h3>
+      <h3 className="text-[10px] font-bold text-disabled uppercase tracking-widest mb-3">{title}</h3>
       <div className="space-y-3">{children}</div>
     </section>
   );
@@ -151,9 +150,9 @@ function Section({ title, children }) {
 function Field({ label, required, children }) {
   return (
     <div>
-      <label className="text-xs font-medium text-gray-500 block mb-1">
+      <label className="text-xs font-medium text-muted block mb-1">
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
+        {required && <span className="text-danger ml-0.5">*</span>}
       </label>
       {children}
     </div>

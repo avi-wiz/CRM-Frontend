@@ -89,7 +89,7 @@ export default function CreateTask({ entity, onClose, onSave }) {
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-300 appearance-none"
+                className="wiz-input w-full pl-7 appearance-none"
               >
                 {PRIORITIES.map((p) => (
                   <option key={p.value} value={p.value}>{p.value}</option>
@@ -113,7 +113,7 @@ export default function CreateTask({ entity, onClose, onSave }) {
             onRemove={(id) => setAssignees((p) => p.filter((a) => a.id !== id))}
             placeholder="Search reps…"
           />
-          <p className="text-xs text-gray-400 mt-1">One task per assignee will be created</p>
+          <p className="text-xs text-disabled mt-1">One task per assignee will be created</p>
         </Field>
 
         <Divider />
@@ -140,7 +140,7 @@ export default function CreateTask({ entity, onClose, onSave }) {
             <button
               type="button"
               onClick={() => setShowAddAssoc(true)}
-              className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+              className="text-xs text-primary hover:text-primary-dark font-medium"
             >
               + Add Association
             </button>

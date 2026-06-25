@@ -30,7 +30,7 @@ export default function LogNote({ entity, onClose, onSave }) {
       <div className="space-y-4">
         <Field label="Note" required>
           <TextArea value={body} onChange={setBody} rows={6} placeholder="Write your note…" />
-          <p className="text-xs text-gray-400 mt-1">Supports plain text</p>
+          <p className="text-xs text-disabled mt-1">Supports plain text</p>
         </Field>
 
         <Toggle checked={pinned} onChange={setPinned} label="Pin to top" />

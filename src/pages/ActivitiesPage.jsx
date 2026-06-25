@@ -79,15 +79,15 @@ export default function ActivitiesPage({ onEntityClick }) {
   return (
     <div className="flex-1 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-border bg-surface">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">Activities</h1>
-          <span className="text-sm text-gray-400">Latest status across all records</span>
+          <h1 className="text-xl font-bold text-ink tracking-tight">Activities</h1>
+          <span className="text-sm text-disabled">Latest status across all records</span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="px-8 py-3 border-b border-gray-150 bg-white space-y-3">
+      <div className="px-8 py-3 border-b border-border bg-surface space-y-3">
         {/* Filter pills (horizontally scrollable) */}
         <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
           {FILTERS.map((f) => (
@@ -96,8 +96,8 @@ export default function ActivitiesPage({ onEntityClick }) {
               onClick={() => setFilter(f.key)}
               className={`px-3 py-1.5 text-xs font-medium rounded-full border whitespace-nowrap transition-colors ${
                 filter === f.key
-                  ? "bg-indigo-50 text-indigo-700 border-indigo-200"
-                  : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                  ? "bg-action-selected text-primary-dark border-primary"
+                  : "bg-surface text-muted border-border hover:bg-action-hover"
               }`}
             >
               {f.label}
@@ -110,7 +110,7 @@ export default function ActivitiesPage({ onEntityClick }) {
           <select
             value={range}
             onChange={(e) => setRange(e.target.value)}
-            className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300"
+            className="wiz-input w-auto text-sm px-3 py-2"
           >
             {TIME_RANGES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
           </select>
@@ -118,28 +118,28 @@ export default function ActivitiesPage({ onEntityClick }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by entity, rep, or summary…"
-            className="flex-1 max-w-md px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300"
+            className="wiz-input flex-1 max-w-md px-3 py-2 text-sm"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-auto p-8 bg-[#f8fafc]">
-        <div className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden">
+      <div className="flex-1 overflow-auto p-8 bg-default">
+        <div className="bg-surface rounded-2xl border border-border shadow-2 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-150 bg-gray-50/70">
+              <tr className="border-b border-divider bg-default">
                 {HEAD.map((h, i) => (
-                  <th key={i} className="py-3 px-4 text-left font-bold text-gray-400 text-[10px] uppercase tracking-wider">{h}</th>
+                  <th key={i} className="py-3 px-4 text-left font-bold text-muted text-[10px] uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-divider">
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={HEAD.length} className="py-12 text-center">
-                    <div className="text-sm text-gray-500">No activities found</div>
-                    <div className="text-xs text-gray-400 mt-1">{emptyMessage}</div>
+                    <div className="text-sm text-muted">No activities found</div>
+                    <div className="text-xs text-disabled mt-1">{emptyMessage}</div>
                   </td>
                 </tr>
               )}
@@ -151,7 +151,7 @@ export default function ActivitiesPage({ onEntityClick }) {
         </div>
         {filtered.length > 0 && (
           <div className="pt-4 text-center">
-            <button disabled className="px-4 py-2 text-xs font-medium text-gray-400 border border-gray-200 rounded-xl bg-white cursor-not-allowed">
+            <button disabled className="px-4 py-2 text-xs font-medium text-disabled border border-border rounded-xl bg-surface cursor-not-allowed">
               Showing all activities
             </button>
           </div>
@@ -172,20 +172,20 @@ function ActivityRow({ activity: a, onEntityClick, onShowHistory }) {
   const extra = a.associatedEntities.length - 1 - cross.length;
 
   return (
-    <tr className="hover:bg-slate-50/50 transition-colors duration-150">
+    <tr className="hover:bg-action-hover transition-colors duration-150">
       {/* Type */}
       <td className="py-3 px-4">
         <span className="inline-flex items-center gap-2">
           <span className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${meta.iconBg}`}>
             <Icon size={14} className={meta.iconColor} />
           </span>
-          <span className="text-xs font-medium text-gray-600">{meta.label}</span>
+          <span className="text-xs font-medium text-muted">{meta.label}</span>
         </span>
       </td>
 
       {/* Summary */}
       <td className="py-3 px-4">
-        <span className="font-medium text-gray-900">{a.summary}</span>
+        <span className="font-medium text-ink">{a.summary}</span>
       </td>
 
       {/* Associated With — primary entity + cross-entity badges */}
@@ -195,24 +195,24 @@ function ActivityRow({ activity: a, onEntityClick, onShowHistory }) {
           {cross.map((e) => (
             <EntityBadge key={`${e.type}-${e.id}`} entity={e} onClick={() => onEntityClick?.(e)} />
           ))}
-          {extra > 0 && <span className="text-[11px] text-gray-400 px-1">+{extra} more</span>}
+          {extra > 0 && <span className="text-[11px] text-disabled px-1">+{extra} more</span>}
         </div>
       </td>
 
       {/* Latest update */}
       <td className="py-3 px-4">
-        <span className="text-gray-700">{a.latestUpdate.action}</span>
-        <span className="text-gray-400"> · {a.latestUpdate.by}</span>
+        <span className="text-ink">{a.latestUpdate.action}</span>
+        <span className="text-disabled"> · {a.latestUpdate.by}</span>
       </td>
 
       {/* Updated (relative) */}
-      <td className="py-3 px-4 text-gray-500 whitespace-nowrap">{formatRelativeTime(a.latestUpdate.timestamp)}</td>
+      <td className="py-3 px-4 text-muted whitespace-nowrap">{formatRelativeTime(a.latestUpdate.timestamp)}</td>
 
       {/* Show History */}
       <td className="py-3 px-4 text-right">
         <button
           onClick={onShowHistory}
-          className="text-xs font-medium text-indigo-600 hover:text-indigo-800 whitespace-nowrap"
+          className="text-xs font-medium text-primary hover:text-primary-dark whitespace-nowrap"
         >
           Show History
         </button>
@@ -228,7 +228,7 @@ function EntityBadge({ entity, primary, onClick }) {
     <button
       onClick={onClick}
       className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full transition-colors ${
-        primary ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+        primary ? "bg-default text-ink hover:bg-action-hover" : "bg-default text-muted hover:bg-action-hover"
       }`}
     >
       <Icon size={11} className="flex-shrink-0" />
@@ -248,26 +248,26 @@ function HistorySheet({ activity, onClose, onEntityClick }) {
       {a && (
         <div className="flex flex-col h-full">
           {/* Activity summary header */}
-          <div className="pb-4 border-b border-gray-100">
+          <div className="pb-4 border-b border-border">
             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wide ${meta.iconBg} ${meta.iconColor}`}>{meta.label}</span>
-            <p className="text-sm font-semibold text-gray-900 mt-1.5">{a.summary}</p>
+            <p className="text-sm font-semibold text-ink mt-1.5">{a.summary}</p>
           </div>
 
           {/* Timeline */}
           <div className="flex-1 overflow-y-auto py-5">
             <div className="relative pl-5">
               {/* connector line */}
-              <div className="absolute left-1 top-1 bottom-1 w-px bg-gray-200" />
+              <div className="absolute left-1 top-1 bottom-1 w-px bg-divider" />
               <div className="space-y-5">
                 {entries.map((h, i) => (
                   <div key={i} className="relative">
-                    <div className="absolute -left-[17px] top-1 w-2.5 h-2.5 rounded-full bg-white border-2 border-indigo-400" />
-                    <div className="text-xs text-gray-400">{formatDate(h.timestamp)} · {formatTime(h.timestamp)}</div>
+                    <div className="absolute -left-[17px] top-1 w-2.5 h-2.5 rounded-full bg-surface border-2 border-primary" />
+                    <div className="text-xs text-disabled">{formatDate(h.timestamp)} · {formatTime(h.timestamp)}</div>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${historyActionStyles[h.action] || "bg-gray-100 text-gray-600"}`}>{h.action}</span>
-                      <span className="text-xs text-gray-500">by {h.by}</span>
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${historyActionStyles[h.action] || "bg-default text-muted"}`}>{h.action}</span>
+                      <span className="text-xs text-muted">by {h.by}</span>
                     </div>
-                    <p className="text-sm text-gray-700 mt-1">{h.detail}</p>
+                    <p className="text-sm text-ink mt-1">{h.detail}</p>
                   </div>
                 ))}
               </div>
@@ -275,11 +275,11 @@ function HistorySheet({ activity, onClose, onEntityClick }) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-            <button onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Close</button>
+          <div className="flex items-center justify-between pt-4 border-t border-border">
+            <button onClick={onClose} className="px-4 py-2 text-sm text-muted hover:text-ink">Close</button>
             <button
               onClick={() => { onClose(); onEntityClick?.(a.entity); }}
-              className="flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-800"
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark"
             >
               Go to {a.entity.name} <ChevronRight size={15} />
             </button>

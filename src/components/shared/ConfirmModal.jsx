@@ -29,11 +29,11 @@ export default function ConfirmModal({
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
     >
-      <div className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
-      <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-gray-150 flex flex-col transition-all duration-300 ease-out transform ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
+      <div className={`absolute inset-0 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} style={{ background: "var(--wiz-overlay-scrim)" }} onClick={onClose} />
+      <div className={`relative bg-surface rounded-2xl shadow-4 w-full max-w-md mx-4 overflow-hidden border border-border flex flex-col transition-all duration-300 ease-out transform ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
         {/* Header */}
         <div className={`flex items-start justify-between px-6 py-4 ${
-          destructive ? "bg-red-50 border-b border-red-100" : "border-b border-gray-100 bg-gray-50/30"
+          destructive ? "bg-red-50 border-b border-red-100" : "border-b border-divider bg-tonal"
         }`}>
           <div className="flex items-start gap-3">
             {destructive && (
@@ -42,11 +42,11 @@ export default function ConfirmModal({
               </div>
             )}
             <div>
-              <h3 className={`text-base font-semibold ${destructive ? "text-red-900" : "text-gray-900"}`}>
+              <h3 className={`text-base font-semibold ${destructive ? "text-red-900" : "text-ink"}`}>
                 {title}
               </h3>
               {count !== undefined && (
-                <p className={`text-xs mt-0.5 font-medium ${destructive ? "text-red-500" : "text-indigo-600"}`}>
+                <p className={`text-xs mt-0.5 font-medium ${destructive ? "text-red-500" : "text-primary"}`}>
                   {count} {count === 1 ? "record" : "records"} will be affected
                 </p>
               )}
@@ -54,7 +54,7 @@ export default function ConfirmModal({
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-disabled hover:text-muted transition-colors"
           >
             <X size={18} />
           </button>
@@ -63,11 +63,11 @@ export default function ConfirmModal({
         {/* Body */}
         <div className="px-6 py-4">
           {message && (
-            <p className="text-sm text-gray-600 leading-relaxed">{message}</p>
+            <p className="text-sm text-muted leading-relaxed">{message}</p>
           )}
           {undoable !== undefined && (
             <p className={`text-xs mt-3 font-medium ${
-              undoable ? "text-emerald-600" : "text-amber-600"
+              undoable ? "text-success" : "text-warning"
             }`}>
               {undoable ? "✓ This action can be undone." : "⚠ This action cannot be undone."}
             </p>
@@ -75,20 +75,16 @@ export default function ConfirmModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-divider bg-tonal">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            className="wiz-btn wiz-btn--text"
           >
             Cancel
           </button>
           <button
             onClick={() => { onConfirm(); onClose(); }}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              destructive
-                ? "bg-red-600 text-white hover:bg-red-700"
-                : "bg-indigo-600 text-white hover:bg-indigo-700"
-            }`}
+            className={`wiz-btn ${destructive ? "wiz-btn--danger" : "wiz-btn--primary"}`}
           >
             {confirmLabel}
           </button>

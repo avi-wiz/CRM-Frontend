@@ -1,0 +1,383 @@
+/* ==========================================================
+   WizCommerce Design System — tokens.css
+   Auto-generated from Figma (LBUhkjizvQ0e0LIOJ0UqqZ)
+   ========================================================== */
+
+:root {
+    /* ── Primitive Colors ── */
+
+    /* Orange */
+    --wiz-orange-100: #f1e1cd;
+    --wiz-orange-200: #f9c597;
+    --wiz-orange-300: #fb905b;
+    --wiz-orange-400: #ff7e3d;
+    --wiz-orange-500: #fd691f;
+    --wiz-orange-600: #b94100;
+    --wiz-orange-700: #922700;
+    --wiz-orange-800: #6a1000;
+    --wiz-orange-900: #410400;
+    --wiz-orange-950: #2a0200;
+
+    /* Orange Tonal */
+    --wiz-orange-tonal-5: #fff8f4;
+    --wiz-orange-tonal-10: #fff0e9;
+    --wiz-orange-tonal-15: #ffe9dd;
+    --wiz-orange-tonal-20: #ffe1d2;
+
+    /* Purple */
+    --wiz-purple-100: #f8eaff;
+    --wiz-purple-200: #efd0ff;
+    --wiz-purple-300: #e6b6ff;
+    --wiz-purple-400: #db98ff;
+    --wiz-purple-500: #d384ff;
+    --wiz-purple-600: #8a2fc8;
+    --wiz-purple-700: #6a19a6;
+    --wiz-purple-800: #5c1190;
+    --wiz-purple-900: #3d0864;
+    --wiz-purple-950: #320055;
+
+    /* Green */
+    --wiz-green-100: #b9e3d2;
+    --wiz-green-200: #95d2b9;
+    --wiz-green-300: #6ec9a4;
+    --wiz-green-400: #63be93;
+    --wiz-green-500: #3cbe89;
+    --wiz-green-600: #0db873;
+    --wiz-green-700: #49a479;
+    --wiz-green-800: #146a47;
+    --wiz-green-900: #1a4331;
+    --wiz-green-950: #123024;
+
+    /* Teal */
+    --wiz-teal-100: #eff6f7;
+    --wiz-teal-200: #d9eef2;
+    --wiz-teal-300: #bce7ee;
+    --wiz-teal-400: #a6dde5;
+    --wiz-teal-500: #7bcedc;
+    --wiz-teal-600: #4bbed1;
+    --wiz-teal-700: #2fa0b3;
+    --wiz-teal-800: #267582;
+    --wiz-teal-900: #1d4950;
+    --wiz-teal-950: #112022;
+
+    /* Neutral */
+    --wiz-neutral-100: #f9f6f3;
+    --wiz-neutral-200: #e7e2dc;
+    --wiz-neutral-300: #c7c2bc;
+    --wiz-neutral-400: #a8a39c;
+    --wiz-neutral-500: #8a857f;
+    --wiz-neutral-600: #6d6862;
+    --wiz-neutral-700: #524e49;
+    --wiz-neutral-800: #36332f;
+    --wiz-neutral-900: #100e0b;
+    --wiz-neutral-950: #080706;
+
+    /* Red */
+    --wiz-red-100: #ffeaea;
+    --wiz-red-200: #ffcccc;
+    --wiz-red-300: #ff9999;
+    --wiz-red-400: #ff6b6b;
+    --wiz-red-500: #f03d3d;
+    --wiz-red-600: #d32020;
+    --wiz-red-700: #a81414;
+    --wiz-red-800: #7c0a0a;
+    --wiz-red-900: #500404;
+    --wiz-red-950: #2e0101;
+
+    /* Amber */
+    --wiz-amber-100: #fff8e6;
+    --wiz-amber-200: #feefc0;
+    --wiz-amber-300: #fde38a;
+    --wiz-amber-400: #fbd155;
+    --wiz-amber-500: #f5ba20;
+    --wiz-amber-600: #d49800;
+    --wiz-amber-700: #a67600;
+    --wiz-amber-800: #7a5500;
+    --wiz-amber-900: #4d3500;
+    --wiz-amber-950: #2e1f00;
+
+    /* Base */
+    --wiz-white: #ffffff;
+    --wiz-black: #080706;
+
+    /* ── Semantic Palette ── */
+
+    /* Primary */
+    --wiz-primary-main: #fd691f;
+    --wiz-primary-light: #ff7e3d;
+    --wiz-primary-dark: #b94100;
+    --wiz-primary-bg: #f1e1cd;
+    --wiz-primary-on: #100e0b;
+
+    /* Secondary */
+    --wiz-secondary-main: #8a2fc8;
+    --wiz-secondary-light: #d384ff;
+    --wiz-secondary-dark: #6a19a6;
+    --wiz-secondary-bg: #f8eaff;
+    --wiz-secondary-on: #ffffff;
+
+    /* Success */
+    --wiz-success-main: #0db873;
+    --wiz-success-light: #63be93;
+    --wiz-success-dark: #146a47;
+    --wiz-success-bg: #b9e3d2;
+    --wiz-success-on: #100e0b;
+
+    /* Error */
+    --wiz-error-main: #f03d3d;
+    --wiz-error-light: #ff9999;
+    --wiz-error-dark: #a81414;
+    --wiz-error-bg: #ffeaea;
+    --wiz-error-on: #ffffff;
+
+    /* Warning */
+    --wiz-warning-main: #f5ba20;
+    --wiz-warning-light: #fde38a;
+    --wiz-warning-dark: #a67600;
+    --wiz-warning-bg: #fff8e6;
+    --wiz-warning-on: #100e0b;
+
+    /* Info */
+    --wiz-info-main: #4bbed1;
+    --wiz-info-light: #a6dde5;
+    --wiz-info-dark: #267582;
+    --wiz-info-bg: #eff6f7;
+    --wiz-info-on: #100e0b;
+
+    /* Text */
+    --wiz-text-primary: #100e0b;
+    --wiz-text-secondary: #6d6862;
+    --wiz-text-disabled: #a8a39c;
+    --wiz-text-placeholder: #a8a39c;
+    --wiz-text-inverse: #ffffff;
+
+    /* Background */
+    --wiz-bg-default: #f9f6f3;
+    --wiz-bg-surface: #ffffff;
+    --wiz-bg-elevated: #ffffff;
+    --wiz-bg-bold: #080706;
+    --wiz-bg-bold-hover: #36332f;
+    --wiz-bg-bold-pressed: #524e49;
+    --wiz-bg-bold-disabled: #c7c2bc;
+    --wiz-bg-tooltip: #36332f;
+
+    /* Border */
+    --wiz-border-default: #c7c2bc;
+    --wiz-border-strong: #8a857f;
+    --wiz-border-focus: #b94100;
+    --wiz-border-disabled: #e7e2dc;
+    --wiz-border-white: #ffffff;
+    --wiz-divider: #e7e2dc;
+
+    /* Action */
+    --wiz-action-hover: #f1e1cd;
+    --wiz-action-selected: #f9c597;
+    --wiz-action-disabled: #c7c2bc;
+    --wiz-action-disabled-bg: #f9f6f3;
+    --wiz-action-focus: #f9c597;
+    --wiz-action-pressed: #f9c597;
+
+    /* Tonal (CTA ghost/tonal variant) */
+    --wiz-tonal-default: #fff0e9;
+    --wiz-tonal-hover: #ffe9dd;
+    --wiz-tonal-pressed: #ffe1d2;
+    --wiz-tonal-disabled: #fff8f4;
+
+    /* Icon */
+    --wiz-icon-primary: #100e0b;
+    --wiz-icon-secondary: #6d6862;
+    --wiz-icon-disabled: #a8a39c;
+    --wiz-icon-inverse: #ffffff;
+    --wiz-icon-error: #f03d3d;
+    --wiz-icon-warning: #f5ba20;
+    --wiz-icon-success: #0db873;
+
+    /* Overlay */
+    --wiz-overlay-scrim: #100e0b66;
+    --wiz-overlay-20: #08070633;
+    --wiz-overlay-40: #08070666;
+    --wiz-overlay-60: #08070699;
+    --wiz-overlay-80: #080706cc;
+
+    /* ── Typography ── */
+
+    /* Font Families */
+    --wiz-font-heading: "Recife Text", Georgia, serif;
+    --wiz-font-body: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --wiz-font-ui: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    /* Font Weights */
+    --wiz-weight-light: 300;
+    --wiz-weight-book: 350;
+    --wiz-weight-regular: 400;
+    --wiz-weight-medium: 500;
+    --wiz-weight-semibold: 600;
+
+    /* Font Sizes (Desktop) */
+    --wiz-text-display-xl: 64px;
+    --wiz-text-display-lg: 48px;
+    --wiz-text-display-md: 40px;
+    --wiz-text-display-sm: 32px;
+    --wiz-text-3xl: 32px;
+    --wiz-text-2xl: 24px;
+    --wiz-text-xl: 20px;
+    --wiz-text-lg: 18px;
+    --wiz-text-md: 16px;
+    --wiz-text-sm: 14px;
+    --wiz-text-xs: 12px;
+    --wiz-text-2xs: 10px;
+
+    /* Line Heights (Desktop) */
+    --wiz-leading-display-xl: 70px;
+    --wiz-leading-display-lg: 60px;
+    --wiz-leading-display-md: 48px;
+    --wiz-leading-display-sm: 40px;
+    --wiz-leading-3xl: 48px;
+    --wiz-leading-2xl: 40px;
+    --wiz-leading-xl: 36px;
+    --wiz-leading-lg: 28px;
+    --wiz-leading-md: 24px;
+    --wiz-leading-sm: 20px;
+    --wiz-leading-xs: 18px;
+    --wiz-leading-2xs: 16px;
+
+    /* Letter Spacing */
+    --wiz-tracking-display-xl: -0.015em;
+    --wiz-tracking-display-lg: -0.01em;
+    --wiz-tracking-display-md: -0.0075em;
+    --wiz-tracking-display-sm: -0.005em;
+    --wiz-tracking-3xl: -0.0025em;
+    --wiz-tracking-2xl: -0.0025em;
+    --wiz-tracking-xl: normal;
+    --wiz-tracking-lg: normal;
+    --wiz-tracking-md: normal;
+    --wiz-tracking-sm: normal;
+    --wiz-tracking-xs: 0.0025em;
+    --wiz-tracking-2xs: 0.005em;
+
+    /* ── Spacing (Desktop) ── */
+
+    --wiz-space-1: 4px;
+    --wiz-space-2: 8px;
+    --wiz-space-3: 12px;
+    --wiz-space-4: 16px;
+    --wiz-space-5: 20px;
+    --wiz-space-6: 24px;
+    --wiz-space-7: 32px;
+    --wiz-space-8: 40px;
+    --wiz-space-9: 48px;
+    --wiz-space-10: 64px;
+
+    /* Component Spacing */
+    --wiz-space-component-xs: 4px;
+    --wiz-space-component-sm: 8px;
+    --wiz-space-component-md: 16px;
+    --wiz-space-component-lg: 24px;
+
+    /* Layout Spacing */
+    --wiz-space-layout-xs: 16px;
+    --wiz-space-layout-sm: 24px;
+    --wiz-space-layout-md: 32px;
+    --wiz-space-layout-lg: 48px;
+    --wiz-space-layout-xl: 64px;
+
+    /* ── Border Radius ── */
+
+    --wiz-radius-none: 0;
+    --wiz-radius-xs: 2px;
+    --wiz-radius-sm: 4px;
+    --wiz-radius-md: 8px;
+    --wiz-radius-lg: 12px;
+    --wiz-radius-xl: 16px;
+    --wiz-radius-2xl: 24px;
+    --wiz-radius-full: 9999px;
+
+    /* ── Elevation / Shadows ── */
+
+    --wiz-shadow-0: none;
+    --wiz-shadow-1: 0 1px 2px rgba(16, 14, 11, 0.08);
+    --wiz-shadow-2: 0 2px 8px rgba(16, 14, 11, 0.10);
+    --wiz-shadow-3: 0 4px 16px rgba(16, 14, 11, 0.12);
+    --wiz-shadow-4: 0 8px 24px rgba(16, 14, 11, 0.16);
+    --wiz-shadow-5: 0 16px 40px rgba(16, 14, 11, 0.20);
+
+    /* ── Motion ── */
+
+    /* Durations */
+    --wiz-duration-instant: 100ms;
+    --wiz-duration-fast: 150ms;
+    --wiz-duration-normal: 250ms;
+    --wiz-duration-slow: 350ms;
+    --wiz-duration-slower: 500ms;
+    --wiz-duration-slowest: 700ms;
+
+    /* Easings */
+    --wiz-ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1.0);
+    --wiz-ease-enter: cubic-bezier(0.0, 0.0, 0.2, 1.0);
+    --wiz-ease-exit: cubic-bezier(0.4, 0.0, 1.0, 1.0);
+    --wiz-ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1.0);
+    --wiz-ease-linear: linear;
+
+    /* Delays */
+    --wiz-delay-none: 0ms;
+    --wiz-delay-short: 50ms;
+    --wiz-delay-medium: 100ms;
+    --wiz-delay-long: 200ms;
+
+    /* ── Grid (Desktop) ── */
+
+    --wiz-grid-columns: 12;
+    --wiz-grid-gutter: 24px;
+    --wiz-grid-margin: 48px;
+    --wiz-grid-max-width: 1280px;
+
+}
+
+/* ── Mobile Overrides ── */
+@media (max-width: 639px) {
+    :root {
+        --wiz-text-display-xl: 40px;
+        --wiz-text-display-lg: 32px;
+        --wiz-text-display-md: 28px;
+        --wiz-text-display-sm: 24px;
+        --wiz-text-3xl: 28px;
+        --wiz-text-2xl: 20px;
+        --wiz-text-xl: 18px;
+        --wiz-text-lg: 16px;
+        --wiz-text-md: 14px;
+
+        --wiz-leading-display-xl: 48px;
+        --wiz-leading-display-lg: 40px;
+        --wiz-leading-display-md: 36px;
+        --wiz-leading-display-sm: 32px;
+        --wiz-leading-3xl: 40px;
+        --wiz-leading-2xl: 32px;
+        --wiz-leading-xl: 28px;
+        --wiz-leading-lg: 24px;
+        --wiz-leading-md: 20px;
+
+        --wiz-space-6: 20px;
+        --wiz-space-7: 24px;
+        --wiz-space-8: 28px;
+        --wiz-space-9: 32px;
+        --wiz-space-10: 40px;
+
+        --wiz-grid-columns: 4;
+        --wiz-grid-gutter: 16px;
+        --wiz-grid-margin: 16px;
+        --wiz-grid-max-width: 390px;
+    }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+    :root {
+        --wiz-space-7: 28px;
+        --wiz-space-8: 32px;
+        --wiz-space-9: 40px;
+        --wiz-space-10: 48px;
+
+        --wiz-grid-gutter: 20px;
+        --wiz-grid-margin: 32px;
+        --wiz-grid-max-width: 1024px;
+    }
+}

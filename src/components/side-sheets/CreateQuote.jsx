@@ -111,10 +111,10 @@ export default function CreateQuote({ company = null, onCreate, onClose }) {
         <Section title="Quote Details">
           <Field label="Company / Customer" required>
             {lockedCompany ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-50/60 border border-indigo-100 text-sm font-medium text-gray-800">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-tonal border border-primary text-sm font-medium text-primary-dark">
                 {company.name}
                 {company.isCustomer && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Customer</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-success-bg text-success-dark">Customer</span>
                 )}
               </div>
             ) : (
@@ -190,25 +190,25 @@ export default function CreateQuote({ company = null, onCreate, onClose }) {
 
           <button
             onClick={addItem}
-            className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+            className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
           >
             <Plus size={15} /> Add Line Item
           </button>
 
           {/* Totals */}
-          <div className="mt-5 space-y-2 border-t border-gray-100 pt-4">
+          <div className="mt-5 space-y-2 border-t border-divider pt-4">
             <TotalRow label="Subtotal" value={formatCurrency(subtotal)} />
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">Discount</span>
+              <span className="text-muted">Discount</span>
               <CurrencyInput value={discount} onChange={setDiscount} />
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">Tax</span>
+              <span className="text-muted">Tax</span>
               <CurrencyInput value={tax} onChange={setTax} />
             </div>
-            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-              <span className="text-sm font-bold text-gray-900">Grand Total</span>
-              <span className="text-base font-bold text-emerald-600">{formatCurrency(grandTotal)}</span>
+            <div className="flex items-center justify-between pt-2 border-t border-divider">
+              <span className="text-sm font-bold text-ink">Grand Total</span>
+              <span className="text-base font-bold text-success-dark">{formatCurrency(grandTotal)}</span>
             </div>
           </div>
         </Section>
@@ -216,8 +216,8 @@ export default function CreateQuote({ company = null, onCreate, onClose }) {
         {/* ─── SETTINGS ─── */}
         <Section title="Settings">
           <Field label="Status">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-150 text-sm text-gray-500">
-              <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">Draft</span>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-default border border-border text-sm text-muted">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-action-hover text-muted font-medium">Draft</span>
               New quotes always start as Draft.
             </div>
           </Field>
@@ -225,21 +225,21 @@ export default function CreateQuote({ company = null, onCreate, onClose }) {
       </div>
 
       {/* Footer */}
-      <div className="pt-3 border-t border-gray-100 space-y-2">
+      <div className="pt-3 border-t border-divider space-y-2">
         {created ? (
-          <div className="w-full py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
+          <div className="w-full py-2.5 bg-success text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
             <CheckCircle size={15} /> Quote created!
           </div>
         ) : (
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="w-full py-2.5 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="wiz-btn wiz-btn--primary w-full"
           >
             Create Quote
           </button>
         )}
-        <button onClick={onClose} className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+        <button onClick={onClose} className="wiz-btn wiz-btn--text w-full">
           Cancel
         </button>
       </div>
@@ -265,12 +265,12 @@ function LineItemRow({ item, onChange, onRemove }) {
   };
 
   return (
-    <div className="rounded-xl border border-gray-150 p-3 bg-white">
+    <div className="rounded-xl border border-border p-3 bg-surface">
       <div className="flex items-start gap-2">
         {/* Product search */}
         <div className="flex-1 relative">
           <div className="relative">
-            <Search size={13} className="absolute left-2.5 top-2.5 text-gray-400" />
+            <Search size={13} className="absolute left-2.5 top-2.5 text-disabled" />
             <input
               value={query}
               onChange={(e) => {
@@ -281,59 +281,59 @@ function LineItemRow({ item, onChange, onRemove }) {
               onFocus={() => setOpenList(true)}
               onBlur={() => setTimeout(() => setOpenList(false), 150)}
               placeholder="Search product…"
-              className="w-full border border-gray-200 rounded-lg pl-7 pr-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              className="wiz-input w-full pl-7 pr-2 py-1.5"
             />
           </div>
           {openList && matches.length > 0 && (
-            <div className="absolute z-20 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg py-1 max-h-56 overflow-y-auto">
+            <div className="absolute z-20 left-0 right-0 mt-1 bg-surface border border-border rounded-xl shadow-3 py-1 max-h-56 overflow-y-auto">
               {matches.map((p) => (
                 <button
                   key={p.id}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => pick(p)}
-                  className="w-full text-left px-3 py-1.5 hover:bg-indigo-50/60 flex items-center justify-between gap-2"
+                  className="w-full text-left px-3 py-1.5 hover:bg-action-hover flex items-center justify-between gap-2"
                 >
-                  <span className="text-sm text-gray-800">{p.name}</span>
-                  <span className="text-xs text-gray-400">{p.sku} · {formatCurrency(p.unitPrice)}</span>
+                  <span className="text-sm text-ink">{p.name}</span>
+                  <span className="text-xs text-disabled">{p.sku} · {formatCurrency(p.unitPrice)}</span>
                 </button>
               ))}
             </div>
           )}
-          {item.sku && <div className="mt-1 text-[11px] text-gray-400">SKU: {item.sku}</div>}
+          {item.sku && <div className="mt-1 text-[11px] text-disabled">SKU: {item.sku}</div>}
         </div>
-        <button onClick={onRemove} className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors" title="Remove">
+        <button onClick={onRemove} className="p-1.5 rounded-lg text-disabled hover:text-danger hover:bg-danger-bg transition-colors" title="Remove">
           <X size={15} />
         </button>
       </div>
 
       <div className="mt-2 grid grid-cols-3 gap-2">
         <div>
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wide block mb-0.5">Qty</label>
+          <label className="text-[10px] font-medium text-disabled uppercase tracking-wide block mb-0.5">Qty</label>
           <input
             type="number"
             min={1}
             value={item.quantity}
             onChange={(e) => onChange({ quantity: e.target.value === "" ? "" : Number(e.target.value) })}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+            className="wiz-input w-full px-2 py-1.5"
           />
         </div>
         <div>
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wide block mb-0.5">Unit Price</label>
+          <label className="text-[10px] font-medium text-disabled uppercase tracking-wide block mb-0.5">Unit Price</label>
           <div className="relative">
-            <span className="absolute left-2 top-1.5 text-sm text-gray-400">$</span>
+            <span className="absolute left-2 top-1.5 text-sm text-disabled">$</span>
             <input
               type="number"
               min={0}
               step="0.01"
               value={item.unitPrice}
               onChange={(e) => onChange({ unitPrice: e.target.value === "" ? "" : Number(e.target.value) })}
-              className="w-full border border-gray-200 rounded-lg pl-5 pr-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              className="wiz-input w-full pl-5 pr-2 py-1.5"
             />
           </div>
         </div>
         <div>
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wide block mb-0.5">Total</label>
-          <div className="px-2 py-1.5 text-sm font-semibold text-gray-900 bg-gray-50 rounded-lg border border-gray-100">
+          <label className="text-[10px] font-medium text-disabled uppercase tracking-wide block mb-0.5">Total</label>
+          <div className="px-2 py-1.5 text-sm font-semibold text-ink bg-default rounded-lg border border-border">
             {formatCurrency(item.total)}
           </div>
         </div>
@@ -343,14 +343,13 @@ function LineItemRow({ item, onChange, onRemove }) {
 }
 
 // ─── small presentational helpers ───
-const inputCls =
-  "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200";
-const selectCls = `${inputCls} bg-white disabled:bg-gray-50 disabled:text-gray-400`;
+const inputCls = "wiz-input w-full";
+const selectCls = inputCls;
 
 function Section({ title, children }) {
   return (
     <section>
-      <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">{title}</h3>
+      <h3 className="text-[10px] font-bold text-disabled uppercase tracking-widest mb-3">{title}</h3>
       <div className="space-y-3">{children}</div>
     </section>
   );
@@ -359,9 +358,9 @@ function Section({ title, children }) {
 function Field({ label, required, children }) {
   return (
     <div>
-      <label className="text-xs font-medium text-gray-500 block mb-1">
+      <label className="text-xs font-medium text-muted block mb-1">
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
+        {required && <span className="text-danger ml-0.5">*</span>}
       </label>
       {children}
     </div>
@@ -371,8 +370,8 @@ function Field({ label, required, children }) {
 function TotalRow({ label, value }) {
   return (
     <div className="flex items-center justify-between text-sm">
-      <span className="text-gray-500">{label}</span>
-      <span className="font-medium text-gray-900">{value}</span>
+      <span className="text-muted">{label}</span>
+      <span className="font-medium text-ink">{value}</span>
     </div>
   );
 }
@@ -380,14 +379,14 @@ function TotalRow({ label, value }) {
 function CurrencyInput({ value, onChange }) {
   return (
     <div className="relative w-28">
-      <span className="absolute left-2 top-1.5 text-sm text-gray-400">$</span>
+      <span className="absolute left-2 top-1.5 text-sm text-disabled">$</span>
       <input
         type="number"
         min={0}
         step="0.01"
         value={value}
         onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
-        className="w-full border border-gray-200 rounded-lg pl-5 pr-2 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+        className="wiz-input w-full pl-5 pr-2 py-1.5 text-right"
       />
     </div>
   );

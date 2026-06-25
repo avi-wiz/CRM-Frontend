@@ -37,7 +37,7 @@ export default function BulkToolbar({ count, totalCount, actions = [], onClear, 
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] transition-transform duration-200 ease-out ${
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-border shadow-3 transition-transform duration-200 ease-out ${
         visible ? "translate-y-0" : "translate-y-full"
       }`}
     >
@@ -46,16 +46,16 @@ export default function BulkToolbar({ count, totalCount, actions = [], onClear, 
         <div className="flex items-center justify-between">
           {/* Left: checkbox icon + count */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-sm font-medium text-gray-800">
-              <CheckSquare size={15} className="text-indigo-600" />
+            <div className="flex items-center gap-1.5 text-sm font-medium text-ink">
+              <CheckSquare size={15} className="text-primary" />
               <span>
-                <span className="font-semibold text-indigo-700">{effectiveCount}</span>{" "}
+                <span className="font-semibold text-primary-dark">{effectiveCount}</span>{" "}
                 {effectiveCount === 1 ? "record" : "records"} selected
               </span>
             </div>
 
             {/* Divider */}
-            <span className="w-px h-4 bg-gray-200" />
+            <span className="w-px h-4 bg-divider" />
 
             {/* Primary action buttons */}
             <div className="flex items-center gap-1.5">
@@ -63,11 +63,7 @@ export default function BulkToolbar({ count, totalCount, actions = [], onClear, 
                 <button
                   key={action.label}
                   onClick={() => action.onClick(effectiveCount, scope)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                    action.danger
-                      ? "border-red-200 text-red-700 hover:bg-red-50"
-                      : "border-gray-200 text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`wiz-btn wiz-btn--sm ${action.danger ? "wiz-btn--danger" : "wiz-btn--secondary"}`}
                 >
                   {action.icon && <action.icon size={12} />}
                   {action.label}
@@ -79,18 +75,18 @@ export default function BulkToolbar({ count, totalCount, actions = [], onClear, 
                 <div className="relative" ref={moreRef}>
                   <button
                     onClick={() => setMoreOpen((o) => !o)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="wiz-btn wiz-btn--sm wiz-btn--secondary"
                   >
                     More <ChevronDown size={11} className={`transition-transform ${moreOpen ? "rotate-180" : ""}`} />
                   </button>
                   {moreOpen && (
-                    <div className="absolute bottom-full mb-1.5 left-0 w-52 bg-white rounded-xl border border-gray-100 shadow-lg py-1 z-50">
+                    <div className="absolute bottom-full mb-1.5 left-0 w-52 bg-surface rounded-xl border border-border shadow-2 py-1 z-50">
                       {overflowActions.map((action) => (
                         <button
                           key={action.label}
                           onClick={() => { setMoreOpen(false); action.onClick(effectiveCount, scope); }}
-                          className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                            action.danger ? "text-red-600" : "text-gray-700"
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-action-hover transition-colors ${
+                            action.danger ? "text-red-600" : "text-muted"
                           }`}
                         >
                           {action.label}
@@ -106,7 +102,7 @@ export default function BulkToolbar({ count, totalCount, actions = [], onClear, 
           {/* Right: clear */}
           <button
             onClick={onClear}
-            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            className="flex items-center gap-1 text-xs text-disabled hover:text-muted transition-colors"
           >
             <X size={13} /> Clear selection
           </button>
@@ -114,17 +110,17 @@ export default function BulkToolbar({ count, totalCount, actions = [], onClear, 
 
         {/* Row 2: scope radio */}
         {onScopeChange && (
-          <div className="flex items-center gap-4 text-xs text-gray-500">
-            <span className="font-medium text-gray-600">Apply to:</span>
+          <div className="flex items-center gap-4 text-xs text-muted">
+            <span className="font-medium text-muted">Apply to:</span>
             <label className="flex items-center gap-1.5 cursor-pointer">
               <input
                 type="radio"
                 name="bulk-scope"
                 checked={scope === "selected"}
                 onChange={() => onScopeChange("selected")}
-                className="accent-indigo-600"
+                className="accent-primary"
               />
-              <span className={scope === "selected" ? "text-indigo-700 font-medium" : ""}>
+              <span className={scope === "selected" ? "text-primary-dark font-medium" : ""}>
                 Selected ({count})
               </span>
             </label>
@@ -134,9 +130,9 @@ export default function BulkToolbar({ count, totalCount, actions = [], onClear, 
                 name="bulk-scope"
                 checked={scope === "all"}
                 onChange={() => onScopeChange("all")}
-                className="accent-indigo-600"
+                className="accent-primary"
               />
-              <span className={scope === "all" ? "text-indigo-700 font-medium" : ""}>
+              <span className={scope === "all" ? "text-primary-dark font-medium" : ""}>
                 All matching ({totalCount})
               </span>
             </label>

@@ -2,9 +2,8 @@ import { useState, useMemo } from "react";
 import { Building2, User, DollarSign, Search, X } from "lucide-react";
 
 // ─── SHARED STYLING TOKENS ───
-export const INPUT_CLASS =
-  "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-300";
-export const LABEL_CLASS = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
+export const INPUT_CLASS = "wiz-input w-full";
+export const LABEL_CLASS = "block text-xs font-medium text-muted uppercase tracking-wider mb-1";
 
 // Today as YYYY-MM-DD (for date input defaults).
 export function todayISO() {
@@ -16,7 +15,7 @@ export function Label({ children, required }) {
   return (
     <label className={LABEL_CLASS}>
       {children}
-      {required && <span className="text-red-500 ml-0.5">*</span>}
+      {required && <span className="text-danger ml-0.5">*</span>}
     </label>
   );
 }
@@ -74,18 +73,18 @@ export function Select({ value, onChange, options }) {
 
 // ─── SECTION DIVIDER ───
 export function Divider() {
-  return <div className="border-t border-gray-100 my-4" />;
+  return <div className="border-t border-divider my-4" />;
 }
 
 // ─── TOGGLE SWITCH ───
 export function Toggle({ checked, onChange, label }) {
   return (
     <label className="flex items-center justify-between cursor-pointer">
-      <span className="text-sm text-gray-700">{label}</span>
+      <span className="text-sm text-muted">{label}</span>
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`relative w-10 h-5 rounded-full transition-colors ${checked ? "bg-indigo-600" : "bg-gray-300"}`}
+        className={`relative w-10 h-5 rounded-full transition-colors ${checked ? "bg-primary" : "bg-border"}`}
       >
         <span
           className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${checked ? "translate-x-5" : ""}`}
@@ -110,10 +109,10 @@ export function AssociatedWith({ entity }) {
   return (
     <div className="mb-4">
       <Label>Associated with</Label>
-      <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-        <EntityIcon type={entity.type} className="text-gray-400" />
-        <span className="text-sm font-medium text-gray-800">{entity.name}</span>
-        <span className="text-xs text-gray-400 capitalize ml-auto">{entity.type}</span>
+      <div className="flex items-center gap-2 px-3 py-2 bg-default border border-border rounded-lg">
+        <EntityIcon type={entity.type} className="text-disabled" />
+        <span className="text-sm font-medium text-ink">{entity.name}</span>
+        <span className="text-xs text-disabled capitalize ml-auto">{entity.type}</span>
       </div>
     </div>
   );
@@ -122,12 +121,12 @@ export function AssociatedWith({ entity }) {
 // ─── CHIP ───
 export function Chip({ label, onRemove, locked }) {
   return (
-    <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+    <span className="inline-flex items-center gap-1 bg-default text-muted text-xs px-2 py-1 rounded-full">
       {label}
       {locked ? (
-        <span className="text-gray-400 ml-0.5">·locked</span>
+        <span className="text-disabled ml-0.5">·locked</span>
       ) : (
-        <button type="button" onClick={onRemove} className="hover:text-red-500 transition-colors">
+        <button type="button" onClick={onRemove} className="hover:text-danger transition-colors">
           <X size={11} />
         </button>
       )}
@@ -160,7 +159,7 @@ export function ChipMultiSelect({ options, selected, onAdd, onRemove, placeholde
       )}
       <div className="relative">
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-disabled" />
           <input
             value={query}
             onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
@@ -172,9 +171,9 @@ export function ChipMultiSelect({ options, selected, onAdd, onRemove, placeholde
         {open && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-            <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-56 overflow-y-auto">
+            <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-surface border border-border rounded-lg shadow-3 overflow-hidden max-h-56 overflow-y-auto">
               {filtered.length === 0 ? (
-                <div className="px-3 py-3 text-xs text-gray-400 text-center">
+                <div className="px-3 py-3 text-xs text-disabled text-center">
                   {emptyHint || "No results"}
                 </div>
               ) : (
@@ -183,10 +182,10 @@ export function ChipMultiSelect({ options, selected, onAdd, onRemove, placeholde
                     key={o.id}
                     type="button"
                     onClick={() => { onAdd(o); setQuery(""); }}
-                    className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm text-gray-700"
+                    className="w-full text-left px-3 py-2 hover:bg-action-hover text-sm text-muted"
                   >
                     {o.label}
-                    {o.sublabel && <span className="text-gray-400 ml-1.5 text-xs">{o.sublabel}</span>}
+                    {o.sublabel && <span className="text-disabled ml-1.5 text-xs">{o.sublabel}</span>}
                   </button>
                 ))
               )}
@@ -201,17 +200,15 @@ export function ChipMultiSelect({ options, selected, onAdd, onRemove, placeholde
 // ─── FOOTER ───
 export function Footer({ onCancel, onSubmit, submitLabel, disabled }) {
   return (
-    <div className="flex items-center justify-between pt-4 mt-2 border-t border-gray-100">
-      <button type="button" onClick={onCancel} className="text-sm text-gray-500 hover:text-gray-700">
+    <div className="flex items-center justify-between pt-4 mt-2 border-t border-divider">
+      <button type="button" onClick={onCancel} className="wiz-btn wiz-btn--text">
         Cancel
       </button>
       <button
         type="button"
         onClick={onSubmit}
         disabled={disabled}
-        className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${
-          disabled ? "bg-indigo-200 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
-        }`}
+        className="wiz-btn wiz-btn--primary"
       >
         {submitLabel}
       </button>

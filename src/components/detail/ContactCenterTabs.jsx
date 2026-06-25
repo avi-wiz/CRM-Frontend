@@ -17,10 +17,10 @@ import { useEntityActivities } from "../../data/activitiesStore";
 const TABS = ["Sales", "Deals", "Visits", "Meetings", "Tasks", "WizShop Activity", "Activities"];
 
 const ORDER_STATUS_COLOR = {
-  Pending: "bg-gray-100 text-gray-600",
-  Confirmed: "bg-blue-50 text-blue-600",
+  Pending: "bg-tonal text-muted",
+  Confirmed: "bg-info-bg text-info-dark",
   Shipped: "bg-purple-50 text-purple-600",
-  Delivered: "bg-emerald-50 text-emerald-700",
+  Delivered: "bg-success-bg text-success-dark",
 };
 
 export default function ContactCenterTabs({ contact, onActivityAction, onDealClick, onCreateDeal, onVisitClick, onTaskClick, onMeetingClick }) {
@@ -35,13 +35,13 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex border-b border-gray-100 bg-white px-4 overflow-x-auto">
+      <div className="flex border-b border-border bg-surface px-4 overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setActive(t)}
             className={`px-3 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
-              active === t ? "border-indigo-600 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-700"
+              active === t ? "border-primary text-primary" : "border-transparent text-muted hover:text-ink"
             }`}
           >
             {t}
@@ -49,17 +49,17 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc]">
+      <div className="flex-1 overflow-y-auto p-6 bg-default">
         {active === "Sales" && (
           <div>
-            <div className="text-xs text-gray-400 mb-3">Via {companyName}</div>
+            <div className="text-xs text-disabled mb-3">Via {companyName}</div>
             <MiniTable
               head={["Order #", "Date", "Amount", "Status", "Items"]}
               rows={(contact.companyOrders || []).map((o) => [
-                <span className="font-medium text-gray-900">{o.id}</span>,
+                <span className="font-medium text-ink">{o.id}</span>,
                 formatDate(o.date),
                 <span className="font-medium">{o.amount}</span>,
-                <span className={`text-xs px-2 py-0.5 rounded-full ${ORDER_STATUS_COLOR[o.status] || "bg-gray-100 text-gray-600"}`}>{o.status}</span>,
+                <span className={`text-xs px-2 py-0.5 rounded-full ${ORDER_STATUS_COLOR[o.status] || "bg-tonal text-muted"}`}>{o.status}</span>,
                 o.items,
               ])}
             />
@@ -72,7 +72,7 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
             <MiniTable
               head={["Deal Name", "Amount", "Stage", "Owner", "Close Date"]}
               rows={(contact.deals || []).map((d) => [
-                <span onClick={() => onDealClick?.(d)} className="font-medium text-gray-900 hover:underline cursor-pointer">{d.name}</span>,
+                <span onClick={() => onDealClick?.(d)} className="font-medium text-ink hover:underline cursor-pointer">{d.name}</span>,
                 <span className="font-semibold">{d.amount}</span>,
                 <StageBadge stage={d.stage} small />,
                 d.owner,
@@ -88,10 +88,10 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
             <MiniTable
               head={["Date", "Rep", "Purpose", "Outcome", "Duration"]}
               rows={contactVisits.map((v) => [
-                <span onClick={() => onVisitClick?.(v.id)} className="font-medium text-gray-900 hover:underline cursor-pointer">{formatDate(v.visitDate)}</span>,
+                <span onClick={() => onVisitClick?.(v.id)} className="font-medium text-ink hover:underline cursor-pointer">{formatDate(v.visitDate)}</span>,
                 v.rep?.repName || "—",
-                <span className={`text-xs px-2 py-0.5 rounded-full ${visitPurposeStyles[v.purpose] || "bg-gray-100 text-gray-600"}`}>{v.purpose}</span>,
-                <span className={`text-xs px-2 py-0.5 rounded-full ${visitOutcomeStyles[v.outcome] || "bg-gray-100 text-gray-600"}`}>{v.outcome}</span>,
+                <span className={`text-xs px-2 py-0.5 rounded-full ${visitPurposeStyles[v.purpose] || "bg-tonal text-muted"}`}>{v.purpose}</span>,
+                <span className={`text-xs px-2 py-0.5 rounded-full ${visitOutcomeStyles[v.outcome] || "bg-tonal text-muted"}`}>{v.outcome}</span>,
                 formatDuration(v.duration),
               ])}
             />
@@ -104,11 +104,11 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
             <MiniTable
               head={["Title", "Date", "Duration", "Attendees", "Outcome"]}
               rows={contactMeetings.map((m) => [
-                <span onClick={() => onMeetingClick?.(m.id)} className="font-medium text-gray-900 hover:underline cursor-pointer">{m.title}</span>,
+                <span onClick={() => onMeetingClick?.(m.id)} className="font-medium text-ink hover:underline cursor-pointer">{m.title}</span>,
                 formatDate(m.date),
                 formatDuration(m.duration),
                 `${(m.attendees || []).length} contact${(m.attendees || []).length === 1 ? "" : "s"}`,
-                <span className={`text-xs px-2 py-0.5 rounded-full ${meetingOutcomeStyles[m.outcome] || "bg-gray-100 text-gray-600"}`}>{m.outcome}</span>,
+                <span className={`text-xs px-2 py-0.5 rounded-full ${meetingOutcomeStyles[m.outcome] || "bg-tonal text-muted"}`}>{m.outcome}</span>,
               ])}
             />
           </div>
@@ -120,11 +120,11 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
             <MiniTable
               head={["Title", "Assignee", "Due Date", "Priority", "Status"]}
               rows={contactTasks.map((t) => [
-                <span onClick={() => onTaskClick?.(t.id)} className="font-medium text-gray-900 hover:underline cursor-pointer">{t.title}</span>,
+                <span onClick={() => onTaskClick?.(t.id)} className="font-medium text-ink hover:underline cursor-pointer">{t.title}</span>,
                 t.assignee?.repName || "—",
                 formatDate(t.dueDate),
-                <span className={`text-xs px-2 py-0.5 rounded-full ${taskPriorityStyles[t.priority] || "bg-gray-100 text-gray-600"}`}>{t.priority}</span>,
-                <span className={`text-xs px-2 py-0.5 rounded-full ${taskStatusStyles[t.status] || "bg-gray-100 text-gray-600"}`}>{t.status}</span>,
+                <span className={`text-xs px-2 py-0.5 rounded-full ${taskPriorityStyles[t.priority] || "bg-tonal text-muted"}`}>{t.priority}</span>,
+                <span className={`text-xs px-2 py-0.5 rounded-full ${taskStatusStyles[t.status] || "bg-tonal text-muted"}`}>{t.status}</span>,
               ])}
             />
           </div>
@@ -133,16 +133,16 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
         {active === "WizShop Activity" && (
           <div className="space-y-2.5 max-w-xl">
             {(contact.wizShopActions || []).length === 0 && (
-              <div className="text-sm text-gray-400 py-4 text-center">No WizShop activity</div>
+              <div className="text-sm text-disabled py-4 text-center">No WizShop activity</div>
             )}
             {(contact.wizShopActions || []).map((a, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-gray-150 bg-white shadow-[0_1px_4px_rgba(0,0,0,0.02)] hover:border-indigo-100 transition-all duration-200">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex-shrink-0 shadow-[0_0_6px_rgba(99,102,241,0.5)]" />
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-surface shadow-1 hover:border-primary transition-all duration-200">
+                <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 shadow-2" />
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-gray-900">{a.action}</span>
-                  <span className="text-sm text-gray-500"> — {a.detail}</span>
+                  <span className="text-sm font-medium text-ink">{a.action}</span>
+                  <span className="text-sm text-muted"> — {a.detail}</span>
                 </div>
-                <span className="text-xs text-gray-400 flex-shrink-0">{a.time}</span>
+                <span className="text-xs text-disabled flex-shrink-0">{a.time}</span>
               </div>
             ))}
           </div>
@@ -160,9 +160,9 @@ export default function ContactCenterTabs({ contact, onActivityAction, onDealCli
 function TabHeader({ count, noun, cta }) {
   return (
     <div className="flex items-center justify-between mb-4">
-      <span className="text-sm text-gray-500">{count} {noun}{count === 1 ? "" : "s"}</span>
+      <span className="text-sm text-muted">{count} {noun}{count === 1 ? "" : "s"}</span>
       {cta && (
-        <button onClick={cta.onClick} className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200">
+        <button onClick={cta.onClick} className="wiz-btn wiz-btn--primary flex items-center gap-1.5">
           <Plus size={15} /> {cta.label}
         </button>
       )}
@@ -173,22 +173,22 @@ function TabHeader({ count, noun, cta }) {
 // Shared read-only mini SSRM table (matches CenterTabs styling).
 function MiniTable({ head, rows }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden">
+    <div className="bg-surface rounded-2xl border border-border shadow-2 overflow-hidden">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-150 bg-gray-50/70">
+          <tr className="border-b border-border bg-default">
             {head.map((h) => (
-              <th key={h} className="py-3 px-4 text-left font-bold text-gray-400 text-[10px] uppercase tracking-wider">{h}</th>
+              <th key={h} className="py-3 px-4 text-left font-bold text-disabled text-[10px] uppercase tracking-wider">{h}</th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-divider">
           {rows.length === 0 && (
-            <tr><td colSpan={head.length} className="py-10 text-center text-sm text-gray-400">No records yet</td></tr>
+            <tr><td colSpan={head.length} className="py-10 text-center text-sm text-disabled">No records yet</td></tr>
           )}
           {rows.map((cells, i) => (
-            <tr key={i} className="hover:bg-slate-50/50 transition-colors duration-150">
-              {cells.map((c, j) => <td key={j} className="py-3 px-4 text-gray-700">{c}</td>)}
+            <tr key={i} className="hover:bg-action-hover transition-colors duration-150">
+              {cells.map((c, j) => <td key={j} className="py-3 px-4 text-muted">{c}</td>)}
             </tr>
           ))}
         </tbody>

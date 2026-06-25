@@ -42,9 +42,21 @@ export function addTask(input) {
     dueDate: input.dueDate || input.due || todayISO(),
     priority: input.priority || "Medium",
     status: input.status || "Open",
-    assignee: input.assignee && input.assignee.repName
-      ? input.assignee
-      : { repName: typeof input.assignee === "string" ? input.assignee : "Unassigned" },
+    // assignees: array of rep name strings. Legacy single-rep shape is normalized
+    // into a one-element array so all consumers can treat it uniformly.
+    assignees: Array.isArray(input.assignees)
+      ? input.assignees
+      : input.assignee && input.assignee.repName
+        ? [input.assignee.repName]
+        : typeof input.assignee === "string"
+          ? [input.assignee]
+          : ["Unassigned"],
+    // Keep legacy `assignee` shape for backward compat with existing detail pages.
+    assignee: Array.isArray(input.assignees)
+      ? { repName: input.assignees[0] || "Unassigned" }
+      : input.assignee && input.assignee.repName
+        ? input.assignee
+        : { repName: typeof input.assignee === "string" ? input.assignee : "Unassigned" },
     createdBy: input.createdBy || "You",
     createdAt: input.createdAt || todayISO(),
     completedAt: input.completedAt || null,

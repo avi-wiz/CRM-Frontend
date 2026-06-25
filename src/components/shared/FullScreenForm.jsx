@@ -59,32 +59,32 @@ export default function FullScreenForm({ title, onBack, actions, sections = [], 
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#f8fafc]">
+    <div className="flex-1 flex flex-col overflow-hidden bg-default">
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-4 bg-[#f8fafc]">
+      <div className="flex items-center justify-between px-8 py-4 bg-default">
         <div className="flex items-center gap-2.5 min-w-0">
-          <button onClick={onBack} className="p-1 -ml-1 rounded-lg hover:bg-gray-200/60 text-gray-700 transition-colors">
+          <button onClick={onBack} className="p-1 -ml-1 rounded-lg hover:bg-action-hover text-muted transition-colors">
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight truncate">{title}</h1>
+          <h1 className="text-xl font-bold text-ink tracking-tight truncate">{title}</h1>
         </div>
         {actions && <div className="flex items-center gap-2 flex-shrink-0">{actions}</div>}
       </div>
 
       {/* Section nav */}
-      <div className="px-8 border-b border-gray-200 bg-[#f8fafc]">
+      <div className="px-8 border-b border-border bg-default">
         <div className="flex items-center gap-7 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           {sections.map((s) => (
             <button
               key={s.id}
               onClick={() => scrollTo(s.id)}
               className={`relative py-3 text-sm font-medium whitespace-nowrap transition-colors ${
-                active === s.id ? "text-emerald-700" : "text-gray-400 hover:text-gray-600"
+                active === s.id ? "text-primary" : "text-disabled hover:text-muted"
               }`}
             >
               {s.label}
               {active === s.id && (
-                <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-emerald-600 rounded-full" />
+                <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-primary rounded-full" />
               )}
             </button>
           ))}
@@ -111,8 +111,8 @@ export function FormSection({ id, title, registerSection, children }) {
   }, [id, registerSection]);
 
   return (
-    <section ref={ref} className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 scroll-mt-4">
-      <h2 className="text-base font-bold text-gray-900 mb-5">{title}</h2>
+    <section ref={ref} className="bg-surface rounded-2xl border border-border shadow-2 p-6 scroll-mt-4">
+      <h2 className="text-base font-bold text-ink mb-5">{title}</h2>
       {children}
     </section>
   );

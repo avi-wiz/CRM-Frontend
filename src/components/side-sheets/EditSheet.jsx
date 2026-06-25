@@ -32,7 +32,7 @@ export function EditSheet({ groups, values, onSave, onClose, entityLabel = "Reco
       <div className="flex-1 overflow-y-auto space-y-6 pb-4">
         {editableGroups.map((group) => (
           <section key={group.title}>
-            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">{group.title}</h3>
+            <h3 className="text-[10px] font-bold text-disabled uppercase tracking-widest mb-3">{group.title}</h3>
             <div className="space-y-3">
               {group.fields.map((field) => (
                 <FieldInput
@@ -47,22 +47,22 @@ export function EditSheet({ groups, values, onSave, onClose, entityLabel = "Reco
         ))}
       </div>
 
-      <div className="pt-3 border-t border-gray-100 space-y-2">
+      <div className="pt-3 border-t border-divider space-y-2">
         {saved ? (
-          <div className="w-full py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
+          <div className="w-full py-2.5 bg-success text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
             <CheckCircle size={15} /> Saved!
           </div>
         ) : (
           <button
             onClick={handleSave}
-            className="w-full py-2.5 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:opacity-90 transition-all"
+            className="wiz-btn wiz-btn--primary w-full"
           >
             Save {entityLabel}
           </button>
         )}
         <button
           onClick={onClose}
-          className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          className="wiz-btn wiz-btn--text w-full"
         >
           Cancel
         </button>
@@ -76,14 +76,14 @@ function FieldInput({ field, value, onChange }) {
 
   return (
     <div>
-      <label className="text-xs font-medium text-gray-500 block mb-1">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      <label className="text-xs font-medium text-muted block mb-1">
+        {label}{required && <span className="text-danger ml-0.5">*</span>}
       </label>
       {type === "select" ? (
         <select
           value={value ?? ""}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+          className="wiz-input w-full"
         >
           <option value="">Select…</option>
           {(options || []).map((o) => <option key={o} value={o}>{o}</option>)}
@@ -92,27 +92,27 @@ function FieldInput({ field, value, onChange }) {
         <div className="flex items-center gap-2 py-1">
           <button
             onClick={() => onChange(!value)}
-            className={`w-9 h-5 rounded-full transition-colors ${value ? "bg-indigo-600" : "bg-gray-200"}`}
+            className={`w-9 h-5 rounded-full transition-colors ${value ? "bg-primary" : "bg-border"}`}
           >
-            <span className={`block w-4 h-4 rounded-full bg-white shadow-sm transition-transform mx-0.5 ${value ? "translate-x-4" : "translate-x-0"}`} />
+            <span className={`block w-4 h-4 rounded-full bg-surface shadow-1 transition-transform mx-0.5 ${value ? "translate-x-4" : "translate-x-0"}`} />
           </button>
-          <span className="text-sm text-gray-700">{value ? "Yes" : "No"}</span>
+          <span className="text-sm text-muted">{value ? "Yes" : "No"}</span>
         </div>
       ) : type === "number" ? (
         <input
           type="number"
           value={value ?? ""}
           onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+          className="wiz-input w-full"
         />
       ) : type === "currency" ? (
         <div className="relative">
-          <span className="absolute left-3 top-2.5 text-sm text-gray-400">$</span>
+          <span className="absolute left-3 top-2.5 text-sm text-disabled">$</span>
           <input
             type="text"
             value={value ?? ""}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl pl-6 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+            className="wiz-input w-full pl-6"
           />
         </div>
       ) : (
@@ -120,7 +120,7 @@ function FieldInput({ field, value, onChange }) {
           type={type === "date" ? "date" : "text"}
           value={value ?? ""}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+          className="wiz-input w-full"
         />
       )}
     </div>

@@ -1,0 +1,556 @@
+/* ==========================================================
+   WizCommerce Design System — globals.css
+   Base reset, typography, and component foundation styles
+   Requires: tokens.css
+   ========================================================== */
+
+@import './tokens.css';
+
+/* ── Reset ── */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+    tab-size: 4;
+    line-height: 1.5;
+}
+
+body {
+    font-family: var(--wiz-font-body);
+    font-weight: var(--wiz-weight-regular);
+    font-size: var(--wiz-text-md);
+    line-height: var(--wiz-leading-md);
+    color: var(--wiz-text-primary);
+    background-color: var(--wiz-bg-default);
+}
+
+img,
+svg,
+video,
+canvas {
+    display: block;
+    max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: var(--wiz-primary-main);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ── Focus ── */
+
+:focus-visible {
+    outline: 2px solid var(--wiz-border-focus);
+    outline-offset: 2px;
+    border-radius: var(--wiz-radius-sm);
+}
+
+/* ── Typography ── */
+
+h1,
+.wiz-h1 {
+    font-family: var(--wiz-font-heading);
+    font-size: var(--wiz-text-display-xl);
+    font-weight: var(--wiz-weight-semibold);
+    line-height: var(--wiz-leading-display-xl);
+    letter-spacing: var(--wiz-tracking-display-xl);
+    color: var(--wiz-text-primary);
+}
+
+h2,
+.wiz-h2 {
+    font-family: var(--wiz-font-heading);
+    font-size: var(--wiz-text-display-lg);
+    font-weight: var(--wiz-weight-semibold);
+    line-height: var(--wiz-leading-display-lg);
+    letter-spacing: var(--wiz-tracking-display-lg);
+    color: var(--wiz-text-primary);
+}
+
+h3,
+.wiz-h3 {
+    font-family: var(--wiz-font-heading);
+    font-size: var(--wiz-text-display-md);
+    font-weight: var(--wiz-weight-semibold);
+    line-height: var(--wiz-leading-display-md);
+    letter-spacing: var(--wiz-tracking-display-md);
+    color: var(--wiz-text-primary);
+}
+
+h4,
+.wiz-h4 {
+    font-family: var(--wiz-font-heading);
+    font-size: var(--wiz-text-display-sm);
+    font-weight: var(--wiz-weight-medium);
+    line-height: var(--wiz-leading-display-sm);
+    letter-spacing: var(--wiz-tracking-display-sm);
+    color: var(--wiz-text-primary);
+}
+
+h5,
+.wiz-h5 {
+    font-family: var(--wiz-font-body);
+    font-size: var(--wiz-text-2xl);
+    font-weight: var(--wiz-weight-medium);
+    line-height: var(--wiz-leading-2xl);
+    letter-spacing: var(--wiz-tracking-2xl);
+    color: var(--wiz-text-primary);
+}
+
+h6,
+.wiz-h6 {
+    font-family: var(--wiz-font-body);
+    font-size: var(--wiz-text-xl);
+    font-weight: var(--wiz-weight-medium);
+    line-height: var(--wiz-leading-xl);
+    letter-spacing: var(--wiz-tracking-xl);
+    color: var(--wiz-text-primary);
+}
+
+.wiz-text-sm {
+    font-size: var(--wiz-text-sm);
+    line-height: var(--wiz-leading-sm);
+}
+
+.wiz-text-xs {
+    font-size: var(--wiz-text-xs);
+    line-height: var(--wiz-leading-xs);
+    letter-spacing: var(--wiz-tracking-xs);
+}
+
+.wiz-text-secondary {
+    color: var(--wiz-text-secondary);
+}
+
+.wiz-text-disabled {
+    color: var(--wiz-text-disabled);
+}
+
+/* ── Divider ── */
+
+hr,
+.wiz-divider {
+    border: none;
+    border-top: 1px solid var(--wiz-divider);
+}
+
+/* ── CTA / Button Foundations ── */
+
+.wiz-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wiz-space-component-xs);
+    font-family: var(--wiz-font-ui);
+    font-weight: var(--wiz-weight-medium);
+    font-size: var(--wiz-text-sm);
+    line-height: var(--wiz-leading-sm);
+    padding: var(--wiz-space-component-sm) var(--wiz-space-component-md);
+    border-radius: var(--wiz-radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition:
+        background-color var(--wiz-duration-fast) var(--wiz-ease-standard),
+        border-color var(--wiz-duration-fast) var(--wiz-ease-standard),
+        box-shadow var(--wiz-duration-fast) var(--wiz-ease-standard);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.wiz-btn:disabled {
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+/* Primary CTA */
+.wiz-btn--primary {
+    background-color: var(--wiz-primary-main);
+    color: var(--wiz-primary-on);
+    border-color: var(--wiz-primary-main);
+}
+
+.wiz-btn--primary:hover:not(:disabled) {
+    background-color: var(--wiz-primary-dark);
+    border-color: var(--wiz-primary-dark);
+}
+
+.wiz-btn--primary:active:not(:disabled) {
+    background-color: var(--wiz-primary-dark);
+}
+
+.wiz-btn--primary:disabled {
+    background-color: var(--wiz-action-disabled-bg);
+    color: var(--wiz-text-disabled);
+    border-color: var(--wiz-border-disabled);
+}
+
+/* Secondary / Outlined CTA */
+.wiz-btn--secondary {
+    background-color: transparent;
+    color: var(--wiz-primary-main);
+    border-color: var(--wiz-border-strong);
+}
+
+.wiz-btn--secondary:hover:not(:disabled) {
+    background-color: var(--wiz-action-hover);
+    border-color: var(--wiz-primary-main);
+}
+
+.wiz-btn--secondary:active:not(:disabled) {
+    background-color: var(--wiz-action-pressed);
+}
+
+.wiz-btn--secondary:disabled {
+    color: var(--wiz-text-disabled);
+    border-color: var(--wiz-border-disabled);
+}
+
+/* Tonal / Ghost CTA */
+.wiz-btn--tonal {
+    background-color: var(--wiz-tonal-default);
+    color: var(--wiz-primary-dark);
+    border-color: transparent;
+}
+
+.wiz-btn--tonal:hover:not(:disabled) {
+    background-color: var(--wiz-tonal-hover);
+}
+
+.wiz-btn--tonal:active:not(:disabled) {
+    background-color: var(--wiz-tonal-pressed);
+}
+
+.wiz-btn--tonal:disabled {
+    background-color: var(--wiz-tonal-disabled);
+    color: var(--wiz-text-disabled);
+}
+
+/* Dark / Bold CTA */
+.wiz-btn--bold {
+    background-color: var(--wiz-bg-bold);
+    color: var(--wiz-text-inverse);
+    border-color: var(--wiz-bg-bold);
+}
+
+.wiz-btn--bold:hover:not(:disabled) {
+    background-color: var(--wiz-bg-bold-hover);
+}
+
+.wiz-btn--bold:active:not(:disabled) {
+    background-color: var(--wiz-bg-bold-pressed);
+}
+
+.wiz-btn--bold:disabled {
+    background-color: var(--wiz-bg-bold-disabled);
+    color: var(--wiz-text-disabled);
+}
+
+/* Text / Link CTA */
+.wiz-btn--text {
+    background-color: transparent;
+    color: var(--wiz-primary-main);
+    border-color: transparent;
+    padding-inline: var(--wiz-space-component-xs);
+}
+
+.wiz-btn--text:hover:not(:disabled) {
+    background-color: var(--wiz-action-hover);
+}
+
+.wiz-btn--text:disabled {
+    color: var(--wiz-text-disabled);
+}
+
+/* Danger CTA */
+.wiz-btn--danger {
+    background-color: var(--wiz-error-main);
+    color: var(--wiz-error-on);
+    border-color: var(--wiz-error-main);
+}
+
+.wiz-btn--danger:hover:not(:disabled) {
+    background-color: var(--wiz-error-dark);
+    border-color: var(--wiz-error-dark);
+}
+
+.wiz-btn--danger:disabled {
+    background-color: var(--wiz-action-disabled-bg);
+    color: var(--wiz-text-disabled);
+    border-color: var(--wiz-border-disabled);
+}
+
+/* Size modifiers */
+.wiz-btn--sm {
+    font-size: var(--wiz-text-xs);
+    padding: var(--wiz-space-component-xs) var(--wiz-space-component-sm);
+    border-radius: var(--wiz-radius-sm);
+}
+
+.wiz-btn--lg {
+    font-size: var(--wiz-text-md);
+    padding: var(--wiz-space-3) var(--wiz-space-6);
+    border-radius: var(--wiz-radius-md);
+}
+
+/* ── Data Table ── */
+
+.wiz-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--wiz-font-ui);
+    font-size: var(--wiz-text-sm);
+    line-height: var(--wiz-leading-sm);
+}
+
+.wiz-table thead {
+    border-bottom: 2px solid var(--wiz-divider);
+}
+
+.wiz-table th {
+    padding: var(--wiz-space-component-sm) var(--wiz-space-component-md);
+    text-align: left;
+    font-weight: var(--wiz-weight-semibold);
+    font-size: var(--wiz-text-xs);
+    line-height: var(--wiz-leading-xs);
+    letter-spacing: var(--wiz-tracking-xs);
+    color: var(--wiz-text-secondary);
+    text-transform: uppercase;
+    white-space: nowrap;
+    background-color: var(--wiz-bg-surface);
+}
+
+.wiz-table td {
+    padding: var(--wiz-space-component-sm) var(--wiz-space-component-md);
+    border-bottom: 1px solid var(--wiz-divider);
+    color: var(--wiz-text-primary);
+    vertical-align: middle;
+}
+
+.wiz-table tbody tr:hover {
+    background-color: var(--wiz-action-hover);
+}
+
+.wiz-table tbody tr[aria-selected="true"],
+.wiz-table tbody tr.wiz-table--selected {
+    background-color: var(--wiz-action-selected);
+}
+
+.wiz-table--striped tbody tr:nth-child(even) {
+    background-color: var(--wiz-bg-default);
+}
+
+.wiz-table--dense th,
+.wiz-table--dense td {
+    padding: var(--wiz-space-component-xs) var(--wiz-space-component-sm);
+}
+
+/* ── Side Sheet / Drawer ── */
+
+.wiz-sidesheet-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: var(--wiz-overlay-scrim);
+    z-index: 999;
+    animation: wiz-fade-in var(--wiz-duration-normal) var(--wiz-ease-enter);
+}
+
+.wiz-sidesheet {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(480px, 100vw - 48px);
+    background-color: var(--wiz-bg-surface);
+    box-shadow: var(--wiz-shadow-4);
+    border-radius: var(--wiz-radius-lg) 0 0 var(--wiz-radius-lg);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    animation: wiz-slide-in-right var(--wiz-duration-slow) var(--wiz-ease-enter);
+}
+
+.wiz-sidesheet__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--wiz-space-component-lg);
+    border-bottom: 1px solid var(--wiz-divider);
+    flex-shrink: 0;
+}
+
+.wiz-sidesheet__title {
+    font-family: var(--wiz-font-body);
+    font-size: var(--wiz-text-xl);
+    font-weight: var(--wiz-weight-semibold);
+    line-height: var(--wiz-leading-xl);
+    color: var(--wiz-text-primary);
+}
+
+.wiz-sidesheet__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--wiz-space-component-lg);
+}
+
+.wiz-sidesheet__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--wiz-space-component-sm);
+    padding: var(--wiz-space-component-md) var(--wiz-space-component-lg);
+    border-top: 1px solid var(--wiz-divider);
+    flex-shrink: 0;
+}
+
+@keyframes wiz-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes wiz-slide-in-right {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* ── Card ── */
+
+.wiz-card {
+    background-color: var(--wiz-bg-surface);
+    border: 1px solid var(--wiz-border-default);
+    border-radius: var(--wiz-radius-lg);
+    box-shadow: var(--wiz-shadow-1);
+    padding: var(--wiz-space-component-lg);
+}
+
+.wiz-card--elevated {
+    box-shadow: var(--wiz-shadow-2);
+    border-color: transparent;
+}
+
+/* ── Badge ── */
+
+.wiz-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wiz-space-component-xs);
+    font-family: var(--wiz-font-ui);
+    font-size: var(--wiz-text-xs);
+    font-weight: var(--wiz-weight-medium);
+    line-height: var(--wiz-leading-xs);
+    padding: 2px var(--wiz-space-component-sm);
+    border-radius: var(--wiz-radius-full);
+    white-space: nowrap;
+}
+
+.wiz-badge--success {
+    background-color: var(--wiz-success-bg);
+    color: var(--wiz-success-dark);
+}
+
+.wiz-badge--error {
+    background-color: var(--wiz-error-bg);
+    color: var(--wiz-error-dark);
+}
+
+.wiz-badge--warning {
+    background-color: var(--wiz-warning-bg);
+    color: var(--wiz-warning-dark);
+}
+
+.wiz-badge--info {
+    background-color: var(--wiz-info-bg);
+    color: var(--wiz-info-dark);
+}
+
+.wiz-badge--neutral {
+    background-color: var(--wiz-bg-default);
+    color: var(--wiz-text-secondary);
+}
+
+/* ── Input ── */
+
+.wiz-input {
+    font-family: var(--wiz-font-ui);
+    font-size: var(--wiz-text-sm);
+    line-height: var(--wiz-leading-sm);
+    color: var(--wiz-text-primary);
+    background-color: var(--wiz-bg-surface);
+    border: 1px solid var(--wiz-border-strong);
+    border-radius: var(--wiz-radius-sm);
+    padding: var(--wiz-space-component-sm) var(--wiz-space-component-md);
+    width: 100%;
+    transition: border-color var(--wiz-duration-fast) var(--wiz-ease-standard);
+}
+
+.wiz-input::placeholder {
+    color: var(--wiz-text-placeholder);
+}
+
+.wiz-input:hover:not(:disabled) {
+    border-color: var(--wiz-neutral-600);
+}
+
+.wiz-input:focus {
+    outline: none;
+    border-color: var(--wiz-border-focus);
+    box-shadow: 0 0 0 2px var(--wiz-action-focus);
+}
+
+.wiz-input:disabled {
+    background-color: var(--wiz-action-disabled-bg);
+    border-color: var(--wiz-border-disabled);
+    color: var(--wiz-text-disabled);
+    cursor: not-allowed;
+}
+
+.wiz-input--error {
+    border-color: var(--wiz-error-main);
+}
+
+.wiz-input--error:focus {
+    box-shadow: 0 0 0 2px var(--wiz-error-bg);
+}
+
+/* ── Reduced Motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

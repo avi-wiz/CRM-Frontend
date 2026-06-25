@@ -6,7 +6,7 @@ import { companies, wizShopRoles } from "../data/constants";
 const DEPARTMENTS = ["Sales", "Marketing", "Operations", "Finance", "Engineering", "Executive", "Other"];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200";
+const inputCls = "wiz-input w-full";
 
 // Resolve a companies[] row from an arbitrary company-like object.
 function toPickerCompany(c) {
@@ -102,15 +102,13 @@ export default function CreateContactPage({ initialCompany = null, onDone, onBac
 
   const actions = (
     <>
-      <button onClick={onBack} className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+      <button onClick={onBack} className="wiz-btn wiz-btn--secondary">
         Cancel
       </button>
       <button
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl shadow-sm transition-all ${
-          created ? "bg-emerald-500" : canSubmit ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-300 cursor-not-allowed"
-        }`}
+        className={`wiz-btn wiz-btn--primary ${created ? "bg-success border-success hover:bg-success" : ""}`}
       >
         {created ? <><CheckCircle size={15} /> Created</> : "Create Contact"}
       </button>
@@ -135,11 +133,11 @@ export default function CreateContactPage({ initialCompany = null, onDone, onBac
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setEmailTouched(true)}
-                  className={`${inputCls} ${emailTouched && email && !emailValid ? "border-red-300 focus:ring-red-300/30 focus:border-red-400" : ""}`}
+                  className={`${inputCls} ${emailTouched && email && !emailValid ? "wiz-input--error" : ""}`}
                   placeholder="jane@example.com"
                 />
                 {emailTouched && email && !emailValid && (
-                  <span className="text-[11px] text-red-500 mt-1 block">Enter a valid email address.</span>
+                  <span className="text-[11px] text-danger mt-1 block">Enter a valid email address.</span>
                 )}
               </Field>
               <Field label="Phone">
@@ -158,13 +156,13 @@ export default function CreateContactPage({ initialCompany = null, onDone, onBac
           </FormSection>
 
           <FormSection id="company-association" title="Company Association" registerSection={registerSection}>
-            <p className="text-xs text-gray-400 -mt-3 mb-4">Required <span className="text-red-500">*</span></p>
+            <p className="text-xs text-disabled -mt-3 mb-4">Required <span className="text-danger">*</span></p>
             {selectedCompany ? (
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 max-w-md">
-                <span className="text-sm font-medium text-indigo-800 flex-1 truncate">{selectedCompany.name}</span>
-                <span className="text-xs text-indigo-400 truncate">{selectedCompany.domain}</span>
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-tonal border border-primary max-w-md">
+                <span className="text-sm font-medium text-primary-dark flex-1 truncate">{selectedCompany.name}</span>
+                <span className="text-xs text-primary truncate">{selectedCompany.domain}</span>
                 {!lockCompany && (
-                  <button onClick={() => setSelectedCompany(null)} className="text-indigo-400 hover:text-indigo-700">
+                  <button onClick={() => setSelectedCompany(null)} className="text-primary hover:text-primary-dark">
                     <X size={15} />
                   </button>
                 )}
@@ -173,24 +171,24 @@ export default function CreateContactPage({ initialCompany = null, onDone, onBac
               <div className="max-w-md">
                 {!createCompanyOpen && (
                   <div className="relative">
-                    <Search size={15} className="absolute left-3 top-3 text-gray-400" />
+                    <Search size={15} className="absolute left-3 top-3 text-disabled" />
                     <input
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Search companies..."
-                      className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      className="wiz-input w-full pl-9"
                     />
                     {query.trim() && (
                       <div className="mt-1.5 space-y-1">
-                        {results.length === 0 && <div className="text-xs text-gray-400 px-1 py-2">No companies match “{query}”.</div>}
+                        {results.length === 0 && <div className="text-xs text-disabled px-1 py-2">No companies match “{query}”.</div>}
                         {results.map((c) => (
                           <button
                             key={c.id}
                             onClick={() => selectCompany(c)}
-                            className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-gray-200 hover:border-indigo-300 text-left"
+                            className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-border hover:border-primary text-left"
                           >
-                            <span className="text-sm text-gray-800 truncate">{c.name}</span>
-                            <span className="text-xs text-gray-400 truncate">{c.domain}</span>
+                            <span className="text-sm text-ink truncate">{c.name}</span>
+                            <span className="text-xs text-disabled truncate">{c.domain}</span>
                           </button>
                         ))}
                       </div>
@@ -201,21 +199,21 @@ export default function CreateContactPage({ initialCompany = null, onDone, onBac
                 <div className="mt-2">
                   <button
                     onClick={() => setCreateCompanyOpen((o) => !o)}
-                    className="flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                    className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary-dark"
                   >
                     {createCompanyOpen ? <ChevronDown size={13} /> : <Plus size={13} />}
                     {createCompanyOpen ? "Back to search" : "Or create a new company"}
                   </button>
 
                   {createCompanyOpen && (
-                    <div className="mt-2 p-3 rounded-xl border border-gray-200 bg-gray-50/60 space-y-3">
+                    <div className="mt-2 p-3 rounded-xl border border-border bg-default space-y-3">
                       <Field label="Company Name" required>
                         <input value={newCompanyName} onChange={(e) => setNewCompanyName(e.target.value)} className={inputCls} placeholder="Acme Inc." />
                       </Field>
                       <Field label="Domain">
                         <input value={newCompanyDomain} onChange={(e) => setNewCompanyDomain(e.target.value)} className={inputCls} placeholder="acme.com" />
                       </Field>
-                      <p className="text-[11px] text-gray-500">Both the company and contact will be created.</p>
+                      <p className="text-[11px] text-muted">Both the company and contact will be created.</p>
                     </div>
                   )}
                 </div>
@@ -225,8 +223,8 @@ export default function CreateContactPage({ initialCompany = null, onDone, onBac
 
           <FormSection id="wizshop-access" title="WizShop Access" registerSection={registerSection}>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={wizEnabled} onChange={(e) => setWizEnabled(e.target.checked)} className="rounded accent-indigo-600" />
-              <span className="text-sm text-gray-700">Create as WizShop User</span>
+              <input type="checkbox" checked={wizEnabled} onChange={(e) => setWizEnabled(e.target.checked)} className="rounded accent-primary" />
+              <span className="text-sm text-muted">Create as WizShop User</span>
             </label>
             {wizEnabled && (
               <div className="mt-4 pl-6 space-y-4 max-w-md">
@@ -236,12 +234,12 @@ export default function CreateContactPage({ initialCompany = null, onDone, onBac
                   </select>
                 </Field>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={wizInvite} onChange={(e) => setWizInvite(e.target.checked)} className="rounded accent-indigo-600" />
-                  <span className="text-sm text-gray-700">Send invite email</span>
+                  <input type="checkbox" checked={wizInvite} onChange={(e) => setWizInvite(e.target.checked)} className="rounded accent-primary" />
+                  <span className="text-sm text-muted">Send invite email</span>
                 </label>
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-gray-400">Status</span>
-                  <span className="px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Active</span>
+                  <span className="text-disabled">Status</span>
+                  <span className="px-1.5 py-0.5 rounded-full bg-success-bg text-success-dark">Active</span>
                 </div>
               </div>
             )}
@@ -255,8 +253,8 @@ export default function CreateContactPage({ initialCompany = null, onDone, onBac
 function Field({ label, required, children }) {
   return (
     <div>
-      <label className="text-xs font-medium text-gray-500 block mb-1.5">
-        {label} {required && <span className="text-red-500">*</span>}
+      <label className="text-xs font-medium text-muted block mb-1.5">
+        {label} {required && <span className="text-danger">*</span>}
       </label>
       {children}
     </div>

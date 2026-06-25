@@ -7,12 +7,13 @@ import ConfirmModal from "../components/shared/ConfirmModal";
 import CreateDeal from "../components/side-sheets/CreateDeal";
 import { CreateTask } from "../components/side-sheets/log/index.jsx";
 import { EditSheet } from "../components/side-sheets/EditSheet";
+import { getMissingFieldsForStage, RequiredFieldsForm } from "../components/shared/stageGate";
 import {
-  deals as initialDeals, dealColumns, dealKanbanStages,
-  dealStageMandatoryFields, dealFieldMeta, repNames,
+  deals as initialDeals, dealColumns, dealKanbanStages, repNames,
 } from "../data/constants";
 
-const DEAL_STAGES = ["Qualification", "Proposal", "Negotiation", "Contract Sent", "Closed Won", "Closed Lost"];
+// Single source of truth for deal stages (board, edit dropdown, gating map).
+const DEAL_STAGES = dealKanbanStages;
 const PIPELINES = ["Default Sales Pipeline", "Enterprise Pipeline", "Renewal Pipeline"];
 
 // Editable fields for the row-level Edit sheet.
@@ -29,14 +30,6 @@ const DEAL_EDIT_GROUPS = [
   },
 ];
 
-function isMissing(value) {
-  return value === undefined || value === null || value === "" || value === false;
-}
-
-function getMissingDealFields(record, stage) {
-  const required = dealStageMandatoryFields[stage] || [];
-  return required.filter((key) => isMissing(record[key]));
-}
 
 function formatColTotal(items) {
   const total = items.reduce((sum, d) => sum + (d.amountRaw || 0), 0);
@@ -58,83 +51,31 @@ function repInitials(name) {
   return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
 }
 
-// ─── MISSING FIELDS FORM (deal) ───────────────────────────────────────────────
-function DealRequiredFieldsForm({ deal, stage, missing, onSave, onCancel }) {
-  const [values, setValues] = useState({});
-
-  const set = (key, val) => setValues((v) => ({ ...v, [key]: val }));
-
-  return (
-    <div className="p-5 space-y-5">
-      <p className="text-sm text-gray-500">
-        Fill in the required fields to move <strong className="text-gray-800">{deal.name}</strong> to{" "}
-        <strong className="text-gray-800">{stage}</strong>.
-      </p>
-      {missing.map((key) => {
-        const meta = dealFieldMeta[key] || { label: key, type: "text" };
-        return (
-          <div key={key}>
-            <label className="block text-xs font-medium text-gray-600 mb-1">{meta.label}</label>
-            {meta.type === "select" ? (
-              <select
-                value={values[key] || ""}
-                onChange={(e) => set(key, e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              >
-                <option value="">Select…</option>
-                {meta.options.map((o) => <option key={o} value={o}>{o}</option>)}
-              </select>
-            ) : (
-              <input
-                type={meta.type === "currency" ? "number" : "text"}
-                placeholder={meta.type === "currency" ? "0" : ""}
-                value={values[key] || ""}
-                onChange={(e) => set(key, meta.type === "currency" ? Number(e.target.value) : e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              />
-            )}
-          </div>
-        );
-      })}
-      <div className="flex gap-2 pt-2">
-        <button
-          onClick={() => onSave(values)}
-          disabled={missing.some((k) => isMissing(values[k]))}
-          className="flex-1 px-4 py-2 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-all"
-        >
-          Save &amp; Move
-        </button>
-        <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-      </div>
-    </div>
-  );
-}
-
 // ─── DEAL KANBAN CARD ─────────────────────────────────────────────────────────
 function DealCard({ item }) {
   const overdue = isOverdue(item.closeDate);
   return (
     <>
-      <div className="font-medium text-sm text-gray-900 mb-2 tracking-tight">{item.name}</div>
-      <div className="text-sm font-semibold text-emerald-600 mb-2">{item.amount}</div>
-      <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+      <div className="font-medium text-sm text-ink mb-2 tracking-tight">{item.name}</div>
+      <div className="text-sm font-semibold text-success mb-2">{item.amount}</div>
+      <div className="flex items-center gap-1.5 text-xs text-muted mb-1">
         {item.isCustomerCompany && (
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+          <span className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0" />
         )}
         <span className="truncate">{item.company}</span>
       </div>
-      <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
-        <div className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 text-[9px] font-extrabold flex items-center justify-center flex-shrink-0">
+      <div className="flex items-center gap-1.5 text-xs text-muted mb-3">
+        <div className="w-4 h-4 rounded-full bg-tonal text-primary-dark text-[9px] font-extrabold flex items-center justify-center flex-shrink-0">
           {repInitials(item.owner)}
         </div>
         <span className="truncate">{item.owner || "Unassigned"}</span>
       </div>
-      <div className="flex items-center justify-between pt-2 border-t border-gray-50 text-xs">
-        <span className="flex items-center gap-1 text-gray-400">
+      <div className="flex items-center justify-between pt-2 border-t border-divider text-xs">
+        <span className="flex items-center gap-1 text-disabled">
           <Clock size={10} />
           {item.daysInStage}d in stage
         </span>
-        <span className={`flex items-center gap-1 ${overdue ? "text-red-500 font-medium" : "text-gray-400"}`}>
+        <span className={`flex items-center gap-1 ${overdue ? "text-danger font-medium" : "text-disabled"}`}>
           <Calendar size={10} />
           {item.closeDate}
         </span>
@@ -146,9 +87,9 @@ function DealCard({ item }) {
 // ─── VIEW TOGGLE ──────────────────────────────────────────────────────────────
 function ViewToggle({ mode, onChange }) {
   return (
-    <div className="flex border border-gray-200 rounded-lg overflow-hidden mr-2">
-      <button onClick={() => onChange("table")} className={`p-1.5 ${mode === "table" ? "bg-gray-100" : "hover:bg-gray-50"}`}><List size={16} /></button>
-      <button onClick={() => onChange("kanban")} className={`p-1.5 ${mode === "kanban" ? "bg-gray-100" : "hover:bg-gray-50"}`}><LayoutGrid size={16} /></button>
+    <div className="flex border border-border rounded-lg overflow-hidden mr-2">
+      <button onClick={() => onChange("table")} className={`p-1.5 ${mode === "table" ? "bg-action-selected" : "hover:bg-action-hover"}`}><List size={16} /></button>
+      <button onClick={() => onChange("kanban")} className={`p-1.5 ${mode === "kanban" ? "bg-action-selected" : "hover:bg-action-hover"}`}><LayoutGrid size={16} /></button>
     </div>
   );
 }
@@ -212,7 +153,7 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
   };
 
   const handleDrop = (deal, stage) => {
-    const missing = getMissingDealFields(deal, stage);
+    const missing = getMissingFieldsForStage(deal, stage, "deal");
     if (missing.length === 0) {
       moveDeal(deal.id, stage);
     } else {
@@ -273,38 +214,38 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
   const BulkPickers = () => (
     <>
       {stagePickerOpen && (
-        <div ref={stageRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
+        <div ref={stageRef} className="fixed top-24 right-8 bg-surface border border-border rounded-xl shadow-4 py-1 z-50 w-52">
           {DEAL_STAGES.map((s) => (
             <button key={s} onClick={() => { setStagePickerOpen(false); setConfirmState({ type: "stage", count: null, extra: s }); }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{s}</button>
+              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-action-hover">{s}</button>
           ))}
         </div>
       )}
       {ownerPickerOpen && (
-        <div ref={ownerRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-52">
+        <div ref={ownerRef} className="fixed top-24 right-8 bg-surface border border-border rounded-xl shadow-4 py-1 z-50 w-52">
           {repNames.map((r) => (
             <button key={r} onClick={() => { setOwnerPickerOpen(false); setConfirmState({ type: "owner", count: null, extra: r }); }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{r}</button>
+              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-action-hover">{r}</button>
           ))}
         </div>
       )}
       {pipelinePickerOpen && (
-        <div ref={pipelineRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-60">
-          <p className="px-4 pt-2 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Select Pipeline</p>
+        <div ref={pipelineRef} className="fixed top-24 right-8 bg-surface border border-border rounded-xl shadow-4 py-1 z-50 w-60">
+          <p className="px-4 pt-2 pb-1 text-[10px] font-semibold text-disabled uppercase tracking-wider">Select Pipeline</p>
           {PIPELINES.map((p) => (
             <button key={p} onClick={() => { setPipelinePickerOpen(false); setConfirmState({ type: "pipeline", count: null, extra: p }); }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{p}</button>
+              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-action-hover">{p}</button>
           ))}
-          <p className="px-4 py-1.5 text-[10px] text-gray-400 border-t border-gray-100 mt-1">
+          <p className="px-4 py-1.5 text-[10px] text-disabled border-t border-border mt-1">
             Stage will auto-map to first active stage in the new pipeline.
           </p>
         </div>
       )}
       {exportPickerOpen && (
-        <div ref={exportRef} className="fixed top-24 right-8 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 w-40">
+        <div ref={exportRef} className="fixed top-24 right-8 bg-surface border border-border rounded-xl shadow-4 py-1 z-50 w-40">
           {["CSV", "Excel"].map((fmt) => (
             <button key={fmt} onClick={() => { setExportPickerOpen(false); showToast(`Exporting records as ${fmt}…`); }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{fmt}</button>
+              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-action-hover">{fmt}</button>
           ))}
         </div>
       )}
@@ -315,13 +256,13 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
     <>
       {viewMode === "kanban" ? (
         <div className="flex-1 flex flex-col">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
-            <h1 className="text-lg font-semibold text-gray-900">Deals</h1>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-surface">
+            <h1 className="text-lg font-semibold text-ink">Deals</h1>
             <div className="flex items-center gap-2">
               <ViewToggle mode={viewMode} onChange={setViewMode} />
               <button
                 onClick={() => setCreateOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                className="wiz-btn wiz-btn--primary flex items-center gap-1.5 px-3 py-1.5"
               >
                 <Plus size={14} />Create Deal
               </button>
@@ -412,10 +353,11 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
       {/* Mandatory-fields gate */}
       <SideSheet open={!!pendingMove} onClose={() => setPendingMove(null)} title="Complete Required Fields">
         {pendingMove && (
-          <DealRequiredFieldsForm
-            deal={pendingMove.deal}
+          <RequiredFieldsForm
+            record={pendingMove.deal}
+            entityName={pendingMove.deal.name}
+            entityType="deal"
             stage={pendingMove.stage}
-            missing={pendingMove.missing}
             onCancel={() => setPendingMove(null)}
             onSave={(values) => {
               moveDeal(pendingMove.deal.id, pendingMove.stage, values);
@@ -447,7 +389,7 @@ export default function DealsPage({ onDealClick, pendingDuplicate, onDuplicateCo
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast}
         </div>
       )}

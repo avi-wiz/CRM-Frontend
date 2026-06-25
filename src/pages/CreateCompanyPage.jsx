@@ -3,9 +3,8 @@ import { CheckCircle } from "lucide-react";
 import FullScreenForm, { FormSection } from "../components/shared/FullScreenForm";
 import { industries, leadSources, repNames, kanbanStages } from "../data/constants";
 
-const inputCls =
-  "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200";
-const selectCls = `${inputCls} bg-white`;
+const inputCls = "wiz-input w-full";
+const selectCls = inputCls;
 
 // Full-screen Create Company / Customer form.
 // `isCustomer` — when launched from the Customers nav, the new record is flagged
@@ -69,15 +68,13 @@ export default function CreateCompanyPage({ isCustomer = false, onCreate, onBack
 
   const actions = (
     <>
-      <button onClick={onBack} className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+      <button onClick={onBack} className="wiz-btn wiz-btn--secondary">
         Cancel
       </button>
       <button
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl shadow-sm transition-all ${
-          created ? "bg-emerald-500" : canSubmit ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-300 cursor-not-allowed"
-        }`}
+        className={`wiz-btn wiz-btn--primary ${created ? "bg-success border-success hover:bg-success" : ""}`}
       >
         {created ? <><CheckCircle size={15} /> Created</> : `Create ${noun}`}
       </button>
@@ -154,9 +151,9 @@ export default function CreateCompanyPage({ isCustomer = false, onCreate, onBack
 function Field({ label, required, children }) {
   return (
     <div>
-      <label className="text-xs font-medium text-gray-500 block mb-1.5">
+      <label className="text-xs font-medium text-muted block mb-1.5">
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
+        {required && <span className="text-danger ml-0.5">*</span>}
       </label>
       {children}
     </div>

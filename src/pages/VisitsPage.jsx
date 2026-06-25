@@ -65,31 +65,31 @@ export default function VisitsPage({ onVisitClick, onCompanyClick }) {
   return (
     <div className="flex-1 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-4 border-b border-gray-150 bg-white">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-border bg-surface">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">Visits</h1>
-          <span className="text-sm text-gray-400">{visits.length} visits</span>
+          <h1 className="text-xl font-bold text-ink tracking-tight">Visits</h1>
+          <span className="text-sm text-disabled">{visits.length} visits</span>
         </div>
         <button
           onClick={() => setLogOpen(true)}
-          className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200"
+          className="wiz-btn wiz-btn--primary flex items-center gap-1.5 px-3.5 py-2"
         >
           <Plus size={15} /> Log Visit
         </button>
       </div>
 
       {/* Filter tabs */}
-      <div className="flex items-center gap-1 px-8 border-b border-gray-150 bg-white">
+      <div className="flex items-center gap-1 px-8 border-b border-border bg-surface">
         {TABS.map((name) => (
           <button
             key={name}
             onClick={() => setTab(name)}
             className={`flex items-center gap-1.5 px-3 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              tab === name ? "border-indigo-600 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-700"
+              tab === name ? "border-primary text-primary" : "border-transparent text-muted hover:text-ink"
             }`}
           >
             {name}
-            <span className={`text-xs px-1.5 py-0.5 rounded-full ${tab === name ? "bg-indigo-50 text-indigo-600" : "bg-gray-100 text-gray-500"}`}>
+            <span className={`text-xs px-1.5 py-0.5 rounded-full ${tab === name ? "bg-tonal text-primary" : "bg-default text-muted"}`}>
               {tabCount(name)}
             </span>
           </button>
@@ -97,38 +97,38 @@ export default function VisitsPage({ onVisitClick, onCompanyClick }) {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-3 px-8 py-3 border-b border-gray-150 bg-white">
+      <div className="flex items-center gap-3 px-8 py-3 border-b border-border bg-surface">
         <div className="relative flex-1 max-w-sm">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-disabled" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by company or rep…"
-            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300"
+            className="wiz-input w-full pl-9 pr-3 py-2 text-sm"
           />
         </div>
-        <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+        <button className="wiz-btn wiz-btn--secondary flex items-center gap-1.5 px-3 py-2">
           <SlidersHorizontal size={14} /> Filter
         </button>
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-auto p-8 bg-[#f8fafc]">
-        <div className="bg-white rounded-2xl border border-gray-150 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden">
+      <div className="flex-1 overflow-auto p-8 bg-default">
+        <div className="bg-surface rounded-2xl border border-border shadow-2 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-150 bg-gray-50/70">
+              <tr className="border-b border-divider bg-default">
                 {HEAD.map((h, i) => (
-                  <th key={i} className="py-3 px-4 text-left font-bold text-gray-400 text-[10px] uppercase tracking-wider">{h}</th>
+                  <th key={i} className="py-3 px-4 text-left font-bold text-muted text-[10px] uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-divider">
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={HEAD.length} className="py-12 text-center">
-                    <div className="text-sm text-gray-500">No visits found</div>
-                    <div className="text-xs text-gray-400 mt-1">Try a different filter or log a visit.</div>
+                    <div className="text-sm text-muted">No visits found</div>
+                    <div className="text-xs text-disabled mt-1">Try a different filter or log a visit.</div>
                   </td>
                 </tr>
               )}
@@ -139,45 +139,45 @@ export default function VisitsPage({ onVisitClick, onCompanyClick }) {
                 return (
                   <tr
                     key={v.id}
-                    className="hover:bg-slate-50/50 cursor-pointer transition-colors duration-150"
+                    className="hover:bg-action-hover cursor-pointer transition-colors duration-150"
                     onClick={() => onVisitClick?.(v.id)}
                   >
                     <td className="py-3 px-4">
-                      <span className="flex items-center gap-2 font-medium text-gray-900">
-                        <Car size={14} className="text-indigo-500 flex-shrink-0" />
+                      <span className="flex items-center gap-2 font-medium text-ink">
+                        <Car size={14} className="text-primary flex-shrink-0" />
                         {formatDate(v.visitDate)}
                       </span>
                     </td>
                     <td className="py-3 px-4">
                       <button
                         onClick={(e) => { e.stopPropagation(); onCompanyClick?.(v.companyId); }}
-                        className="text-gray-700 hover:text-indigo-600 hover:underline disabled:hover:no-underline disabled:hover:text-gray-700"
+                        className="text-ink hover:text-primary hover:underline disabled:hover:no-underline disabled:hover:text-ink"
                         disabled={!v.companyId}
                       >
                         {v.companyName}
                       </button>
                     </td>
-                    <td className="py-3 px-4 text-gray-600">{v.rep?.repName || "—"}</td>
+                    <td className="py-3 px-4 text-muted">{v.rep?.repName || "—"}</td>
                     <td className="py-3 px-4">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${visitPurposeStyles[v.purpose] || "bg-gray-100 text-gray-600"}`}>{v.purpose}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${visitPurposeStyles[v.purpose] || "bg-default text-muted"}`}>{v.purpose}</span>
                     </td>
-                    <td className="py-3 px-4 text-gray-600">
+                    <td className="py-3 px-4 text-muted">
                       {contactCount > 0 ? (
                         <span className="inline-flex items-center gap-1.5" title={contactNames}>
-                          <Users size={13} className="text-gray-400" />
+                          <Users size={13} className="text-disabled" />
                           {contactCount} contact{contactCount === 1 ? "" : "s"}
                         </span>
                       ) : (
-                        <span className="text-gray-400">—</span>
+                        <span className="text-disabled">—</span>
                       )}
                     </td>
                     <td className="py-3 px-4">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${visitOutcomeStyles[v.outcome] || "bg-gray-100 text-gray-600"}`}>{v.outcome}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${visitOutcomeStyles[v.outcome] || "bg-default text-muted"}`}>{v.outcome}</span>
                     </td>
-                    <td className={`py-3 px-4 ${fuOverdue ? "text-amber-600 font-medium" : "text-gray-500"}`}>
+                    <td className={`py-3 px-4 ${fuOverdue ? "text-warning-dark font-medium" : "text-muted"}`}>
                       {v.followUpNeeded && v.followUpDate ? formatDate(v.followUpDate) : "—"}
                     </td>
-                    <td className="py-3 px-4 text-gray-600">{formatDuration(v.duration)}</td>
+                    <td className="py-3 px-4 text-muted">{formatDuration(v.duration)}</td>
                     <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <RowActions
                         actions={[
@@ -272,7 +272,7 @@ export default function VisitsPage({ onVisitClick, onCompanyClick }) {
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-xl shadow-lg">
-          <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle size={15} className="text-success flex-shrink-0" />
           {toast}
         </div>
       )}
