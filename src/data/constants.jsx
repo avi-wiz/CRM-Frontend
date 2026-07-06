@@ -1,4 +1,4 @@
-import { Building2, Users, Star, DollarSign, Calendar, CheckSquare, Car, Activity, BarChart3, FileText, Globe, Upload, UserPlus, ShoppingCart } from "lucide-react";
+import { Building2, Users, Star, DollarSign, Calendar, CheckSquare, Car, Activity, FileText, Globe, Upload, UserPlus, ShoppingCart } from "lucide-react";
 
 // ─── STAGE COLORS (single source of truth) ───
 // Mapped to the WizCommerce "Molten" palette (tokens.css). StageBadge consumes
@@ -51,7 +51,6 @@ export const crmNav = [
   { key: "tasks", label: "Tasks", icon: CheckSquare },
   { key: "visits", label: "Visits", icon: Car },
   { key: "activities", label: "Activities", icon: Activity },
-  { key: "dashboard", label: "Dashboard", icon: BarChart3 },
 ];
 
 // ─── SAMPLE DATA: COMPANIES ───

@@ -1,0 +1,104 @@
+CRM Prototype — Implementation Notes
+====================================
+
+1. Resale Certificate — Field Handling
+   - Improve field handling (drag and drop, upload, etc.).
+   - The resale certificate upload currently requires browsing to find the
+     file. Add a drag-and-drop option as well.
+
+2. Unsaved Changes Pop-up — Copy
+   - The pop-up text for unsaved changes is too long and reads awkwardly.
+   - Rewrite it to be short and clear, e.g. "You have unsaved changes.
+     Save or discard?"
+   - Set max characters and set a max width on the popup.
+
+3. Phone Number Fields — Consistency
+   - Phone number fields are inconsistent across the platform: some auto-format
+     with dashes and validate digit count, others are plain text.
+   - All phone fields should behave the same way.
+   - Formatting of phone number isn't correct — check on all pages.
+   - Action: Add to JIRA.
+
+4. "Email ID" Label
+   - Rename "Email ID" to "Email" or "Email Address."
+
+5. Back Button — Prominence
+   - The Back button is easy to miss, causing users to accidentally use the
+     browser's back button and lose their work.
+   - Make it more visually prominent.
+   - Show a confirmation prompt when navigating away from unsaved changes.
+   - Note: Also requested on the website.
+
+6. Internal Fields Hidden from TM View
+   - Several internal fields are visible in the customer record that TMs should
+     never see: Customer Credit Status, Customer Dating Eligibility, Special
+     Promo Eligibility, Gift Show Promo Eligibility, Stage Customer, EIN, and
+     Paste-in URL.
+   - These should be hidden from TM view.
+   - New Org Settings handle this, but only for Edit or Create. Need View here too.
+
+7. Product & Lookbook — Locked in Nav
+   - Product and Lookbook disappear from the left-hand navigation when toggling
+     between catalog and product view.
+   - These need to be permanently locked in the nav regardless of mode.
+   - Action: Add to JIRA — file under the PIM section (same entry CTA).
+
+8. "Incoming" Status Label — Styling
+   - The "Incoming" status label on product cards shows in yellow/orange, which
+     visually signals caution or unavailability.
+   - It should match the styling of "Ready to Ship" — no color differentiation
+     between the two statuses (both color and text).
+   - Action: Wire with alternative colors. Add to JIRA.
+
+9. "Catalog" Nav Label — Terminology Conflict
+   - The left-hand nav has a section labeled "Catalog" that actually leads to
+     Product Lists. To TMs, "catalog" means the lookbook/Publitas catalog — a
+     direct terminology conflict.
+   - Rename this label to something that doesn't create confusion.
+   - Action: Inform Sunny and team that this is happening.
+   - Action: Create a JIRA and attach to Two's Epic — 22nd July date.
+
+10. Wholesale Price List — Hidden from TMs
+    - The wholesale price list is showing above the item listing in the cart and
+      at checkout. TMs should never see this — remove it from all views.
+    - Disabled price lists should not be visible.
+    - Action: Create JIRA.
+
+11. Pricing Format — Cart
+    - Pricing format is inconsistent in the cart.
+    - All pricing should display to 2 decimal places, everywhere — map on all pages.
+
+12. Cart 3-Dot Menu — Terminology
+    - The 3-dot menu on the cart uses inconsistent terminology: "Cancel Order,"
+      "Copy Cart," and "Repeat Order" mix "order" and "cart" language.
+    - Make labels consistent throughout (either all "cart" or all "order,"
+      depending on the stage).
+    - Change "Repeat" to "Duplicate."
+
+13. Checkout Note Fields — Clarity (Open Question: does this need change?)
+    - There are two note fields at checkout — "Customer Note" and "Your Note" —
+      with an unclear distinction between them.
+    - The "Share with Customer" toggle is a good feature and should be kept, but
+      the two-field setup is confusing.
+    - Either simplify to one notes field, or clarify the difference with better
+      labels (e.g., "Order Note" vs "Internal Note").
+
+14. Order Confirmation Screen — Full Review
+    - The order confirmation screen after submission needs a full review.
+      Issues identified:
+      - Rename the column labeled "Number Product ID" to "SKU."
+      - Product images should always appear on the far left.
+      - Pricing should be consistent at 4 decimal places.
+      - Unit of Measure column is missing.
+      - Totals section should show ordered, committed, shipped, and backordered.
+      - Add an S.No column (similar to Turkana).
+    - Recommend a dedicated session with the Wiz team on this screen's layout.
+    - Action: Add to JIRA.
+
+15. Org Settings — Field Visibility Control
+    - Org Settings to control which fields show on the left side (show/hide).
+    - Action: Create in JIRA.
+
+16. Change copy (Covert company to customer popup)
+- Set max characters and set a max width on the popup.
+- Setting to edit section name on the Order Form.
