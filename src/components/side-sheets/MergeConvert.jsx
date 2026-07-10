@@ -28,7 +28,7 @@ function getMergeCounts(record) {
 }
 
 const STEP_TITLES = {
-  1: "Merge / Convert",
+  1: "Merge",
   2: "Select Primary",
   3: "Merge",
 };
@@ -49,7 +49,7 @@ export default function MergeConvertContent({ source, onComplete, onClose, onTit
 
   // Keep the host's SideSheet header title in sync with the current step.
   useEffect(() => {
-    onTitleChange?.(STEP_TITLES[step] || "Merge / Convert");
+    onTitleChange?.(STEP_TITLES[step] || "Merge");
   }, [step, onTitleChange]);
 
   // Report a header back handler to the host for every step past the first.
@@ -318,7 +318,6 @@ function Step2SelectPrimary({ candidates, primary, setPrimary, onCancel, onNext 
 // fixed, pre-selected "Merge" radio (no "Ignore" option in our flow).
 function Step3Merge({ primaryRecord, secondaryRecord, onBack, onMerge }) {
   const [summaryOpen, setSummaryOpen] = useState(false);
-  const [grantAccess, setGrantAccess] = useState(true); // on by default → contacts expand
   const counts = useMemo(() => getMergeCounts(secondaryRecord), [secondaryRecord]);
 
   // Contacts being merged in from the secondary record.
@@ -332,7 +331,7 @@ function Step3Merge({ primaryRecord, secondaryRecord, onBack, onMerge }) {
   useEffect(() => {
     const seed = {};
     for (const c of mergingContacts) {
-      seed[c.id] = { role: c.wizShopRole || "Buyer", invite: true };
+      seed[c.id] = { role: c.wizShopRole || "Buyer", invite: false };
     }
     setWizSetup(seed);
   }, [mergingContacts]);
@@ -340,10 +339,11 @@ function Step3Merge({ primaryRecord, secondaryRecord, onBack, onMerge }) {
   const updateWiz = (id, patch) => setWizSetup((s) => ({ ...s, [id]: { ...s[id], ...patch } }));
 
   const handleMerge = () => {
-    const granted = grantAccess
-      ? mergingContacts.map((c) => ({ id: c.id, ...wizSetup[c.id] }))
-      : [];
-    onMerge({ grantAccess, granted });
+    // Only contacts that don't already have WizShop access are newly granted.
+    const granted = mergingContacts
+      .filter((c) => !c.isWizShopUser)
+      .map((c) => ({ id: c.id, ...wizSetup[c.id] }));
+    onMerge({ grantAccess: true, granted });
   };
 
   return (
@@ -395,63 +395,69 @@ function Step3Merge({ primaryRecord, secondaryRecord, onBack, onMerge }) {
             count={counts.others}
             hint="Deals, Quotes, Visits, Meetings, Tasks, Notes & Emails"
           />
-          <MergeCategoryRow label="Contacts" count={counts.contacts} />
-
-          {/* Contacts expand into WizShop access cards when "Grant" is on */}
-          {grantAccess && mergingContacts.length > 0 && (
-            <div className="space-y-2.5 pl-1">
+          {/* Contacts section — the contact cards live inside this section.
+              Contacts that already have WizShop access are greyed out / disabled
+              (same pattern as Create WizShop Users). */}
+          <MergeCategoryRow label="Contacts" count={counts.contacts}>
+            {mergingContacts.length > 0 && (
+            <div className="space-y-2.5">
+              <h4 className="text-xs font-semibold text-disabled uppercase tracking-wider">Grant Website Access</h4>
               {mergingContacts.map((c) => {
-                const cfg = wizSetup[c.id] || { role: "Buyer", invite: true };
+                const active = c.isWizShopUser;
+                const cfg = wizSetup[c.id] || { role: "Buyer", invite: false };
                 return (
-                  <div key={c.id} className="border border-border rounded-xl p-3 bg-surface">
+                  <div
+                    key={c.id}
+                    className={`border rounded-xl p-3 ${active ? "border-border bg-default opacity-70" : "border-border bg-surface"}`}
+                  >
                     <div className="flex items-start gap-2.5">
                       <input
                         type="checkbox"
                         checked
+                        disabled={active}
                         readOnly
                         className="accent-primary mt-0.5"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-ink">{c.firstName} {c.lastName}</div>
-                        <div className="text-xs text-disabled truncate">{c.email}</div>
-                        <div className="flex items-center gap-3 mt-2">
-                          <select
-                            value={cfg.role}
-                            onChange={(e) => updateWiz(c.id, { role: e.target.value })}
-                            className="wiz-input text-xs px-1.5 py-1"
-                          >
-                            {wizShopRoles.map((r) => <option key={r}>{r}</option>)}
-                          </select>
-                          <label className="flex items-center gap-1.5 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={cfg.invite}
-                              onChange={(e) => updateWiz(c.id, { invite: e.target.checked })}
-                              className="accent-primary"
-                            />
-                            <span className="text-xs text-muted">Send invite email</span>
-                          </label>
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium text-ink">{c.firstName} {c.lastName}</div>
+                          {active && (
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-success-bg text-success-dark flex-shrink-0">
+                              Already active
+                            </span>
+                          )}
                         </div>
+                        <div className="text-xs text-disabled truncate">{c.email}</div>
+                        {!active && (
+                          <div className="flex items-center gap-3 mt-2">
+                            <select
+                              value={cfg.role}
+                              onChange={(e) => updateWiz(c.id, { role: e.target.value })}
+                              className="wiz-input text-xs px-1.5 py-1"
+                            >
+                              {wizShopRoles.map((r) => <option key={r}>{r}</option>)}
+                            </select>
+                            <label className="flex items-center gap-1.5 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={cfg.invite}
+                                onChange={(e) => updateWiz(c.id, { invite: e.target.checked })}
+                                className="accent-primary"
+                              />
+                              <span className="text-xs text-muted">Send invite email</span>
+                            </label>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-          )}
+            )}
+          </MergeCategoryRow>
         </div>
       </div>
-
-      {/* Grant WizShop Access toggle — above the footer divider */}
-      <label className="flex items-center gap-2.5 px-6 py-3 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={grantAccess}
-          onChange={(e) => setGrantAccess(e.target.checked)}
-          className="accent-primary"
-        />
-        <span className="text-sm font-medium text-ink">Grant WizShop Access</span>
-      </label>
 
       {/* Footer: Back + Merge */}
       <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-divider">
@@ -463,28 +469,37 @@ function Step3Merge({ primaryRecord, secondaryRecord, onBack, onMerge }) {
 }
 
 // A single mandatory-merge row: label + count, with a fixed, checked "Merge"
-// radio. No "Ignore" — every category must merge in our flow.
-function MergeCategoryRow({ label, count, hint }) {
+// radio. No "Ignore" — every category must merge in our flow. Optional
+// `children` render inside the same bordered card, below a divider (used by the
+// Contacts section to hold the per-contact cards).
+function MergeCategoryRow({ label, count, hint, children }) {
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl border border-border bg-surface">
-      <span className="flex items-center gap-1.5 min-w-0">
-        <span className="text-sm text-ink">{label}</span>
-        {hint && (
-          <span className="relative group flex-shrink-0">
-            <Info size={13} className="text-disabled cursor-default" />
-            <span className="absolute left-0 top-5 z-30 hidden group-hover:block bg-gray-900 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg whitespace-nowrap">
-              {hint}
+    <div className="rounded-xl border border-border bg-surface">
+      <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+        <span className="flex items-center gap-1.5 min-w-0">
+          <span className="text-sm text-ink">{label}</span>
+          {hint && (
+            <span className="relative group flex-shrink-0">
+              <Info size={13} className="text-disabled cursor-default" />
+              <span className="absolute left-0 top-5 z-30 hidden group-hover:block bg-gray-900 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg whitespace-nowrap">
+                {hint}
+              </span>
             </span>
-          </span>
-        )}
-        <span className="text-sm text-muted">({count})</span>
-      </span>
-      <span className="flex items-center gap-2 flex-shrink-0">
-        <span className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center">
-          <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+          )}
+          <span className="text-sm text-muted">({count})</span>
         </span>
-        <span className="text-sm text-ink">Merge</span>
-      </span>
+        <span className="flex items-center gap-2 flex-shrink-0">
+          <span className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center">
+            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+          </span>
+          <span className="text-sm text-ink">Merge</span>
+        </span>
+      </div>
+      {children && (
+        <div className="border-t border-divider px-3 py-3">
+          {children}
+        </div>
+      )}
     </div>
   );
 }

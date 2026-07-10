@@ -8,9 +8,11 @@ import CreateContactPage from "./CreateContactPage";
 import { CreateTask } from "../components/side-sheets/log/index.jsx";
 import { EditSheet } from "../components/side-sheets/EditSheet";
 import { CreateWizShopUserContent } from "../components/side-sheets/index";
+import GrantAccessContent, { normalizeContacts } from "../components/side-sheets/GrantAccess";
 import {
   contacts as initialContacts, contactColumns, repNames, leadSources, kanbanStages,
   getContactStage, formatRelativeTime,
+  WebsiteAccessChip, websiteAccessRequestType,
 } from "../data/constants";
 
 // Editable fields for the row-level Edit sheet (mirrors ContactDetailPage).
@@ -40,6 +42,7 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
   // Row-action state
   const [editTarget, setEditTarget] = useState(null); // contact being edited
   const [wizTarget, setWizTarget] = useState(null); // contact for WizShop create/manage
+  const [bulkWizContacts, setBulkWizContacts] = useState(null); // contacts for bulk Create WizShop Users sheet
 
   // Bulk action state
   const [bulkTask, setBulkTask] = useState(false);
@@ -97,7 +100,7 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
     {
       label: "Create WizShop Users",
       overflow: true,
-      onClick: (count) => setConfirmState({ type: "wizshop", count }),
+      onClick: (count, scope, selectedRows = []) => setBulkWizContacts(selectedRows),
     },
   ];
 
@@ -105,7 +108,7 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
     { label: "View Detail", onClick: () => onContactClick?.(row.id) },
     { label: "Edit", onClick: () => setEditTarget(row) },
     {
-      label: row.isWizShopUser ? "Change WizShop Role" : "Create WizShop User",
+      label: row.isWizShopUser ? "Change WizShop Role" : "Grant Website Access",
       onClick: () => setWizTarget(row),
     },
     { label: "Archive", onClick: () => setConfirmState({ type: "archive", count: 1, row }), danger: true },
@@ -170,9 +173,9 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
         <span className="flex items-center gap-1 truncate"><User size={11} />{item.companyName}</span>
         <span className="flex items-center gap-1 flex-shrink-0"><Clock size={11} />{formatRelativeTime(item.lastActivity)}</span>
       </div>
-      {item.isWizShopUser && (
-        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-success-bg text-success-dark">WizShop · {item.wizShopRole}</span>
-      )}
+      <div className="flex items-center gap-1.5">
+        <WebsiteAccessChip type={websiteAccessRequestType(item)} />
+      </div>
     </>
   );
 
@@ -200,6 +203,7 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
             data={rows}
             onCardClick={(item) => onContactClick?.(item.id)}
             renderCard={renderContactCard}
+            cardActions={buildRowActions}
           />
         </div>
         {toast && (
@@ -236,21 +240,17 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
         undoable={confirmState?.type === "archive" ? true : undefined}
         title={
           confirmState?.type === "archive" ? "Archive Contacts" :
-          confirmState?.type === "owner" ? `Assign Owner: ${confirmState?.extra}` :
-          confirmState?.type === "wizshop" ? "Create WizShop Users" : "Confirm"
+          confirmState?.type === "owner" ? `Assign Owner: ${confirmState?.extra}` : "Confirm"
         }
         message={
           confirmState?.type === "archive"
             ? `Archive ${confirmState.count} ${confirmState.count === 1 ? "contact" : "contacts"}? They can be restored later.`
             : confirmState?.type === "owner"
             ? `Assign ${confirmState?.extra} as owner of selected contacts?`
-            : confirmState?.type === "wizshop"
-            ? `Create WizShop user accounts for ${confirmState.count} ${confirmState.count === 1 ? "contact" : "contacts"}? They'll receive an invitation email.`
             : ""
         }
         confirmLabel={
-          confirmState?.type === "archive" ? "Archive" :
-          confirmState?.type === "wizshop" ? "Create Users" : "Apply"
+          confirmState?.type === "archive" ? "Archive" : "Apply"
         }
         onConfirm={() => {
           const { type, extra, count, row } = confirmState;
@@ -263,7 +263,6 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
             }
           }
           else if (type === "owner") showToast(`Assigned ${extra} as owner`);
-          else if (type === "wizshop") showToast(`WizShop invitations sent to ${count} ${count === 1 ? "contact" : "contacts"}`);
         }}
       />
 
@@ -298,22 +297,49 @@ export default function ContactsPage({ onCompanyClick, onContactClick }) {
         )}
       </SideSheet>
 
-      {/* Row WizShop create / change role */}
-      <SideSheet open={!!wizTarget} onClose={() => setWizTarget(null)} title={wizTarget?.isWizShopUser ? "Change WizShop Role" : "Create WizShop User"}>
-        {wizTarget && (
+      {/* Bulk Create WizShop Users — role + send-invite per contact */}
+      <SideSheet open={!!bulkWizContacts} onClose={() => setBulkWizContacts(null)} title="Create WizShop Users">
+        {bulkWizContacts && (
+          <GrantAccessContent
+            contacts={normalizeContacts(bulkWizContacts)}
+            onClose={() => setBulkWizContacts(null)}
+            onDone={(count) => {
+              const ids = new Set(bulkWizContacts.filter((c) => !c.isWizShopUser).map((c) => c.id));
+              setContactData((prev) => prev.map((c) => (ids.has(c.id) ? { ...c, isWizShopUser: true, wizShopStatus: "Active" } : c)));
+              setBulkWizContacts(null);
+              showToast(`Created WizShop access for ${count} ${count === 1 ? "contact" : "contacts"}`);
+            }}
+          />
+        )}
+      </SideSheet>
+
+      {/* Row: Grant Website Access (new user) / Change WizShop Role (existing user) */}
+      <SideSheet open={!!wizTarget} onClose={() => setWizTarget(null)} title={wizTarget?.isWizShopUser ? "Change WizShop Role" : "Grant Website Access"}>
+        {wizTarget && (wizTarget.isWizShopUser ? (
           <CreateWizShopUserContent
             contact={wizTarget}
-            mode={wizTarget.isWizShopUser ? "change" : "create"}
+            mode="change"
             onClose={() => setWizTarget(null)}
             onDone={({ role }) => {
               setContactData((prev) => prev.map((c) => (c.id === wizTarget.id ? { ...c, isWizShopUser: true, wizShopRole: role, wizShopStatus: "Active" } : c)));
               const name = `${wizTarget.firstName} ${wizTarget.lastName}`;
-              const wasUser = wizTarget.isWizShopUser;
               setWizTarget(null);
-              showToast(wasUser ? `WizShop role updated to ${role} for ${name}` : `WizShop ${role} account created for ${name}`);
+              showToast(`WizShop role updated to ${role} for ${name}`);
             }}
           />
-        )}
+        ) : (
+          <GrantAccessContent
+            contacts={normalizeContacts([wizTarget])}
+            onClose={() => setWizTarget(null)}
+            onDone={(count) => {
+              const id = wizTarget.id;
+              const name = `${wizTarget.firstName} ${wizTarget.lastName}`;
+              setContactData((prev) => prev.map((c) => (c.id === id ? { ...c, isWizShopUser: true, wizShopStatus: "Active" } : c)));
+              setWizTarget(null);
+              showToast(`Granted website access to ${name}`);
+            }}
+          />
+        ))}
       </SideSheet>
 
       {toast && (

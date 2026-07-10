@@ -14,6 +14,7 @@ import { getMissingFieldsForStage, RequiredFieldsForm } from "../components/shar
 import {
   companies, companyColumns, kanbanStages, formatRelativeTime,
   contacts as allContacts, repNames, orgSettings,
+  WebsiteAccessChip, websiteAccessRequestType,
 } from "../data/constants";
 
 const COMPANY_STAGES = ["New Lead", "Contacted", "Qualified", "Proposal Sent", "Negotiation", "Won", "Lost"];
@@ -38,7 +39,7 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
   const [viewMode, setViewMode] = useState("table");
   const [createOpen, setCreateOpen] = useState(false);
   const [mergeSource, setMergeSource] = useState(null);
-  const [mergeTitle, setMergeTitle] = useState("Merge / Convert");
+  const [mergeTitle, setMergeTitle] = useState("Merge");
   const [toast, setToast] = useState(null);
   const [companyData, setCompanyData] = useState(companies);
   const [pendingMove, setPendingMove] = useState(null);
@@ -96,12 +97,6 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
         ? ` · WizShop access granted to ${granted.length} contact${granted.length === 1 ? "" : "s"}`
         : "";
     showToast(`Merged ${secondaryRecord?.name} into ${primaryRecord?.name}${grantNote}`);
-  };
-
-  // Merge/Convert header CTA → switch from merge sheet to the Convert flow.
-  const handleConvertFromMerge = () => {
-    setConvertSource(mergeSource);
-    setMergeSource(null);
   };
 
   const handleConverted = (values) => {
@@ -227,7 +222,7 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
       onClick: (count, _scope) => setConfirmState({ type: "convert", count }),
     },
     {
-      label: "Grant Web Access",
+      label: "Grant Website Access",
       overflow: true,
       onClick: () => setBulkGrant(true),
     },
@@ -248,13 +243,17 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-default text-muted">Company</span>
         )}
       </div>
+      <div className="mt-1.5">
+        <WebsiteAccessChip type={websiteAccessRequestType(item)} />
+      </div>
     </>
   );
 
   const buildRowActions = (row) => [
     { label: "View Detail", onClick: () => onRowClick?.(row) },
-    { label: "Merge / Convert", onClick: () => { setMergeTitle("Merge / Convert"); setMergeSource(row); } },
-    { label: "Grant Web Access", onClick: () => setGrantTarget(row) },
+    { label: "Merge", onClick: () => { setMergeTitle("Merge"); setMergeSource(row); } },
+    ...(row.isCustomer ? [] : [{ label: "Convert to Customer", onClick: () => setConvertSource(row) }]),
+    { label: "Grant Website Access", onClick: () => setGrantTarget(row) },
     { label: "Archive", onClick: () => setConfirmState({ type: "archive", count: 1, row }), danger: true },
   ];
 
@@ -359,6 +358,7 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
             onCardClick={onRowClick}
             onDrop={handleDrop}
             renderCard={renderCompanyCard}
+            cardActions={buildRowActions}
           />
         </div>
       ) : (
@@ -425,23 +425,13 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
       />
 
       {/* Create company */}
-      {/* Merge / Convert */}
+      {/* Merge */}
       <SideSheet
         open={!!mergeSource}
         onClose={() => setMergeSource(null)}
         title={mergeTitle}
         width="max-w-lg"
         onHeaderBack={mergeHeaderBack || undefined}
-        headerAction={
-          mergeSource && !mergeSource.isCustomer ? (
-            <button
-              onClick={handleConvertFromMerge}
-              className="wiz-btn wiz-btn--secondary wiz-btn--sm whitespace-nowrap"
-            >
-              Convert to Customer
-            </button>
-          ) : null
-        }
       >
         {mergeSource && (
           <MergeConvertContent
@@ -465,11 +455,11 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
         )}
       </SideSheet>
 
-      {/* Grant Web Access (single company) */}
+      {/* Grant Website Access (single company) */}
       <SideSheet
         open={!!grantTarget && !bulkGrant}
         onClose={() => setGrantTarget(null)}
-        title={grantTarget ? `Grant WizShop Access — ${grantTarget.name}` : ""}
+        title={grantTarget ? `Grant Website Access — ${grantTarget.name}` : ""}
       >
         {grantTarget && !bulkGrant && (
           <GrantAccessContent
@@ -483,11 +473,11 @@ export default function CompaniesPage({ customerFilter = false, onRowClick }) {
         )}
       </SideSheet>
 
-      {/* Grant Web Access — bulk (all contacts of selected companies) */}
+      {/* Grant Website Access — bulk (all contacts of selected companies) */}
       <SideSheet
         open={bulkGrant}
         onClose={() => setBulkGrant(false)}
-        title="Grant WizShop Access — Selected Companies"
+        title="Grant Website Access — Selected Companies"
       >
         {bulkGrant && (
           <GrantAccessContent

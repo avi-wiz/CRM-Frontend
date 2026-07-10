@@ -71,6 +71,7 @@ export default function ListingPage({
             <BulkActionsMenu
               count={selected.length}
               actions={bulkActions}
+              selectedRows={data.filter((d) => selected.includes(d.id))}
               onClear={clearSelection}
             />
           )}
@@ -152,8 +153,8 @@ export default function ListingPage({
 }
 
 // Bulk Actions dropdown CTA — shown in the header only when rows are selected.
-// Each action is called with (count, "selected"); a danger flag styles it red.
-function BulkActionsMenu({ count, actions, onClear }) {
+// Each action is called with (count, "selected", selectedRows); a danger flag styles it red.
+function BulkActionsMenu({ count, actions, selectedRows = [], onClear }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -182,7 +183,7 @@ function BulkActionsMenu({ count, actions, onClear }) {
           {actions.map((action, i) => (
             <button
               key={i}
-              onClick={() => { setOpen(false); action.onClick?.(count, "selected"); }}
+              onClick={() => { setOpen(false); action.onClick?.(count, "selected", selectedRows); }}
               className={`w-full text-left px-3 py-2 text-sm transition-colors ${action.danger ? "text-red-600 hover:bg-red-50" : "text-ink hover:bg-action-hover"}`}
             >
               {action.label}

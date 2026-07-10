@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Clock } from "lucide-react";
 import { stageColors } from "../../data/constants";
+import RowActions from "../shared/RowActions";
 
 // Helper to extract initials for representations
 function repInitials(name) {
@@ -14,7 +15,9 @@ function repInitials(name) {
 // owns the data, so the column a card appears in always reflects item[stageField].
 // `columnMeta` is an optional object keyed by stage name with { bg, borderColor, total }
 // that allows hosts to customize column header appearance and show aggregate totals.
-export default function KanbanBoard({ stages, data, stageField = "stage", onCardClick, onDrop, renderCard, columnMeta }) {
+// `cardActions` is an optional `(item) => [{ label, onClick, danger? }]` that,
+// when provided, renders an Actions kebab menu in the top-right of each card.
+export default function KanbanBoard({ stages, data, stageField = "stage", onCardClick, onDrop, renderCard, cardActions, columnMeta }) {
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverStage, setDragOverStage] = useState(null);
 
@@ -73,11 +76,21 @@ export default function KanbanBoard({ stages, data, stageField = "stage", onCard
                     onDragStart={() => setDraggingId(item.id)}
                     onDragEnd={() => { setDraggingId(null); setDragOverStage(null); }}
                     onClick={() => onCardClick?.(item)}
-                    className={`bg-surface border border-border rounded-2xl p-4 cursor-pointer hover:shadow-3 hover:border-primary transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.99] ${
+                    className={`relative bg-surface border border-border rounded-2xl p-4 cursor-pointer hover:shadow-3 hover:border-primary transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.99] ${
                       draggingId === item.id ? "opacity-35 scale-95" : ""
                     }`}
                   >
-                    {renderCard ? renderCard(item) : (
+                    {cardActions && (
+                      <div
+                        className="absolute top-2 right-2 z-10"
+                        draggable
+                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <RowActions actions={cardActions(item)} />
+                      </div>
+                    )}
+                    {cardActions ? <div className="pr-7">{renderCard ? renderCard(item) : null}</div> : (renderCard ? renderCard(item) : (
                       <>
                         <div className="font-bold text-sm text-ink mb-2 tracking-tight">{item.name}</div>
                         <div className="flex items-center gap-2.5 text-xs text-muted mb-3">
@@ -94,7 +107,7 @@ export default function KanbanBoard({ stages, data, stageField = "stage", onCard
                           <span>{item.deals} deals</span>
                         </div>
                       </>
-                    )}
+                    ))}
                   </div>
                 ))}
                 {stageItems.length === 0 && (

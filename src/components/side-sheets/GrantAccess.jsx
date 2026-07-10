@@ -28,7 +28,7 @@ export default function GrantAccessContent({ contacts = [], onClose, onDone }) {
   );
   // Per-contact config for newly-selected (non-existing) users.
   const [config, setConfig] = useState(() =>
-    Object.fromEntries(contacts.map((c) => [c.id, { role: "Buyer", invite: true }]))
+    Object.fromEntries(contacts.map((c) => [c.id, { role: "Buyer", invite: false }]))
   );
 
   const toggle = (id) => setSelected((s) => ({ ...s, [id]: !s[id] }));
@@ -53,78 +53,70 @@ export default function GrantAccessContent({ contacts = [], onClose, onDone }) {
           {contacts.length === 0 && (
             <div className="text-sm text-disabled py-4 text-center">This company has no contacts.</div>
           )}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {contacts.map((c) => {
               const active = c.isWizShopUser;
               const checked = !!selected[c.id];
+              const cfg = config[c.id] || { role: "Buyer", invite: false };
               return (
-                <label
+                <div
                   key={c.id}
-                  className={`flex items-center gap-3 p-2.5 border rounded-lg ${
+                  className={`border rounded-lg p-3 ${
                     active
-                      ? "border-border bg-default opacity-70 cursor-default"
+                      ? "border-border bg-default opacity-70"
                       : checked
-                        ? "border-primary bg-tonal cursor-pointer"
-                        : "border-border hover:border-primary cursor-pointer"
+                        ? "border-primary bg-tonal"
+                        : "border-border"
                   }`}
                 >
-                  <input
-                    type="checkbox"
-                    checked={active || checked}
-                    disabled={active}
-                    onChange={() => toggle(c.id)}
-                    className="rounded accent-primary"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-ink truncate">{c.name}</div>
-                    <div className="text-xs text-disabled truncate">{c.email}</div>
+                  {/* Name row: checkbox next to the contact name */}
+                  <div className="flex items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      checked={active || checked}
+                      disabled={active}
+                      onChange={() => toggle(c.id)}
+                      className="rounded accent-primary mt-0.5"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-ink truncate">{c.name}</span>
+                        {active && (
+                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-success-bg text-success-dark flex-shrink-0">
+                            Already active
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-disabled truncate">{c.email}</div>
+
+                      {/* Role + invite — only for non-active, selected contacts */}
+                      {!active && checked && (
+                        <div className="flex items-center gap-3 mt-2.5">
+                          <select
+                            value={cfg.role}
+                            onChange={(e) => setCfg(c.id, { role: e.target.value })}
+                            className="wiz-input text-xs px-2 py-1.5"
+                          >
+                            {wizShopRoles.map((r) => <option key={r}>{r}</option>)}
+                          </select>
+                          <label className="flex items-center gap-1.5 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={cfg.invite}
+                              onChange={(e) => setCfg(c.id, { invite: e.target.checked })}
+                              className="rounded accent-primary"
+                            />
+                            <span className="text-xs text-muted">Send invite email</span>
+                          </label>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  {active && (
-                    <span className="text-xs px-1.5 py-0.5 rounded-full bg-success-bg text-success-dark flex-shrink-0">
-                      Already active
-                    </span>
-                  )}
-                </label>
+                </div>
               );
             })}
           </div>
         </section>
-
-        {/* User Configuration — scoped to newly-selected contacts */}
-        {newUsers.length > 0 && (
-          <section className="mb-5">
-            <h3 className="text-xs font-semibold text-disabled uppercase tracking-wider mb-2">User Configuration</h3>
-            <div className="space-y-2.5">
-              {newUsers.map((c) => {
-                const cfg = config[c.id];
-                return (
-                  <div key={c.id} className="border border-border rounded-lg p-3">
-                    <div className="text-sm font-medium text-ink">{c.name}</div>
-                    <div className="text-xs text-disabled mb-2.5">{c.email}</div>
-                    <div className="flex items-center gap-3">
-                      <select
-                        value={cfg.role}
-                        onChange={(e) => setCfg(c.id, { role: e.target.value })}
-                        className="wiz-input text-xs px-2 py-1.5"
-                      >
-                        {wizShopRoles.map((r) => <option key={r}>{r}</option>)}
-                      </select>
-                      <label className="flex items-center gap-1.5 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={cfg.invite}
-                          onChange={(e) => setCfg(c.id, { invite: e.target.checked })}
-                          className="rounded accent-primary"
-                        />
-                        <span className="text-xs text-muted">Send invite email</span>
-                      </label>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
       </div>
 
       {/* Footer */}

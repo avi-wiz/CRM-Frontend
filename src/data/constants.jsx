@@ -628,7 +628,44 @@ export function SourceBadge({ source }) {
   return <span className="text-xs text-gray-500">{source}</span>;
 }
 
+// ─── WEBSITE ACCESS REQUEST TYPE ───
+// "Existing" → entity already has website (WizShop) access. "New" → doesn't yet.
+// Contacts key off `isWizShopUser`; companies/customers aggregate over their contacts.
+export function companyHasWebsiteAccess(companyId) {
+  return contacts.some((c) => c.companyId === companyId && c.isWizShopUser);
+}
+
+// Resolve the request type ("Existing" | "New") for any entity row.
+export function websiteAccessRequestType(row) {
+  const hasAccess = "isWizShopUser" in row
+    ? row.isWizShopUser
+    : companyHasWebsiteAccess(row.id);
+  return hasAccess ? "Existing" : "New";
+}
+
+// Chip: "New" = yellow bg / black text, "Existing" = blue bg / white text.
+export function WebsiteAccessChip({ type }) {
+  if (type === "Existing") {
+    return (
+      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600 text-white font-medium">
+        Existing
+      </span>
+    );
+  }
+  return (
+    <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-300 text-black font-medium">
+      New
+    </span>
+  );
+}
+
 // ─── COLUMN CONFIGS ───
+const websiteAccessColumn = {
+  key: "_websiteAccessType",
+  label: "Website Access Request",
+  render: (_, row) => <WebsiteAccessChip type={websiteAccessRequestType(row)} />,
+};
+
 export const companyColumns = [
   {
     key: "name",
@@ -649,6 +686,7 @@ export const companyColumns = [
         <span className="text-xs px-2 py-0.5 rounded-full bg-default text-muted">Company</span>
       ),
   },
+  websiteAccessColumn,
   { key: "rep", label: "Rep" },
   { key: "source", label: "Source", render: (v) => <SourceBadge source={v} /> },
   { key: "contactCount", label: "Contacts" },
@@ -689,6 +727,7 @@ export const contactColumns = [
         <span className="text-xs text-disabled">—</span>
       ),
   },
+  websiteAccessColumn,
   { key: "stage", label: "Stage", render: "stage_badge" },
   { key: "jobTitle", label: "Title", render: (v) => <span className="text-sm text-gray-600">{v}</span> },
   { key: "createdAt", label: "Created", render: (v) => formatDate(v) },
