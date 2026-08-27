@@ -1,10 +1,16 @@
 import { useState, useMemo } from "react";
-import { Search, X, Building2 } from "lucide-react";
-import { repNames, companies, getCompanyContacts, getCompanyDeals } from "../../../data/constants";
+import { repNames, companies, getCompanyContacts } from "../../../data/constants";
 import {
   AssociatedWith, Field, TextInput, TextArea, Select, ChipMultiSelect, Footer,
   Divider, Label, todayISO, contactOptions,
 } from "./_shared";
+import AssociationsSection from "../../shared/AssociationsSection";
+import { useAssociations } from "../../../data/useAssociations";
+import {
+  suggestedContactsFor,
+  MEETING_ASSOCIATION_ORDER,
+  REQUIRED_BY_HOST,
+} from "../../../data/associationRegistry";
 
 const DURATIONS = ["15 min", "30 min", "45 min", "1 hour", "1.5 hours", "2 hours"];
 const OUTCOMES = ["Interested", "Follow-up Needed", "Not Interested", "Rescheduled", "No Show"];
@@ -15,9 +21,27 @@ function entityToCompany(entity) {
   return companies.find((c) => c.id === entity.id) || { id: entity.id, name: entity.name };
 }
 
+// Shape a companies[] row into the registry's association-record form.
+function toAssociationRecord(c) {
+  return {
+    id: c.id,
+    primary: c.name,
+    secondary: c.domain,
+    badge: c.isCustomer ? "Customer" : null,
+    meta: [
+      ["Industry", c.industry],
+      ["Stage", c.stage],
+      ["Employees", c.employeeCount],
+      ["Owner", c.rep],
+    ],
+    raw: c,
+  };
+}
+
 // Log Meeting — appends a { type: "meeting" } activity.
 // `entity` (from a Company detail page) locks the company association; otherwise
-// the company is searchable. A deal can be linked, scoped to the chosen company.
+// companies, contacts and deals are all associable through the single
+// "Add association" picker, each searching its whole object.
 /**
  * FORM SOURCE: Org Settings → Forms → Meeting
  * System fields: Title, Date/Time
@@ -33,34 +57,51 @@ export default function LogMeeting({ entity, contacts = [], onClose, onSave }) {
   const [startTime, setStartTime] = useState("");
   const [duration, setDuration] = useState("30 min");
   const [location, setLocation] = useState("");
-  const [company, setCompany] = useState(seedCompany);
-  const [dealId, setDealId] = useState("");
   const [externalAttendees, setExternalAttendees] = useState([]);
   const [internalAttendees, setInternalAttendees] = useState([]);
   const [notes, setNotes] = useState("");
   const [outcome, setOutcome] = useState(OUTCOMES[0]);
 
-  // When the company comes from the host entity, its nested contacts are passed
-  // in; otherwise look them up from the selected company.
+  // Typed association edges, seeded from the host entity when opened from a
+  // Company detail page.
+  const associations = useAssociations(
+    seedCompany
+      ? {
+          company: [{ record: toAssociationRecord(seedCompany), label: null }],
+          contact: suggestedContactsFor(seedCompany.id).map((r) => ({ record: r, label: null })),
+        }
+      : {}
+  );
+  const company = associations.company;
+
+  // Picking a company prefills its contacts; clearing it clears them. The
+  // pickers still search every record of their type.
+  const handleAssociationAdd = (type, record) => {
+    associations.add(type, record);
+    if (type === "company") associations.setType("contact", suggestedContactsFor(record.id));
+  };
+  const handleAssociationRemove = (type, id) => {
+    associations.remove(type, id);
+    if (type === "company") associations.setType("contact", []);
+  };
+
+  // Attendee pool follows the associated company, falling back to any contacts
+  // handed in by the host page.
   const scopedContacts = useMemo(() => {
     if (contacts.length > 0) return contacts;
     return company ? getCompanyContacts(company.id) : [];
   }, [contacts, company]);
   const contactOpts = useMemo(() => contactOptions(scopedContacts), [scopedContacts]);
   const repOpts = useMemo(() => repNames.map((r) => ({ id: r, label: r })), []);
-  const dealOpts = useMemo(() => (company ? getCompanyDeals(company.name) : []), [company]);
 
   const canSave = title.trim() && date && startTime;
 
-  const selectCompany = (c) => {
-    setCompany(c);
-    setDealId("");
-    setExternalAttendees([]); // contact pool changes with the company
-  };
-
   const handleSave = () => {
     if (!canSave) return;
-    const deal = dealOpts.find((d) => String(d.id) === String(dealId)) || null;
+    const { companyIds, contactIds, dealIds, meetingIds, associationLabels } = associations.toPayload();
+    // The meetings store still carries a single primary deal; the full typed
+    // edge set rides alongside it.
+    const primaryDeal = associations.value.deal?.[0]?.record ?? null;
     onSave({
       type: "meeting",
       title: title.trim(),
@@ -75,9 +116,12 @@ export default function LogMeeting({ entity, contacts = [], onClose, onSave }) {
       outcome,
       notes: notes.trim(),
       companyId: company?.id ?? null,
-      companyName: company?.name ?? "—",
-      dealId: deal?.id ?? null,
-      dealName: deal?.name ?? null,
+      companyName: company?.primary ?? "—",
+      dealId: primaryDeal?.id ?? null,
+      dealName: primaryDeal?.primary ?? null,
+      // Typed association edges — ids preserved, labels included.
+      associations: { companyIds, contactIds, dealIds, meetingIds },
+      associationLabels,
     });
   };
 
@@ -110,23 +154,18 @@ export default function LogMeeting({ entity, contacts = [], onClose, onSave }) {
 
         <Divider />
 
-        {/* ── Associate With (company + optional deal) ── */}
+        {/* ── Associate With — one picker for companies, contacts and deals ── */}
         <div>
           <Label>Associate With</Label>
-          <div className="space-y-3">
-            <div>
-              <Label>Company</Label>
-              <CompanyPicker company={company} onSelect={selectCompany} onClear={() => selectCompany(null)} locked={lockCompany} />
-            </div>
-            <div>
-              <Label>Deal</Label>
-              <Select
-                value={dealId}
-                onChange={setDealId}
-                options={[{ value: "", label: company ? "No deal linked" : "Select a company first" }, ...dealOpts.map((d) => ({ value: String(d.id), label: `${d.name} — ${d.amount}` }))]}
-              />
-            </div>
-          </div>
+          <AssociationsSection
+            value={associations.value}
+            order={MEETING_ASSOCIATION_ORDER}
+            requiredTypes={REQUIRED_BY_HOST.meeting}
+            onAdd={handleAssociationAdd}
+            onRemove={handleAssociationRemove}
+            onLabelChange={associations.setLabel}
+            lockedTypes={lockCompany ? ["company"] : []}
+          />
         </div>
 
         <Divider />
@@ -164,68 +203,6 @@ export default function LogMeeting({ entity, contacts = [], onClose, onSave }) {
       </div>
 
       <Footer onCancel={onClose} onSubmit={handleSave} submitLabel="Save Meeting" disabled={!canSave} />
-    </div>
-  );
-}
-
-// Searchable company selector. When `locked`, shows the selection without a
-// remove control (the host page fixed the association).
-function CompanyPicker({ company, onSelect, onClear, locked }) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return companies.slice(0, 8);
-    return companies.filter((c) => c.name.toLowerCase().includes(q) || (c.domain || "").toLowerCase().includes(q)).slice(0, 8);
-  }, [query]);
-
-  if (company) {
-    return (
-      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-tonal border border-primary">
-        <Building2 size={14} className="text-primary flex-shrink-0" />
-        <span className="text-sm font-medium text-primary-dark flex-1 truncate">{company.name}</span>
-        {!locked && (
-          <button type="button" onClick={onClear} className="text-primary hover:text-primary-dark">
-            <X size={14} />
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative">
-      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-disabled" />
-      <input
-        value={query}
-        onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-        placeholder="Search companies…"
-        className="wiz-input w-full pl-8"
-      />
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-surface border border-border rounded-lg shadow-3 overflow-hidden max-h-56 overflow-y-auto">
-            {results.length === 0 ? (
-              <div className="px-3 py-3 text-xs text-disabled text-center">No companies match “{query}”.</div>
-            ) : (
-              results.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => { onSelect(c); setQuery(""); setOpen(false); }}
-                  className="w-full flex items-center justify-between gap-2 text-left px-3 py-2 hover:bg-action-hover text-sm text-muted"
-                >
-                  <span className="truncate">{c.name}</span>
-                  <span className="text-xs text-disabled truncate">{c.domain}</span>
-                </button>
-              ))
-            )}
-          </div>
-        </>
-      )}
     </div>
   );
 }

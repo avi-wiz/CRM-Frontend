@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Building2, ChevronsLeft, ChevronsRight } from "lucide-react";
-import { crmNav } from "../data/constants";
+import { crmNav, settingsNav } from "../data/constants";
 
 export default function AppShell({ activeEntity, onEntityChange, children }) {
   const [crmOpen, setCrmOpen] = useState(true);
@@ -19,6 +19,14 @@ export default function AppShell({ activeEntity, onEntityChange, children }) {
           title="CRM"
         >
           <Building2 size={20} />
+        </button>
+
+        <button
+          onClick={() => onEntityChange(settingsNav.key)}
+          className={`mt-auto w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 ${activeEntity === settingsNav.key ? "bg-primary text-white shadow-2" : "text-disabled hover:text-white hover:bg-bold-hover"}`}
+          title={settingsNav.label}
+        >
+          <settingsNav.icon size={18} />
         </button>
       </div>
 

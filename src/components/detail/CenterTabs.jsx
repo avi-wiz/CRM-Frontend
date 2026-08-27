@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import StageBadge from "../shared/StageBadge";
 import ActivityTimeline from "./ActivityTimeline";
+import EmailViewSideSheet from "./EmailViewSideSheet";
+import SideSheet from "../shared/SideSheet";
+import ComposeEmail from "../side-sheets/email/ComposeEmail";
 import {
   formatDate, formatCurrency, formatDuration, quoteStatusStyles, isQuoteExpired,
   meetingOutcomeStyles, taskStatusStyles, taskPriorityStyles, visitPurposeStyles, visitOutcomeStyles,
@@ -10,6 +13,7 @@ import { useEntityActivities } from "../../data/activitiesStore";
 import { useMeetings } from "../../data/meetingsStore";
 import { useTasks } from "../../data/tasksStore";
 import { useVisits } from "../../data/visitsStore";
+import { groupEmailThreads } from "../../data/groupEmailThreads";
 
 // Center panel — tab bar + tab content for the Company / Customer detail page.
 // Tab set + styling mirror the Contact detail page (ContactCenterTabs) for
@@ -19,9 +23,19 @@ const TABS = ["Sales", "Deals", "Visits", "Meetings", "Tasks", "WizShop Activity
 
 export default function CenterTabs({ company, onActivityAction, onDealClick, quotes = [], onQuoteClick, onCreateQuote, onVisitClick, onTaskClick, onMeetingClick }) {
   const [active, setActive] = useState("Activities");
+  const [openEmail, setOpenEmail] = useState(null);
+  const [replyState, setReplyState] = useState(null); // { mode, original }
 
   const entityType = company.isCustomer ? "customer" : "company";
   const activities = useEntityActivities(entityType, company.id);
+
+  // Real synced emails carry threadId — group them so opening one shows the
+  // whole conversation (e.g. a reply that landed back), not just the message
+  // that was clicked.
+  const emailThreadGroups = groupEmailThreads(activities.filter((a) => a.type === "email" && a.date != null));
+  const openThread = openEmail
+    ? emailThreadGroups.find((g) => g.messages.some((m) => m.id === openEmail.id))?.messages || [openEmail]
+    : null;
 
   // Store-backed, company-scoped collections.
   const companyVisits = useVisits().filter((v) => v.companyId === company.id);
@@ -57,11 +71,31 @@ export default function CenterTabs({ company, onActivityAction, onDealClick, quo
             onVisitClick={onVisitClick}
             onTaskClick={onTaskClick}
             onMeetingClick={onMeetingClick}
+            onEmailOpen={setOpenEmail}
+            onEmailReply={(email) => setReplyState({ mode: "reply", original: email })}
+            onEmailForward={(email) => setReplyState({ mode: "forward", original: email })}
           />
         )}
         {active === "WizShop Activity" && <WizShopTab company={company} />}
         {active === "Quotes" && <QuotesTab quotes={quotes} onQuoteClick={onQuoteClick} onCreateQuote={onCreateQuote} />}
       </div>
+
+      {openThread && <EmailViewSideSheet thread={openThread} onClose={() => setOpenEmail(null)} />}
+
+      {replyState && (
+        <SideSheet
+          open={!!replyState}
+          onClose={() => setReplyState(null)}
+          title={replyState.mode === "reply" ? "Reply" : "Forward"}
+        >
+          <ComposeEmail
+            mode={replyState.mode}
+            original={replyState.original}
+            onClose={() => setReplyState(null)}
+            onSent={() => setReplyState(null)}
+          />
+        </SideSheet>
+      )}
     </div>
   );
 }

@@ -1,6 +1,13 @@
-import { useState, useMemo } from "react";
-import { X, Search, ChevronDown } from "lucide-react";
-import { companies, contacts, repNames } from "../../data/constants";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { companies, repNames } from "../../data/constants";
+import AssociationsSection from "../shared/AssociationsSection";
+import { useAssociations } from "../../data/useAssociations";
+import {
+  suggestedContactsFor,
+  DEAL_ASSOCIATION_ORDER,
+  REQUIRED_BY_HOST,
+} from "../../data/associationRegistry";
 
 // ─── PIPELINE DEFINITIONS ───
 const PIPELINES = [
@@ -72,177 +79,29 @@ function SectionHeader({ children }) {
   );
 }
 
-// ─── COMPANY SEARCH ───
-function CompanySearch({ selected, onSelect, locked }) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const filtered = useMemo(() => {
-    if (!query.trim()) return companies.slice(0, 8);
-    const q = query.toLowerCase();
-    return companies.filter(
-      (c) => c.name.toLowerCase().includes(q) || c.domain.toLowerCase().includes(q)
-    ).slice(0, 8);
-  }, [query]);
-
-  const handleSelect = (company) => {
-    onSelect(company);
-    setQuery("");
-    setOpen(false);
-  };
-
-  if (selected) {
-    return (
-      <div className="flex items-center justify-between px-3 py-2 bg-tonal border border-primary rounded-lg">
-        <div>
-          <div className="text-sm font-medium text-primary-dark">{selected.name}</div>
-          <div className="text-xs text-muted">{selected.domain}</div>
-        </div>
-        {!locked && (
-          <button
-            onClick={() => onSelect(null)}
-            className="p-1 rounded hover:bg-action-hover text-disabled hover:text-muted"
-          >
-            <X size={14} />
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative">
-      <div className="relative">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-disabled" />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => setOpen(true)}
-          placeholder="Search company…"
-          className="wiz-input w-full pl-8"
-        />
-      </div>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-surface border border-border rounded-lg shadow-3 overflow-hidden">
-            {filtered.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-disabled text-center">No results</div>
-            ) : (
-              filtered.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => handleSelect(c)}
-                  className="w-full text-left px-3 py-2 hover:bg-action-hover flex items-center justify-between"
-                >
-                  <div>
-                    <div className="text-sm text-ink">{c.name}</div>
-                    <div className="text-xs text-disabled">{c.domain}</div>
-                  </div>
-                  {c.isCustomer && (
-                    <span className="text-xs px-1.5 py-0.5 bg-success-bg text-success-dark rounded-full">Customer</span>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-// ─── CONTACT CHIPS ───
-function ContactChips({ chips, onRemove, onAdd, companyId }) {
-  const [addOpen, setAddOpen] = useState(false);
-  const [query, setQuery] = useState("");
-
-  const available = useMemo(() => {
-    const chipIds = new Set(chips.map((c) => c.id));
-    const pool = contacts.filter((c) => !chipIds.has(c.id));
-    if (!query.trim()) return pool.slice(0, 6);
-    const q = query.toLowerCase();
-    return pool.filter((c) =>
-      `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) || c.email.toLowerCase().includes(q)
-    ).slice(0, 6);
-  }, [chips, query]);
-
-  const handleAdd = (contact) => {
-    onAdd(contact);
-    setQuery("");
-    setAddOpen(false);
-  };
-
-  return (
-    <div>
-      <div className="flex flex-wrap gap-1.5 mb-2">
-        {chips.map((c) => (
-          <span
-            key={c.id}
-            className="inline-flex items-center gap-1 px-2 py-1 bg-action-hover text-muted text-xs rounded-full"
-          >
-            {c.firstName} {c.lastName}
-            <button
-              onClick={() => onRemove(c.id)}
-              className="hover:text-danger transition-colors"
-            >
-              <X size={11} />
-            </button>
-          </span>
-        ))}
-      </div>
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => setAddOpen((o) => !o)}
-          className="text-xs text-primary hover:text-primary-dark font-medium"
-        >
-          + Add Contact
-        </button>
-        {addOpen && (
-          <>
-            <div className="fixed inset-0 z-10" onClick={() => setAddOpen(false)} />
-            <div className="absolute z-20 top-6 left-0 w-64 bg-surface border border-border rounded-lg shadow-3 overflow-hidden">
-              <div className="p-2 border-b border-divider">
-                <div className="relative">
-                  <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-disabled" />
-                  <input
-                    autoFocus
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search contacts…"
-                    className="wiz-input w-full pl-6 text-xs"
-                  />
-                </div>
-              </div>
-              {available.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => handleAdd(c)}
-                  className="w-full text-left px-3 py-2 hover:bg-action-hover text-xs"
-                >
-                  <div className="font-medium text-ink">{c.firstName} {c.lastName}</div>
-                  <div className="text-disabled">{c.companyName}</div>
-                </button>
-              ))}
-              {available.length === 0 && (
-                <div className="px-3 py-3 text-xs text-disabled text-center">No contacts found</div>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // Resolve a companies[] row from an arbitrary company-like object (the company
 // detail record carries extra nested data we don't want in the picker).
 function toPickerCompany(c) {
   if (!c) return null;
   const match = companies.find((co) => co.id === c.id) || companies.find((co) => co.name === c.name);
   return match || { id: c.id, name: c.name, domain: c.domain || "", isCustomer: !!c.isCustomer };
+}
+
+// Shape a companies[] row into the registry's association-record form.
+function toAssociationRecord(c) {
+  return {
+    id: c.id,
+    primary: c.name,
+    secondary: c.domain,
+    badge: c.isCustomer ? "Customer" : null,
+    meta: [
+      ["Industry", c.industry],
+      ["Stage", c.stage],
+      ["Employees", c.employeeCount],
+      ["Owner", c.rep],
+    ],
+    raw: c,
+  };
 }
 
 // ─── MAIN COMPONENT ───
@@ -274,10 +133,18 @@ export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
   const [closeDate, setCloseDate] = useState("");
   const [owner, setOwner] = useState(repNames[0]);
   const [forecastCategory, setForecastCategory] = useState("Pipeline");
-  const [company, setCompany] = useState(seedCompany);
-  const [contactChips, setContactChips] = useState(
-    seedCompany ? contacts.filter((ct) => ct.companyId === seedCompany.id) : []
+
+  // Typed association edges, keyed by object type. Seeded from `initialCompany`
+  // when launched from a Company detail page.
+  const associations = useAssociations(
+    seedCompany
+      ? {
+          company: [{ record: toAssociationRecord(seedCompany), label: null }],
+          contact: suggestedContactsFor(seedCompany.id).map((r) => ({ record: r, label: null })),
+        }
+      : {}
   );
+  const company = associations.company;
 
   const handlePipelineChange = (pipelineName) => {
     const p = PIPELINES.find((pl) => pl.name === pipelineName) ?? null;
@@ -285,23 +152,25 @@ export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
     setStage(p ? firstActiveStage(p) : "");
   };
 
-  const handleCompanySelect = (c) => {
-    setCompany(c);
-    if (c) {
-      const companyContacts = contacts.filter((ct) => ct.companyId === c.id);
-      setContactChips(companyContacts);
-    } else {
-      setContactChips([]);
+  // Picking a company prefills its contacts as a convenience default; clearing
+  // it clears them. The contact picker still searches every contact.
+  const handleAdd = (type, record) => {
+    associations.add(type, record);
+    if (type === "company") {
+      associations.setType("contact", suggestedContactsFor(record.id));
     }
   };
 
-  const removeChip = (id) => setContactChips((prev) => prev.filter((c) => c.id !== id));
-  const addChip = (contact) => setContactChips((prev) => [...prev, contact]);
+  const handleRemove = (type, id) => {
+    associations.remove(type, id);
+    if (type === "company") associations.setType("contact", []);
+  };
 
   const canSubmit = pipeline && name.trim() && amount.trim() && closeDate && company;
 
   const handleSubmit = () => {
     if (!canSubmit) return;
+    const { companyIds, contactIds, dealIds, meetingIds, associationLabels } = associations.toPayload();
     onDone?.({
       name: name.trim(),
       pipeline: pipeline.name,
@@ -310,9 +179,13 @@ export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
       closeDate,
       owner,
       forecastCategory,
-      company: company.name,
+      company: company.primary,
       companyId: company.id,
-      contacts: contactChips.map((c) => `${c.firstName} ${c.lastName}`),
+      // Display strings kept for the existing DealsPage row builder.
+      contacts: (associations.value.contact ?? []).map((e) => e.record.primary),
+      // Typed association edges — ids preserved, labels included.
+      associations: { companyIds, contactIds, dealIds, meetingIds },
+      associationLabels,
     });
   };
 
@@ -386,27 +259,18 @@ export default function CreateDeal({ onClose, onDone, initialCompany = null }) {
           </div>
         </div>
 
-        {/* ASSOCIATIONS */}
+        {/* ASSOCIATE WITH */}
         <div>
-          <SectionHeader>Associations</SectionHeader>
-          <div className="space-y-3">
-            <div>
-              <Label required>Company / Customer</Label>
-              <CompanySearch selected={company} onSelect={handleCompanySelect} locked={lockCompany} />
-            </div>
-            <div>
-              <Label>Contacts</Label>
-              <ContactChips
-                chips={contactChips}
-                onRemove={removeChip}
-                onAdd={addChip}
-                companyId={company?.id}
-              />
-              {contactChips.length === 0 && !company && (
-                <p className="text-xs text-disabled">Select a company to auto-populate contacts</p>
-              )}
-            </div>
-          </div>
+          <SectionHeader>Associate with</SectionHeader>
+          <AssociationsSection
+            value={associations.value}
+            order={DEAL_ASSOCIATION_ORDER}
+            requiredTypes={REQUIRED_BY_HOST.deal}
+            onAdd={handleAdd}
+            onRemove={handleRemove}
+            onLabelChange={associations.setLabel}
+            lockedTypes={lockCompany ? ["company"] : []}
+          />
         </div>
       </div>
 

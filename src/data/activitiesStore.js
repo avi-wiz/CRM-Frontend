@@ -1,7 +1,10 @@
-import { useSyncExternalStore, useMemo } from "react";
+import { useSyncExternalStore, useMemo, useEffect, useRef } from "react";
 import { useTasks } from "./tasksStore";
 import { useMeetings } from "./meetingsStore";
 import { useVisits } from "./visitsStore";
+import { useEmailMessages, useEmailActions } from "./useEmailThread";
+import { useEmailAccount } from "./useEmailAccount";
+import { matchEmailsForCompany, matchEmailsForContact } from "./matchEmailsToEntity";
 
 // ─── Unified activities store ───
 // Single source of truth for the activity timeline. Every activity carries an
@@ -168,13 +171,15 @@ export function useActivitiesRaw() {
 }
 
 // All activities visible on a given entity, newest-first. Merges the store's
-// note/email/system records with live-derived meeting/task/visit activities,
-// then filters strictly by explicit association.
+// note/email/system records with live-derived meeting/task/visit activities
+// and real synced Nylas emails (matched by contact email address — see
+// matchEmailsToEntity.js), then filters strictly by explicit association.
 export function useEntityActivities(type, id) {
   const owned = useActivitiesRaw();
   const tasks = useTasks();
   const meetings = useMeetings();
   const visits = useVisits();
+  const realEmails = useRealEmailActivities(type, id);
 
   return useMemo(() => {
     if (id == null) return [];
@@ -186,10 +191,36 @@ export function useEntityActivities(type, id) {
     const all = [...owned, ...derived];
     return all
       .filter((a) => isVisibleOn(a, type, id))
+      .concat(realEmails)
       .sort((a, b) => {
         const pin = (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
         if (pin !== 0) return pin;
         return String(b.time).localeCompare(String(a.time));
       });
-  }, [owned, tasks, meetings, visits, type, id]);
+  }, [owned, tasks, meetings, visits, realEmails, type, id]);
+}
+
+// Real Nylas emails matched to this entity by contact email address.
+// Auto-loads the message cache once (per mount) if the mailbox is connected
+// and nothing has been fetched yet, so this works even if the user never
+// visits Inbox first.
+function useRealEmailActivities(type, id) {
+  const { status } = useEmailAccount();
+  const messages = useEmailMessages();
+  const { load } = useEmailActions();
+  const attemptedLoad = useRef(false);
+
+  useEffect(() => {
+    if (status === "connected" && messages.length === 0 && !attemptedLoad.current) {
+      attemptedLoad.current = true;
+      load().catch(() => {});
+    }
+  }, [status, messages.length, load]);
+
+  return useMemo(() => {
+    if (id == null) return [];
+    if (type === "company" || type === "customer") return matchEmailsForCompany(messages, id);
+    if (type === "contact") return matchEmailsForContact(messages, id);
+    return [];
+  }, [messages, type, id]);
 }

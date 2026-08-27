@@ -7,8 +7,10 @@ import PropertiesPanel from "../components/detail/PropertiesPanel";
 import ContactCenterTabs from "../components/detail/ContactCenterTabs";
 import ContactAssociations from "../components/detail/ContactAssociations";
 import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
+import ComposeEmail from "../components/side-sheets/email/ComposeEmail";
 import { EditSheet } from "../components/side-sheets/EditSheet";
 import { CreateWizShopUserContent } from "../components/side-sheets/index";
+import { normalizeContacts } from "../components/side-sheets/GrantAccess";
 import CreateDeal from "../components/side-sheets/CreateDeal";
 import { getContactDetail, getContactStage, repNames, leadSources } from "../data/constants";
 import { logActivityFromEntity } from "../data/logActivity";
@@ -78,7 +80,10 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
     showToast(`${LOG_SHEETS[logSheet]?.title || "Activity"} saved`);
   };
 
-  const ActiveLogSheet = logSheet ? LOG_SHEETS[logSheet].Component : null;
+  // "email" opens the real Nylas ComposeEmail sheet instead of the manual
+  // "log what happened" mock form — handled separately below.
+  const isEmailAction = logSheet === "email";
+  const ActiveLogSheet = logSheet && !isEmailAction ? LOG_SHEETS[logSheet].Component : null;
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -159,8 +164,18 @@ export default function ContactDetailPage({ contactId, onBack, onCompanyClick, o
       <SideSheet
         open={!!logSheet}
         onClose={() => setLogSheet(null)}
-        title={logSheet ? LOG_SHEETS[logSheet].title : ""}
+        title={isEmailAction ? "Create Email" : logSheet ? LOG_SHEETS[logSheet].title : ""}
       >
+        {isEmailAction && (
+          <ComposeEmail
+            mode="new"
+            entity={entity}
+            defaultTo={contact.email}
+            contacts={normalizeContacts([contact])}
+            onClose={() => setLogSheet(null)}
+            onSent={() => setLogSheet(null)}
+          />
+        )}
         {ActiveLogSheet && (
           <ActiveLogSheet
             entity={entity}

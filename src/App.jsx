@@ -17,6 +17,8 @@ import VisitsPage from "./pages/VisitsPage";
 import VisitDetailPage from "./pages/VisitDetailPage";
 import ActivitiesPage from "./pages/ActivitiesPage";
 import CreateOrderPage from "./pages/CreateOrderPage";
+import CrmSettingsPage from "./screens/settings/CrmSettingsPage";
+import InboxPage from "./components/inbox/InboxPage";
 import { crmNav } from "./data/constants";
 
 export default function App() {
@@ -233,6 +235,12 @@ export default function App() {
 
       case "orders":
         return <CreateOrderPage onBack={() => handleEntityChange("companies")} />;
+
+      case "inbox":
+        return <InboxPage />;
+
+      case "settings":
+        return <CrmSettingsPage />;
 
       // Meetings, Tasks, Visits, Activities, Dashboard aren't built yet —
       // route them to PlaceholderPage, passing the nav label so it renders

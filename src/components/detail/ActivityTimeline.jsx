@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Activity, FileText, CalendarCheck, Mail, CheckSquare, Car, Plus, ChevronDown } from "lucide-react";
 import { formatRelativeTime } from "../../data/constants";
+import EmailCard from "./EmailCard";
 
 // Per-type visual config: left-border color, icon, accent. Drives both the
 // timeline rows and the filter-pill grouping.
@@ -27,7 +28,7 @@ const ACTIONS = [
   { type: "note", label: "Log Note", icon: FileText },
   { type: "meeting", label: "Log Meeting", icon: CalendarCheck },
   { type: "task", label: "Create Task", icon: CheckSquare },
-  { type: "email", label: "Log Email", icon: Mail },
+  { type: "email", label: "Create Email", icon: Mail },
   { type: "visit", label: "Log Visit", icon: Car },
 ];
 
@@ -35,7 +36,7 @@ const ACTIONS = [
 // explicitly associated with this entity (see useEntityActivities) and sorted
 // newest-first. The component only does type-filtering + rendering — there is
 // no cross-entity inference or "show history" roll-up.
-export default function ActivityTimeline({ activities = [], onAction, onVisitClick, onTaskClick, onMeetingClick }) {
+export default function ActivityTimeline({ activities = [], onAction, onVisitClick, onTaskClick, onMeetingClick, onEmailOpen, onEmailReply, onEmailForward }) {
   const [filter, setFilter] = useState("all");
   const [logOpen, setLogOpen] = useState(false);
 
@@ -91,14 +92,23 @@ export default function ActivityTimeline({ activities = [], onAction, onVisitCli
           <div className="text-center py-10 text-disabled text-sm">No activities</div>
         )}
         {visible.map((a) => (
-          <TimelineRow key={a.id} activity={a} onVisitClick={onVisitClick} onTaskClick={onTaskClick} onMeetingClick={onMeetingClick} />
+          <TimelineRow
+            key={a.id}
+            activity={a}
+            onVisitClick={onVisitClick}
+            onTaskClick={onTaskClick}
+            onMeetingClick={onMeetingClick}
+            onEmailOpen={onEmailOpen}
+            onEmailReply={onEmailReply}
+            onEmailForward={onEmailForward}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function TimelineRow({ activity: a, onVisitClick, onTaskClick, onMeetingClick }) {
+function TimelineRow({ activity: a, onVisitClick, onTaskClick, onMeetingClick, onEmailOpen, onEmailReply, onEmailForward }) {
   const meta = TYPE_META[a.type] || TYPE_META.system;
   const Icon = meta.icon;
   const onClick =
@@ -108,18 +118,27 @@ function TimelineRow({ activity: a, onVisitClick, onTaskClick, onMeetingClick })
     : undefined;
   return (
     <div
-      onClick={onClick}
+      onClick={a.type === "email" ? undefined : onClick}
       className={`flex gap-3 p-3.5 rounded-xl border border-border border-l-4 ${meta.border} ${
         a.type === "system" ? "bg-default" : "bg-surface"
-      } shadow-1 hover:shadow-2 transition-all duration-200 ${onClick ? "cursor-pointer" : ""}`}
+      } shadow-1 hover:shadow-2 transition-all duration-200 ${onClick && a.type !== "email" ? "cursor-pointer" : ""}`}
     >
       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${meta.iconBg} shadow-1`}>
         <Icon size={14} className={meta.iconColor} />
       </div>
-      <div className="flex-1 min-w-0">
-        <ActivityBody activity={a} />
-        <div className="text-xs text-disabled mt-1">{formatRelativeTime(a.time)}</div>
-      </div>
+      {a.type === "email" && a.date != null ? (
+        <EmailCard
+          email={a}
+          onOpen={onEmailOpen}
+          onReply={onEmailReply}
+          onForward={onEmailForward}
+        />
+      ) : (
+        <div className="flex-1 min-w-0">
+          <ActivityBody activity={a} />
+          <div className="text-xs text-disabled mt-1">{formatRelativeTime(a.time)}</div>
+        </div>
+      )}
     </div>
   );
 }

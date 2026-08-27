@@ -1,4 +1,4 @@
-import { Building2, Users, Star, DollarSign, Calendar, CheckSquare, Car, Activity, FileText, Globe, Upload, UserPlus, ShoppingCart } from "lucide-react";
+import { Building2, Users, Star, DollarSign, Calendar, CheckSquare, Car, Activity, FileText, Globe, Upload, UserPlus, ShoppingCart, Mail, Settings } from "lucide-react";
 
 // ─── STAGE COLORS (single source of truth) ───
 // Mapped to the WizCommerce "Molten" palette (tokens.css). StageBadge consumes
@@ -51,7 +51,11 @@ export const crmNav = [
   { key: "tasks", label: "Tasks", icon: CheckSquare },
   { key: "visits", label: "Visits", icon: Car },
   { key: "activities", label: "Activities", icon: Activity },
+  { key: "inbox", label: "Inbox", icon: Mail },
 ];
+
+// Rendered separately from crmNav (bottom of the sidebar) — opens CRM Settings.
+export const settingsNav = { key: "settings", label: "Settings", icon: Settings };
 
 // ─── SAMPLE DATA: COMPANIES ───
 // Reps cycle through this roster; ~4 records are customers (isCustomer).
@@ -83,7 +87,10 @@ export const companies = [
 // ─── SAMPLE DATA: CONTACTS ───
 export const contacts = [
   // ABC Corp (companyId 2) — 4 contacts, some WizShop users
-  { id: 1, firstName: "Sneha", lastName: "Iyer", email: "sneha@abccorp.com", phone: "+1-312-555-0101", companyId: 2, companyName: "ABC Corp", isWizShopUser: true, wizShopRole: "Admin", stage: "In Progress", jobTitle: "VP Procurement", department: "Procurement", createdAt: "2026-04-03", lastActivity: "2026-06-20" },
+  // email set to a real test mailbox (avi.b@wizcommerce.com) so real synced Nylas
+  // emails to/from it match this contact — the rest of Sneha's seed data
+  // elsewhere (meetings, wizshop actions, deal contacts) still uses sneha@abccorp.com.
+  { id: 1, firstName: "Sneha", lastName: "Iyer", email: "avi.b@wizcommerce.com", phone: "+1-312-555-0101", companyId: 2, companyName: "ABC Corp", isWizShopUser: true, wizShopRole: "Admin", stage: "In Progress", jobTitle: "VP Procurement", department: "Procurement", createdAt: "2026-04-03", lastActivity: "2026-06-20" },
   { id: 2, firstName: "Marcus", lastName: "Bell", email: "marcus@abccorp.com", phone: "+1-312-555-0102", companyId: 2, companyName: "ABC Corp", isWizShopUser: true, wizShopRole: "Buyer", stage: "Qualified", jobTitle: "Purchasing Manager", department: "Finance", createdAt: "2026-04-03", lastActivity: "2026-06-18" },
   { id: 3, firstName: "Dana", lastName: "Cole", email: "dana@abccorp.com", phone: "+1-312-555-0103", companyId: 2, companyName: "ABC Corp", isWizShopUser: false, wizShopRole: null, stage: "Open", jobTitle: "Logistics Coordinator", department: "Operations", createdAt: "2026-04-10", lastActivity: "2026-06-14" },
   { id: 4, firstName: "Priya", lastName: "Raman", email: "priya@abccorp.com", phone: "+1-312-555-0104", companyId: 2, companyName: "ABC Corp", isWizShopUser: true, wizShopRole: "Viewer", stage: "Qualified", jobTitle: "Finance Director", department: "Finance", createdAt: "2026-04-10", lastActivity: "2026-06-12" },

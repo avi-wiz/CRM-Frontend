@@ -10,6 +10,7 @@ import CenterTabs from "../components/detail/CenterTabs";
 import AssociationsPanel from "../components/detail/AssociationsPanel";
 import { ConvertCustomerContent } from "../components/side-sheets/index";
 import { LOG_SHEETS, nowStamp } from "../components/side-sheets/log";
+import ComposeEmail from "../components/side-sheets/email/ComposeEmail";
 import GrantAccessContent, { normalizeContacts } from "../components/side-sheets/GrantAccess";
 import CreateDeal from "../components/side-sheets/CreateDeal";
 import CreateContactPage from "./CreateContactPage";
@@ -19,8 +20,10 @@ import { useCompanyQuotes, addQuote } from "../data/quotesStore";
 import { logActivityFromEntity } from "../data/logActivity";
 import { getCompanyDetail, kanbanStages, industries, leadSources, repNames } from "../data/constants";
 
-// Activity logging action keys handled by the shared log sheets.
-const LOG_ACTIONS = ["note", "meeting", "task", "email", "visit"];
+// Activity logging action keys handled by the shared log sheets. "email" is
+// handled separately below — it opens the real Nylas ComposeEmail sheet
+// instead of the manual "log what happened" mock form.
+const LOG_ACTIONS = ["note", "meeting", "task", "visit"];
 
 // Property-group config for the Company entity (left panel).
 /**
@@ -84,6 +87,21 @@ function sheetFor(action, company, handlers) {
   }
 
   switch (action) {
+    case "email": {
+      const entity = { id: company.id, type: company.isCustomer ? "customer" : "company", name: company.name };
+      return {
+        title: "Create Email",
+        content: (
+          <ComposeEmail
+            mode="new"
+            entity={entity}
+            contacts={normalizeContacts(company.contacts)}
+            onClose={onClose}
+            onSent={onClose}
+          />
+        ),
+      };
+    }
     case "convert": return { title: `Convert ${company.name} to Customer`, content: <ConvertCustomerContent entity={company} onDone={onConversionDone} /> };
     case "grantAccess": return {
       title: `Grant WizShop Access — ${company.name}`,
